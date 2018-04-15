@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+    <link rel="stylesheet" href="css/preloading.css"/>
+    <link href="Ext/theme-neptune-all.css" rel="stylesheet"/>
+    <link href="Ext/neptune/ux-all.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="styles.css"/>
+</head>
+
+<body>
+<!-- Start Page Loading -->
+<div id="loader-wrapper">
+    <div id="loader"></div>
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+</div>
+<div id="vscode-body" style="display: none;">
+    <div id="vscode-container"></div>
+</div>
+<!-- End Page Loading -->
+<script>
+    if (typeof module === 'object') {
+        window.module = module;
+        module = undefined;
+    }
+</script>
+<script src="Ext/ext-all.js"></script>
+<script src="Ext/ux.js"></script>
+<script src="Ext/theme-neptune.js"></script>
+<script src="Ext/ext-locale-zh_CN.js"></script>
+<script src="app/Application.js"></script>
+<script>
+    if (window.module) module = window.module;
+</script>
+<script>
+    var nodeRequire = global.require;
+</script>
+<script src="vs/loader.js"></script>
+<script>
+    var amdRequire = global.require;
+    global.require = nodeRequire;
+</script>
+<script src="js/base.js"></script>
+</body>
+
+</html>
