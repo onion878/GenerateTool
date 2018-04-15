@@ -1,11 +1,11 @@
 {
-  "name": "project",
+  "name": "GenaretorTool",
   "version": "1.0.0",
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --version 1.8.4 --icon=icon.ico --out=release-builds --version-string.CompanyName=OnionTool --version-string.FileDescription=OnionTools --version-string.ProductName=\"工具\" && node renderer.js",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --version 1.8.4 --icon=icon.ico --out=release-builds --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\" && node renderer.js",
     "electron-build": "ng build --prod && electron ."
   },
   "keywords": [
