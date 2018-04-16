@@ -21,7 +21,7 @@ Ext.application({
      * 下面的代码就是 MVC 的加载文件规则了。
      */
     // 其实翻译出来就是“从根 app 开始找 controller（注意没带 s 哦） 目录，在这个目录下加载 Students.js 这个文件”
-    controllers: ['User', 'Mode', 'Editor'],
+    controllers: ['User', 'Mode', 'Editor', 'Code'],
     launch: function () {
         let pId = history.getMode();
         moduleId = pId;
@@ -75,15 +75,7 @@ Ext.application({
                                     xtype: 'editor',
                                     pId: pId
                                 },
-                                buttonAlign: 'center',
-                                onResize: function () {
-                                    vsLayout();
-                                },
-                                listeners:{
-                                    'close':function(win){
-                                        vsReset();
-                                    }
-                                }
+                                buttonAlign: 'center'
                             }).show().focus();
                         }
                     }
@@ -274,11 +266,10 @@ Ext.application({
                     store: store,
                     listeners: {
                         itemclick: function (node, event) {
-                            var url = event.data.uri;
-                            var item = event.data.item;
+                            var item = event.data.id;
                             var icon = event.data.icon;
                             var title = event.data.text;
-                            addbutton(item, url, icon, title);
+                            addbutton(item, 'code', icon, title);
                         }
                     },
                     hideCollapseTool: true,
@@ -317,6 +308,30 @@ Ext.application({
                                                 }
                                             }
                                         ]
+                                    }).show().focus();
+                                }
+                            }
+                        },
+                        {
+                            type: 'save', qtip: '测试编辑器', listeners: {
+                                click: function () {
+                                    Ext.create('Ext.window.Window', {
+                                        title: '测试编辑器',
+                                        height: 400,
+                                        width: 600,
+                                        maximized: false,
+                                        resizable: true,
+                                        maximizable: true,
+                                        minimizable: true,
+                                        constrain: true,
+                                        modal: true,
+                                        layout: 'fit',
+                                        items: {
+                                            xtype: 'code',
+                                            language: 'html',
+                                            pId: pId
+                                        },
+                                        buttonAlign: 'center'
                                     }).show().focus();
                                 }
                             }

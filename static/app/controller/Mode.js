@@ -1,4 +1,3 @@
-
 Ext.define('MyAppNamespace.controller.Mode', {
     extend: 'Ext.app.Controller',
     views: ['mode.mode'],
@@ -105,10 +104,16 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         xtype: 'textfield',
                         fieldLabel: label,
                         flex: 1,
-                        bind: {
-                            value: `{name.${label}}`
+                        labelSeparator: '',
+                        listeners: {
+                            'render': function () {
+                                this.labelEl.on('dblclick', function(e, t) {
+                                    labelEditor.startEdit(t);
+                                    labelEditor.field.focus(50, true);
+                                });
+                            }
                         },
-                        required: true
+                        allowBlank: false
                     },
                     {
                         xtype: 'button',
@@ -172,10 +177,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         xtype: 'textfield',
                         fieldLabel: label,
                         flex: 1,
-                        bind: {
-                            value: `{name.${label}}`
-                        },
-                        required: true
+                        allowBlank: false
                     },
                     {
                         xtype: 'button',

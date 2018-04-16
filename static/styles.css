@@ -2,7 +2,11 @@ body {
     font-family: 微软雅黑;
 }
 
-.code-content{
+.code-content {
     width: 100%;
     height: 100%;
+}
+
+.slider-mouseover {
+    box-shadow: -1px 0px 1px 1px #d6d6d6;
 }

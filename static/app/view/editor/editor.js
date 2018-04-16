@@ -5,13 +5,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
     layout: 'border',
     listeners: {
         render: function (c) {
-            const dom = this.getEl().down('.code-content');
-            const len = dom.query('div').length;
-            if (len == 0) {
-                dom.append(Ext.get('vscode-container'));
-            }
-            if (jsFile != null)
-                this.up('window').setTitle('正在编辑:' + jsFile.substring(jsFile.lastIndexOf('/')+1));
+
         }
     },
     initComponent: function () {
@@ -25,7 +19,6 @@ Ext.define('MyAppNamespace.view.editor.editor', {
             margins: '0 0 0 0',
             xtype: 'treepanel',
             useArrows: true,
-            closable: false,
             lines: false,
             viewConfig: {
                 plugins: [{
@@ -62,9 +55,23 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                 itemclick: function (node, record) {
                     if (record.data.type == 'file') {
                         const {file, content} = jsCode.readFile(pId, record.data.parentFolder);
-                        jsFile = file;
-                        vsEditor.setValue(content);
-                        this.up('window').setTitle('正在编辑:' + record.data.text);
+                        const tPanel = this.up('editor').down('tabpanel');
+                        const id = record.data.id;
+                        const nowItem = Ext.getCmp(id);
+                        if (nowItem) {
+                            tPanel.setActiveTab(nowItem);
+                        } else {
+                            const jTab = tPanel.add({
+                                id: id,
+                                pId: pId,
+                                title: record.data.parentFolder,
+                                filePath: file,
+                                fileContent: content,
+                                closable: true,
+                                xtype: 'code'
+                            });
+                            tPanel.setActiveTab(jTab);
+                        }
                     }
                 },
                 itemcontextmenu: function (node, record, item, index, event, eOpts) {
@@ -171,8 +178,9 @@ Ext.define('MyAppNamespace.view.editor.editor', {
             }
         }, {
             region: 'center',
-            xtype: 'panel',
-            html: `<div class="code-content"></div>`,
+            xtype: 'tabpanel',
+            fullscreen: true,
+            plugins: new Ext.ux.TabCloseMenu(),
             fullscreen: true
         }];
         this.callParent(arguments);

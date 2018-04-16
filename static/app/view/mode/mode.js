@@ -2,7 +2,6 @@ Ext.define('MyAppNamespace.view.mode.mode', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.mode',
     scrollable: true,
-    viewModel: true,
     layout: {
         type: 'vbox',
         pack: 'start',
