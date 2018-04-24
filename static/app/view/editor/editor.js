@@ -101,6 +101,26 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                             root.appendChild(child);
                                         });
                                     }
+                                },
+                                {
+                                    text: '安装包',
+                                    icon: 'images/npm.jpg',
+                                    handler: function () {
+                                        const nowItem = Ext.getCmp('pkg-main');
+                                        const tPanel = that.up('editor').down('tabpanel');
+                                        if (nowItem) {
+                                            tPanel.setActiveTab(nowItem);
+                                        } else {
+                                            const jTab = tPanel.add({
+                                                id: 'pkg-main',
+                                                pId: pId,
+                                                title: '安装包',
+                                                closable: true,
+                                                xtype: 'pkg'
+                                            });
+                                            tPanel.setActiveTab(jTab);
+                                        }
+                                    }
                                 }
                             ]
                         }).showAt(event.getPoint());

@@ -21,7 +21,7 @@ Ext.application({
      * 下面的代码就是 MVC 的加载文件规则了。
      */
     // 其实翻译出来就是“从根 app 开始找 controller（注意没带 s 哦） 目录，在这个目录下加载 Students.js 这个文件”
-    controllers: ['User', 'Mode', 'Editor', 'Code'],
+    controllers: ['User', 'Mode', 'Editor', 'Code', 'Pkg'],
     launch: function () {
         let pId = history.getMode();
         moduleId = pId;
@@ -33,7 +33,7 @@ Ext.application({
             }
         });
         let title = '数据模板';
-        if(pId !== '') {
+        if (pId !== '') {
             title = parentData.getById(pId).text;
         }
         const d = [
@@ -118,7 +118,7 @@ Ext.application({
                     tools: [
                         {
                             type: 'down',
-                            qtip: '切换模板', 
+                            qtip: '切换模板',
                             listeners: {
                                 click: function () {
                                     Ext.create('Ext.window.Window', {
@@ -149,7 +149,7 @@ Ext.application({
                                                 text: '确定', handler: function () {
                                                     const combo = this.up('window').down('combobox');
                                                     const row = combo.getSelectedRecord();
-                                                    if(row !== null) {
+                                                    if (row !== null) {
                                                         pId = row.id;
                                                         moduleId = pId;
                                                         history.setMode(pId);
@@ -175,7 +175,7 @@ Ext.application({
                         },
                         {
                             type: 'save',
-                            qtip: '保存模板', 
+                            qtip: '保存模板',
                             listeners: {
                                 click: function () {
                                     showPrompt('模板名称', '', function (text) {
@@ -195,7 +195,7 @@ Ext.application({
                         {
                             type: 'plus', qtip: '添加模板详情', listeners: {
                                 click: function () {
-                                    if(pId === null) {
+                                    if (pId === null) {
                                         showToast('请先设置模板名称');
                                         showPrompt('模板名称', '', function (text) {
                                             pId = parentData.setData(text);
@@ -234,11 +234,11 @@ Ext.application({
                                                     const t = combo.getRawValue();
                                                     let ifAdd = true;
                                                     modes.forEach(function (m) {
-                                                        if(m.text === t) {
+                                                        if (m.text === t) {
                                                             ifAdd = false;
                                                         }
                                                     });
-                                                    if(ifAdd) {
+                                                    if (ifAdd) {
                                                         data.setData(t, pId);
                                                     }
                                                     this.up('window').close();
@@ -327,8 +327,7 @@ Ext.application({
                                         modal: true,
                                         layout: 'fit',
                                         items: {
-                                            xtype: 'code',
-                                            language: 'html',
+                                            xtype: 'pkg',
                                             pId: pId
                                         },
                                         buttonAlign: 'center'
@@ -384,6 +383,17 @@ function showToast(s) {
     });
 }
 
+function showError(s) {
+    Ext.toast({
+        html: `<span style="color: red;">${s}</span>`,
+        closable: true,
+        autoClose: false,
+        align: 't',
+        slideDUration: 400,
+        maxWidth: 400
+    });
+}
+
 function showPrompt(title, msg, fn, dom) {
     let options = {
         title: title,
@@ -403,7 +413,7 @@ function showPrompt(title, msg, fn, dom) {
     Ext.MessageBox.show(options).focus();
 }
 
-function showConfirm( msg, fn, dom) {
+function showConfirm(msg, fn, dom) {
     let options = {
         title: '提示',
         width: 300,
