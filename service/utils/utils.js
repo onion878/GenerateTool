@@ -41,6 +41,27 @@ class Utils {
         return (selectDate);
     }
 
+    getNowTime(){
+        let date = new Date();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        let hours = date.getHours();
+        let min = date.getMinutes();
+        let sec = date.getSeconds();
+
+        let code = date.getFullYear() + '-' + toForMatter(month) + '-' +
+            toForMatter(day) + ' ' + toForMatter(hours) + ':' + toForMatter(min)
+            + ':' + toForMatter(sec);
+
+        function toForMatter(num) {
+            if (num < 10) {
+                num = "0" + num;
+            }
+            return num + "";
+        }
+        return code;
+    }
+
     getNowYear() {
         const date = new Date();
         const Y = date.getFullYear() + '';
@@ -81,7 +102,6 @@ class Utils {
     readFile(path) {
         return fs.readFileSync(path, 'utf8');
     }
-
 }
 
 module.exports = new Utils();

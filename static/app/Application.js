@@ -2,6 +2,8 @@ const data = require('../service/dao/modeData');
 const parentData = require('../service/dao/mode');
 const history = require('../service/dao/history');
 const jsCode = require('../service/utils/JscodeUtil');
+const systemConfig = require('../service/dao/system');
+const packageConfig = require('../service/dao/package');
 
 Ext.application({
     requires: ['Ext.container.Viewport'],
@@ -21,7 +23,7 @@ Ext.application({
      * 下面的代码就是 MVC 的加载文件规则了。
      */
     // 其实翻译出来就是“从根 app 开始找 controller（注意没带 s 哦） 目录，在这个目录下加载 Students.js 这个文件”
-    controllers: ['User', 'Mode', 'Editor', 'Code', 'Pkg'],
+    controllers: ['User', 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg'],
     launch: function () {
         let pId = history.getMode();
         moduleId = pId;
@@ -373,6 +375,23 @@ Ext.application({
         Ext.getBody().addCls('loaded');
     }
 });
+
+function openSet() {
+    var panel = "mainmenutab";
+    var tabPanel = Ext.getCmp(panel);
+    var taa = Ext.getCmp('set-main');
+    if (taa) {
+        tabPanel.setActiveTab(taa);
+    } else {
+        var tab = tabPanel.add({
+            id: 'set-main',
+            title: '系统设置',
+            closable: true,
+            xtype: 'code'
+        });
+        tabPanel.setActiveTab(tab);
+    }
+}
 
 function showToast(s) {
     Ext.toast({

@@ -10,3 +10,11 @@ body {
 .slider-mouseover {
     box-shadow: -1px 0px 1px 1px #d6d6d6;
 }
+
+.x-tree-no-icon .x-tree-icon {
+    display: none;
+}
+
+.x-tree-no-icon .x-tree-elbow-img {
+    width: 0px;
+}

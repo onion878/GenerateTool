@@ -5,10 +5,19 @@ const db = low(adapter);
 
 class System {
 
-    getData() {
-        db.set('user.name', 'typicode')
+    constructor() {
+        db.defaults({ data: [] }).write();
+        db.defaults({ code: [] }).write();
+    }
+
+    setCode(name, language) {
+        db.get('data')
+            .push({id: utils.getUUID(),pId: pId, text: name, leaf: true})
             .write();
-        const d = db.get('user').write().name;
+    }
+
+    getCode(pId) {
+        return db.get('data').filter({pId: pId}).value();
     }
 }
 

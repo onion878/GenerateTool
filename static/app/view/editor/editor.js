@@ -121,6 +121,26 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                             tPanel.setActiveTab(jTab);
                                         }
                                     }
+                                },
+                                {
+                                    text: '管理包',
+                                    icon: 'images/npm.jpg',
+                                    handler: function () {
+                                        const nowItem = Ext.getCmp('unpkg-main');
+                                        const tPanel = that.up('editor').down('tabpanel');
+                                        if (nowItem) {
+                                            tPanel.setActiveTab(nowItem);
+                                        } else {
+                                            const jTab = tPanel.add({
+                                                id: 'unpkg-main',
+                                                pId: pId,
+                                                title: '管理包',
+                                                closable: true,
+                                                xtype: 'unpkg'
+                                            });
+                                            tPanel.setActiveTab(jTab);
+                                        }
+                                    }
                                 }
                             ]
                         }).showAt(event.getPoint());

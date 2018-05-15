@@ -11,13 +11,8 @@ Ext.define('MyAppNamespace.view.mode.mode', {
         this.tbar = [{
             xtype: 'button',
             action: 'add',
-            tooltip: '添加数据',
+            tooltip: '添加数据模板',
             text: '添加'
-        }, {
-            xtype: 'button',
-            action: 'save',
-            tooltip: '保存模板',
-            text: '保存'
         }];
 
         this.callParent(arguments);

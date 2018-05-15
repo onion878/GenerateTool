@@ -28,6 +28,7 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
                 xtype: 'actioncolumn',
                 width: 60,
                 sortable: false,
+                text: '操作',
                 align: 'center',
                 items: [{
                     icon: 'images/coins_add.png',
@@ -35,82 +36,35 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
                     handler: function(view, recIndex, cellIndex, item, e, {data}) {
                         const el = this.up('pkg').getEl();
                         el.mask('安装中...');
-                        Ext.Ajax.request({
-                            url: `https://registry.npmjs.org/${data.name}/latest`,
-                            success: function(response, opts) {
-                                const donwloadUrl = Ext.decode(response.responseText).dist.tarball;
-                                jsCode.downloadPkg(pId, data.name, donwloadUrl).then( fileName => {
-                                    el.unmask();
-                                    showToast(`${fileName},安装成功!`);
-                                }).catch(e => {
-                                    el.unmask();
-                                    showError(`安装失败-> ${e}`);
-                                });
-                            },
-                            failure: function(response, opts) {
-                                el.unmask();
-                                console.log('server-side failure with status code ' + response.status);
-                            }
+                        jsCode.downloadPkg(pId, data.name).then( fileName => {
+                            el.unmask();
+                            showToast(`${fileName},安装成功!`);
+                        }).catch(e => {
+                            el.unmask();
+                            showError(`安装失败-> ${e}`);
                         });
                     }
                 },{
                     icon: 'images/cog_add.png',
                     tooltip: '安装其它版本',
-                    handler: function(grid, rowIndex, colIndex) {
-                        Ext.create('Ext.window.Window', {
-                            title: '选择模板',
-                            height: 120,
-                            width: 400,
-                            layout: 'fit',
-                            resizable: false,
-                            constrain: true,
-                            modal: true,
-                            items: {
-                                xtype: 'combobox',
-                                fieldLabel: '名称',
-                                margin: '10',
-                                labelWidth: 45,
-                                store: {
-                                    fields: ['id', 'text'],
-                                    data: parentData.getAll()
-                                },
-                                queryMode: 'local',
-                                displayField: 'text',
-                                valueField: 'id'
-                            },
-                            buttonAlign: 'center',
-                            buttons: [
-                                {
-                                    text: '确定', handler: function () {
-                                        const combo = this.up('window').down('combobox');
-                                        const row = combo.getSelectedRecord();
-                                        if (row !== null) {
-                                            pId = row.id;
-                                            moduleId = pId;
-                                            history.setMode(pId);
-                                        }
-                                        this.up('window').close();
-                                        store.setRoot({
-                                            expanded: true,
-                                            text: '人员管理',
-                                            children: data.getData(pId)
-                                        });
-                                        Ext.getCmp('panel-model').setTitle(row.data.text);
-                                    }
-                                },
-                                {
-                                    text: '取消', handler: function () {
-                                        this.up('window').close();
-                                    }
-                                }
-                            ]
-                        }).show().focus();
+                    handler: function(view, recIndex, cellIndex, item, e, {data}) {
+                        const el = this.up('pkg').getEl();
+                        showPrompt('输入版本号', '', function (text) {
+                            el.mask('安装中...');
+                            jsCode.downloadPkg(pId, data.name, text).then( fileName => {
+                                el.unmask();
+                                showToast(`${fileName},安装成功!`);
+                            }).catch(e => {
+                                el.unmask();
+                                showError(`安装失败-> ${e}`);
+                            });
+                        });
                     }
                 }, {
                     icon: 'images/find.png',
                     tooltip: '详情',
                     handler: function(view, recIndex, cellIndex, item, e, record) {
-                        window.open(record.data.links.npm);
+                        require("open")(record.data.links.npm);
                     }
                 }]
             }
