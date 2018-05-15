@@ -2,7 +2,6 @@ const {app, BrowserWindow, dialog, Menu, MenuItem} = require('electron');
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
-const sysData = require('./service/dao/system');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -13,7 +12,6 @@ function createWindow() {
         width: 800,
         height: 600
     });
-    sysData.getData();
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'static/index.html'),
@@ -25,12 +23,13 @@ function createWindow() {
     //mainWindow.webContents.openDevTools();
     const menu = Menu.buildFromTemplate([
         {
-            label: 'close',
+            label: '系统',
             submenu: [
                 {
-                    label: 'startspeaking',
+                    label: '设置',
                     click() {
-                        console.log(123);
+                        let code = `openSet()`;
+                        mainWindow.webContents.executeJavaScript(code);
                     }
                 },
                 {
