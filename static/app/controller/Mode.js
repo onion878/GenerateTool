@@ -55,7 +55,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
                                 {id: 'text', text: '文本框'},
                                 {id: 'textarea', text: '多行文本框'},
                                 {id: 'datalist', text: '单一集合'},
-                                {id: 'datagrid', text: '表格数据'}
+                                {id: 'datagrid', text: '表格数据'},
+                                {id: 'minicode', text: '代码块'}
                             ]
                         },
                         name: 'type',
@@ -94,18 +95,19 @@ Ext.define('MyAppNamespace.controller.Mode', {
     },
     getComponent(type, label) {
         const that = this;
+        let content = {};
         if (type == 'text') {
-            return that.getDataModule({
+            content = {
                 xtype: 'textfield',
                 flex: 1
-            }, type, label);
+            };
         } else if (type == 'textarea') {
-            return that.getDataModule({
+            content = {
                 xtype: 'textareafield',
                 flex: 1
-            }, type, label);
+            };
         } else if (type == 'datalist') {
-            return that.getDataModule({
+            content = {
                 xtype: 'treepanel',
                 flex: 1,
                 closable: false,
@@ -145,9 +147,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 style: {
                     border: '1px solid #c2c2c2'
                 }
-            }, type, label);
-        } else {
-            return that.getDataModule({
+            };
+        } else if (type == 'datagrid') {
+            content = {
                 xtype: 'grid',
                 flex: 1,
                 style: {
@@ -176,8 +178,21 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     icon: 'images/delete.png'
                 }],
                 columns: []
-            }, type, label);
+            };
+        } else {
+            content = {
+                xtype: 'panel',
+                flex: 1,
+                height: 100,
+                style: {
+                    border: '1px solid #c2c2c2'
+                },
+                items: {
+                    xtype: 'minicode'
+                }
+            };
         }
+        return that.getDataModule(content, type, label);
     },
     getDataModule(content, type, label) {
         const that = this;
@@ -268,7 +283,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                                 root.removeChild(root.firstChild);
                             }
                             root.appendChild(child);
-                        } else {
+                        } else if (type == 'datagrid') {
                             const grid = btn.up('container').down('grid');
                             const columns = [new Ext.grid.RowNumberer()], fields = [];
                             if (d.length > 0) {
@@ -290,6 +305,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
                             });
                             grid.reconfigure(store, columns);
                             console.log(d);
+                        } else {
+
                         }
                         this.up('window').close();
                     }

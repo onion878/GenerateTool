@@ -23,7 +23,7 @@ Ext.application({
      * 下面的代码就是 MVC 的加载文件规则了。
      */
     // 其实翻译出来就是“从根 app 开始找 controller（注意没带 s 哦） 目录，在这个目录下加载 Students.js 这个文件”
-    controllers: ['User', 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg'],
+    controllers: ['User', 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode'],
     launch: function () {
         let pId = history.getMode();
         moduleId = pId;
