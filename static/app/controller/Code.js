@@ -3,7 +3,7 @@ Ext.define('MyAppNamespace.controller.Code', {
     views: ['code.code'],
     init: function () {
         this.control({
-            'viewport > panel': {
+            'code': {
                 render: this.onPanelRendered
             }
         });

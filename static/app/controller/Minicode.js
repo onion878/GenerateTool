@@ -3,7 +3,7 @@ Ext.define('MyAppNamespace.controller.Minicode', {
     views: ['minicode.minicode'],
     init: function () {
         this.control({
-            'viewport > panel': {
+            'minicode': {
                 render: this.onPanelRendered
             }
         });

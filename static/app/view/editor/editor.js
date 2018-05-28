@@ -185,17 +185,27 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                 text: '重命名',
                                 icon: 'images/arrow_refresh_small.png',
                                 handler: function () {
-                                    showPrompt('名称', '', function (text) {
-                                        jsCode.reName(pId, record.data.text, text, record.parentNode.data.parentFolder);
-                                        record.set('text', text);
-                                        let parentFolder = record.parentNode.data.parentFolder;
-                                        if (parentFolder == undefined) parentFolder = '';
-                                        record.set('parentFolder', parentFolder + '/' + text);
-                                        if (record.data.type == 'folder') {
-                                            that.collapseNode(record);
-                                            that.expandNode(record);
+                                    Ext.MessageBox.show({
+                                        title: '名称',
+                                        width: 300,
+                                        prompt: true,
+                                        value:  record.data.text,
+                                        buttons: Ext.MessageBox.OKCANCEL,
+                                        scope: this,
+                                        fn:  function (btn, text) {
+                                            if (btn === 'ok'){
+                                                jsCode.reName(pId, record.data.text, text, record.parentNode.data.parentFolder);
+                                                record.set('text', text);
+                                                let parentFolder = record.parentNode.data.parentFolder;
+                                                if (parentFolder == undefined) parentFolder = '';
+                                                record.set('parentFolder', parentFolder + '/' + text);
+                                                if (record.data.type == 'folder') {
+                                                    that.collapseNode(record);
+                                                    that.expandNode(record);
+                                                }
+                                            }
                                         }
-                                    });
+                                    }).focus();
                                 }
                             },
                             {

@@ -1,0 +1,46 @@
+body {
+    font-family: 微软雅黑;
+}
+
+/* 定义滚动条宽度 */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* 定义那个轨道的样式 */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 定义滚动按钮的样式，就是那个bar */
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    background: rgba(196, 196, 198, 0.49);
+    -webkit-box-shadow: inset 0 0 6px rgba(99, 57, 80, 0.14);
+}
+
+.code-content {
+    width: 100%;
+    height: 100%;
+}
+
+.slider-mouseover {
+    box-shadow: -1px 0px 1px 1px #d6d6d6;
+}
+
+.x-tree-no-icon .x-tree-icon {
+    display: none;
+}
+
+.x-tree-no-icon .x-tree-elbow-img {
+    width: 0px;
+}
+
+.mode-controls .x-form-text {
+    border-bottom: 0.5px inset #c2c2c2;
+}
+
+.mode-controls .x-form-text:focus {
+    border-bottom: 0.5px inset #3892D4;
+}

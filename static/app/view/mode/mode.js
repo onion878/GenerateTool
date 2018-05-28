@@ -7,6 +7,7 @@ Ext.define('MyAppNamespace.view.mode.mode', {
         pack: 'start',
         align: 'stretch'
     },
+    cls: 'mode-controls',
     initComponent: function () {
         this.tbar = [{
             xtype: 'button',
@@ -14,7 +15,6 @@ Ext.define('MyAppNamespace.view.mode.mode', {
             tooltip: '添加数据模板',
             text: '添加'
         }];
-
         this.callParent(arguments);
     }
 });

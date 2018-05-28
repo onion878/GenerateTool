@@ -3,7 +3,7 @@ Ext.define('MyAppNamespace.controller.Editor', {
     views: ['editor.editor'],
     init: function () {
         this.control({
-            'viewport > panel': {
+            'editor': {
                 render: this.onPanelRendered
             }
         });

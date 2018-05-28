@@ -5,7 +5,7 @@ Ext.define('MyAppNamespace.controller.Pkg', {
     stores: ['Pkg'],
     init: function () {
         this.control({
-            'viewport > panel': {
+            'pkg': {
                 render: this.onPanelRendered
             },
             'toolbar textfield[action=search]': {

@@ -3,7 +3,7 @@ Ext.define('MyAppNamespace.controller.Unpkg', {
     views: ['unpkg.unpkg'],
     init: function () {
         this.control({
-            'viewport > panel': {
+            'unpkg': {
                 render: this.onPanelRendered
             },
             'toolbar button[action=refresh]': {

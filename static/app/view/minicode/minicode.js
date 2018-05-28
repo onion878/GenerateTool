@@ -4,6 +4,7 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
     viewModel: true,
     html: `<div class="code-editor-content" style="width: 400px;height: 400px;"></div>`,
     layout: 'fit',
+    value: null,
     codeEditor: null,
     listeners: {
         render: function (c) {
@@ -11,7 +12,11 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
             that.language = that.language != undefined ? that.language : 'javascript';
             that.fileContent = that.fileContent != undefined ? that.fileContent : '';
             that.codeEditor = monaco.editor.create(dom, {
-                language: that.language
+                language: that.language,
+                value: that.value
+            });
+            that.codeEditor.onDidChangeModelContent(function (e) {
+                that.changeValue();
             });
             that.editorLayout();
         }
@@ -30,5 +35,8 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
     },
     initComponent: function () {
         this.callParent(arguments);
+    },
+    changeValue: function () {
+
     }
 });

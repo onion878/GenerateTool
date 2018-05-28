@@ -5,7 +5,7 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --version 1.8.4 --icon=icon.ico --out=release-builds --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\" && node renderer.js",
+    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=x64 --version 2.0.2 --icon=icon.ico --out=release-builds --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\" && node renderer.js",
     "electron-build": "ng build --prod && electron ."
   },
   "keywords": [
@@ -28,6 +28,7 @@
     "npmi": "^4.0.0",
     "open": "0.0.5",
     "require-uncached": "^1.0.3",
-    "shelljs": "^0.8.2"
+    "shelljs": "^0.8.2",
+    "swig": "^1.4.2"
   }
 }

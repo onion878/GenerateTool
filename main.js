@@ -28,7 +28,7 @@ function createWindow() {
                 {
                     label: '设置',
                     click() {
-                        let code = `openSet()`;
+                        let code = `openSome({id:'set-demo',title:'系统设置',type:'code'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },

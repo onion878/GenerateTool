@@ -4,45 +4,36 @@ const history = require('../service/dao/history');
 const jsCode = require('../service/utils/JscodeUtil');
 const systemConfig = require('../service/dao/system');
 const packageConfig = require('../service/dao/package');
+const controlData = require('../service/dao/controls');
+const fileData = require('../service/dao/file');
+const geFileData = require('../service/dao/gefile');
+const swig = require('swig');
 
 Ext.application({
     requires: ['Ext.container.Viewport'],
-
-    // ****** 下面两行代码定义的变量很重要 *******
-    /**
-     * name 定义了这整个 MVC 应用的命名空间。
-     * appFolder 定义了根目录。
-     *
-     * 在 https://docs.sencha.com/extjs/6.0/application_architecture/application_architecture.html 文档上有介绍。
-     * 规则大概就是 <AppName>.<foldername>.<ClassAndFileName>
-     */
-    name: 'MyAppNamespace', // 定义的命名空间
-    appFolder: 'app', // 指明应用的根目录
-
-    /**
-     * 下面的代码就是 MVC 的加载文件规则了。
-     */
-    // 其实翻译出来就是“从根 app 开始找 controller（注意没带 s 哦） 目录，在这个目录下加载 Students.js 这个文件”
-    controllers: ['User', 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode'],
+    name: 'MyAppNamespace',
+    appFolder: 'app',
+    controllers: ['Welcome', 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Generate'],
     launch: function () {
         let pId = history.getMode();
         moduleId = pId;
         let store = Ext.create('Ext.data.TreeStore', {
             root: {
                 expanded: true,
-                text: '人员管理',
                 children: data.getData(pId)
+            }
+        });
+        let fileStore = Ext.create('Ext.data.TreeStore', {
+            root: {
+                expanded: true,
+                text: '',
+                children: []
             }
         });
         let title = '数据模板';
         if (pId !== '') {
             title = parentData.getById(pId).text;
         }
-        const d = [
-            {text: "系统用户管理", leaf: true, uri: "studentlist", item: 'sysuser'},
-            {text: "客户管理", leaf: true, uri: "useraa", item: 'khgl'},
-            {text: "全类型参数测试", leaf: true, uri: "alltype", item: 'sycs'}
-        ];
         const viewport = Ext.create('Ext.Viewport', {
             id: 'border-example',
             layout: 'border',
@@ -92,7 +83,7 @@ Ext.application({
                             var item = event.data.id;
                             var icon = event.data.icon;
                             var title = event.data.text;
-                            addbutton(item, 'mode', icon, title);
+                            addbutton(item, 'mode', icon, title, {});
                         },
                         itemcontextmenu: function (node, record, item, index, event, eOpts) {
                             new Ext.menu.Menu({
@@ -105,7 +96,7 @@ Ext.application({
                                             data.removeById(record.data.id);
                                             store.setRoot({
                                                 expanded: true,
-                                                text: '人员管理',
+                                                text: '',
                                                 children: data.getData(pId)
                                             });
                                         }, this);
@@ -159,7 +150,7 @@ Ext.application({
                                                     this.up('window').close();
                                                     store.setRoot({
                                                         expanded: true,
-                                                        text: '人员管理',
+                                                        text: '',
                                                         children: data.getData(pId)
                                                     });
                                                     Ext.getCmp('panel-model').setTitle(row.data.text);
@@ -186,7 +177,7 @@ Ext.application({
                                         history.setMode(pId);
                                         store.setRoot({
                                             expanded: true,
-                                            text: '人员管理',
+                                            text: '',
                                             children: data.getData(pId)
                                         });
                                         Ext.getCmp('panel-model').setTitle(text);
@@ -246,7 +237,7 @@ Ext.application({
                                                     this.up('window').close();
                                                     store.setRoot({
                                                         expanded: true,
-                                                        text: '人员管理',
+                                                        text: '',
                                                         children: data.getData(pId)
                                                     });
                                                 }
@@ -265,75 +256,68 @@ Ext.application({
                 }, {
                     xtype: 'treepanel',
                     title: '生成文件',
-                    store: store,
+                    store: fileStore,
+                    id: 'ge-tree',
                     listeners: {
-                        itemclick: function (node, event) {
+                        itemdblclick: function (node, event) {
                             var item = event.data.id;
                             var icon = event.data.icon;
                             var title = event.data.text;
-                            addbutton(item, 'code', icon, title);
+                            if (event.childNodes.length == 0) {
+                                addbutton(item, 'generate', icon, title, {path: event.get('folder') + '\\' + title});
+                            }
+                        },
+                        itemcontextmenu: function (node, record, item, index, event, eOpts) {
+                            if (record.childNodes.length > 0) {
+                                new Ext.menu.Menu({
+                                    minWidth: 60,
+                                    items: [
+                                        {
+                                            text: '修改',
+                                            icon: 'images/table_edit.png',
+                                            handler: function () {
+                                                addGeFiles(record.get('id'));
+                                            }
+                                        },
+                                        {
+                                            text: '删除',
+                                            icon: 'images/cross.png',
+                                            handler: function () {
+                                                showConfirm(`是否删除[${record.data.text}]?`, function (text) {
+                                                    record.parentNode.removeChild(record);
+                                                    fileData.removeFile(record.get('id'));
+                                                });
+                                            }
+                                        }
+                                    ]
+                                }).showAt(event.getPoint());
+                            }
                         }
                     },
                     hideCollapseTool: true,
                     closable: false,
+                    checkPropagation: 'both',
+                    useArrows: true,
                     rootVisible: false,
                     tools: [
                         {
-                            type: 'plus', qtip: '选择生成目录', listeners: {
+                            type: 'plus', qtip: '设置生成文件', listeners: {
                                 click: function () {
-                                    Ext.create('Ext.window.Window', {
-                                        title: '选择生成目录',
-                                        height: 120,
-                                        width: 400,
-                                        layout: 'fit',
-                                        animateTarget: this,
-                                        resizable: false,
-                                        constrain: true,
-                                        modal: true,
-                                        items: {
-                                            xtype: 'filefield',
-                                            margin: '10',
-                                            labelWidth: 45,
-                                            fieldLabel: '文件夹',
-                                            attr: 'webkitdirectory'
-                                        },
-                                        buttonAlign: 'center',
-                                        buttons: [
-                                            {
-                                                text: '确定', handler: function () {
-                                                    this.up('window').close();
-                                                }
-                                            },
-                                            {
-                                                text: '取消', handler: function () {
-                                                    this.up('window').close();
-                                                }
-                                            }
-                                        ]
-                                    }).show().focus();
+                                    addGeFiles();
                                 }
                             }
                         },
                         {
-                            type: 'save', qtip: '测试编辑器', listeners: {
+                            type: 'save', qtip: '开始创建', listeners: {
                                 click: function () {
-                                    Ext.create('Ext.window.Window', {
-                                        title: '测试编辑器',
-                                        height: 400,
-                                        width: 600,
-                                        maximized: false,
-                                        resizable: true,
-                                        maximizable: true,
-                                        minimizable: true,
-                                        constrain: true,
-                                        modal: true,
-                                        layout: 'fit',
-                                        items: {
-                                            xtype: 'pkg',
-                                            pId: pId
-                                        },
-                                        buttonAlign: 'center'
-                                    }).show().focus();
+                                    const records = Ext.getCmp('ge-tree').getView().getChecked(),
+                                        files = [];
+                                    Ext.Array.each(records, function (r) {
+                                        if (r.childNodes.length == 0) {
+                                            files.push(r.get('folder') + '\\' + r.get('text'));
+                                        }
+                                    });
+                                    console.log(files);
                                 }
                             }
                         }
@@ -345,49 +329,309 @@ Ext.application({
                 fullscreen: true,
                 id: 'mainmenutab',
                 plugins: new Ext.ux.TabCloseMenu(),
-                items: [{
-                    id: 'sysuser',
-                    title: '系统用户管理',
-                    xtype: 'useraa'
-                }]
+                items: [],
+                listeners: {
+                    tabchange: function (tabPanel, tab) {
+                        history.setShowTab(tab.id);
+                        labelEditor.cancelEdit();
+                    },
+                    add: function (tabPanel, tab) {
+                        history.setTab({id: tab.config.id, params: tab.config.params, title: tab.config.title, type: tab.config.xtype});
+                    },
+                    remove: function (tabPanel, tab) {
+                        history.removeTab(tab.config.id);
+                        labelEditor.cancelEdit();
+                    }
+                }
             }]
         });
 
-        function addbutton(item, url, icon, title) {
-            var panel = "mainmenutab";
-            var tabPanel = Ext.getCmp(panel);
-            var taa = Ext.getCmp(item);
+        function getFilesData() {
+            let GfData = fileData.getFiles(pId), data = [];
+            GfData.forEach(function (d) {
+                const child = [];
+                d.files.forEach(function (e) {
+                    child.push({
+                        text: e,
+                        checked: true,
+                        folder: d.folder,
+                        leaf: true
+                    })
+                });
+                data.push({
+                    text: d.folder,
+                    id: d.id,
+                    checked: true,
+                    children: child
+                });
+            });
+            const root = Ext.getCmp('ge-tree').getRootNode();
+            while (root.firstChild) {
+                root.removeChild(root.firstChild);
+            }
+            root.appendChild(data);
+        }
+
+        getFilesData();
+
+        function addbutton(item, url, icon, title, data) {
+            const panel = "mainmenutab";
+            const tabPanel = Ext.getCmp(panel);
+            const taa = Ext.getCmp(item);
             if (taa) {
                 tabPanel.setActiveTab(taa);
             } else {
-                var tab = tabPanel.add({
+                const tab = tabPanel.add({
                     id: item,
                     pId: pId,
                     title: title,
                     icon: icon,
                     closable: true,
+                    params: data,
                     xtype: url
                 });
                 tabPanel.setActiveTab(tab); // 设置当前tab页
             }
         }
 
+        function addGeFiles(id) {
+            let d = {};
+            if (id != undefined) {
+                d = fileData.getFile(id);
+            }
+            Ext.create('Ext.window.Window', {
+                title: '设置生成文件',
+                width: 400,
+                fixed: true,
+                layout: 'fit',
+                resizable: false,
+                constrain: true,
+                modal: true,
+                items: {
+                    xtype: 'form',
+                    layout: {
+                        type: 'vbox',
+                        pack: 'start',
+                        align: 'stretch'
+                    },
+                    items: [
+                        {
+                            xtype: 'filefield',
+                            margin: '10',
+                            labelWidth: 45,
+                            name: 'folder',
+                            allowBlank: false,
+                            fieldLabel: '文件夹',
+                            attr: 'webkitdirectory',
+                            listeners: {
+                                render: function () {
+                                    this.setRawValue(d.folder);
+                                }
+                            }
+                        },
+                        {
+                            xtype: 'textareafield',
+                            margin: '10',
+                            labelWidth: 45,
+                            name: 'code',
+                            value: d.code,
+                            hidden: true,
+                            fieldLabel: '代码块'
+                        },
+                        {
+                            xtype: 'container',
+                            layout: 'hbox',
+                            margin: {
+                                left: 10,
+                                right: 10,
+                                bottom: 10
+                            },
+                            items: [
+                                {
+                                    xtype: 'container',
+                                    flex: 1,
+                                    layout: 'hbox',
+                                    items: [{
+                                        xtype: 'label',
+                                        text: '文件名:',
+                                        width: 50,
+                                        name: 'fileName',
+                                        margin: {
+                                            top: 3
+                                        }
+                                    }, {
+                                        xtype: 'treepanel',
+                                        flex: 1,
+                                        closable: false,
+                                        rootVisible: false,
+                                        hideCollapseTool: true,
+                                        lines: false,
+                                        plugins: {
+                                            ptype: 'rowediting',
+                                            clicksToMoveEditor: 1,
+                                            autoUpdate: true,
+                                            autoCancel: false
+                                        },
+                                        columns: [
+                                            {
+                                                xtype: 'treecolumn',
+                                                dataIndex: 'text',
+                                                flex: 1,
+                                                editor: {
+                                                    xtype: 'textfield',
+                                                    allowBlank: false,
+                                                    allowOnlyWhitespace: false
+                                                }
+                                            }
+                                        ],
+                                        style: {
+                                            border: '1px solid #c2c2c2'
+                                        },
+                                        listeners: {
+                                            render: function () {
+                                                const f = d.files;
+                                                const child = [];
+                                                if (f instanceof Array) {
+                                                    f.forEach(function (r) {
+                                                        child.push({
+                                                            leaf: true,
+                                                            cls: 'x-tree-no-icon',
+                                                            text: r
+                                                        });
+                                                    });
+                                                }
+                                                const root = this.getRootNode();
+                                                while (root.firstChild) {
+                                                    root.removeChild(root.firstChild);
+                                                }
+                                                root.appendChild(child);
+                                            }
+                                        }
+                                    }]
+                                },
+                                {
+                                    xtype: 'button',
+                                    icon: 'images/script_code.png',
+                                    tooltip: '从js脚本取值',
+                                    bId: id,
+                                    handler: function (btn) {
+                                        const val = btn.up('window').down('textareafield').getValue();
+                                        Ext.create('Ext.window.Window', {
+                                            title: '使用脚本',
+                                            height: 160,
+                                            width: 400,
+                                            layout: 'fit',
+                                            animateTarget: this,
+                                            resizable: true,
+                                            constrain: true,
+                                            modal: true,
+                                            items: {
+                                                xtype: 'minicode',
+                                                value: val,
+                                                changeValue: function () {
+                                                    btn.up('window').down('textareafield').setValue(this.codeEditor.getValue());
+                                                }
+                                            },
+                                            buttonAlign: 'center',
+                                            buttons: [
+                                                {
+                                                    text: '确定', handler: function () {
+                                                        const valStr = this.up('window').down('minicode').codeEditor.getValue();
+                                                        const d = eval(valStr);
+                                                        const tree = btn.up('container').down('treepanel');
+                                                        const child = [];
+                                                        if (d instanceof Array) {
+                                                            d.forEach(function (r) {
+                                                                child.push({
+                                                                    leaf: true,
+                                                                    cls: 'x-tree-no-icon',
+                                                                    text: r
+                                                                });
+                                                            });
+                                                        } else {
+                                                            child.push({
+                                                                leaf: true,
+                                                                cls: 'x-tree-no-icon',
+                                                                text: d
+                                                            });
+                                                        }
+                                                        const root = tree.getRootNode();
+                                                        while (root.firstChild) {
+                                                            root.removeChild(root.firstChild);
+                                                        }
+                                                        root.appendChild(child);
+                                                        this.up('window').close();
+                                                    }
+                                                },
+                                                {
+                                                    text: '取消', handler: function () {
+                                                        this.up('window').close();
+                                                    }
+                                                }
+                                            ]
+                                        }).show().focus();
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                },
+                buttonAlign: 'center',
+                buttons: [
+                    {
+                        text: '确定', handler: function () {
+                            const form = this.up('window').down('form').getForm();
+                            if (form.isValid()) {
+                                const {code} = form.getValues();
+                                if (code.trim().length == 0) {
+                                    showToast('请设置文件名!');
+                                    return;
+                                }
+                                const data = this.up('window').down('treepanel').getStore().getData(),
+                                    files = [];
+                                data.items.forEach(function (d) {
+                                    files.push(d.data.text);
+                                });
+                                const folder = this.up('window').down('filefield').getValue();
+                                fileData.addFile(pId, folder, files, code, id);
+                                this.up('window').close();
+                                getFilesData();
+                            }
+                        }
+                    },
+                    {
+                        text: '取消', handler: function () {
+                            this.up('window').close();
+                        }
+                    }
+                ]
+            }).show().focus();
+        }
+
+        const tabData = history.getTab();
+        const showTab = history.getShowTab();
+        for (let i = 0; i < tabData.length; i++) {
+            openSome(tabData[i]);
+        }
+        Ext.getCmp('mainmenutab').setActiveTab(Ext.getCmp(showTab));
         Ext.getBody().addCls('loaded');
     }
 });
 
-function openSet() {
-    var panel = "mainmenutab";
-    var tabPanel = Ext.getCmp(panel);
-    var taa = Ext.getCmp('set-main');
+function openSome({id, title, type, params}) {
+    const panel = "mainmenutab";
+    const tabPanel = Ext.getCmp(panel);
+    const taa = Ext.getCmp(id);
     if (taa) {
         tabPanel.setActiveTab(taa);
     } else {
-        var tab = tabPanel.add({
-            id: 'set-main',
-            title: '系统设置',
+        const tab = tabPanel.add({
+            id: id,
+            title: title,
+            pId: history.getMode(),
             closable: true,
-            xtype: 'code'
+            params: params,
+            xtype: type
         });
         tabPanel.setActiveTab(tab);
     }

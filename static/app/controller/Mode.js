@@ -1,9 +1,10 @@
 Ext.define('MyAppNamespace.controller.Mode', {
     extend: 'Ext.app.Controller',
     views: ['mode.mode'],
+    pId: null,
     init: function () {
         this.control({
-            'viewport > panel': {
+            'mode': {
                 render: this.onPanelRendered
             },
             'toolbar button[action=add]': {
@@ -14,14 +15,19 @@ Ext.define('MyAppNamespace.controller.Mode', {
             }
         });
     },
-    onPanelRendered: function () {
-        //console.debug('userpanel被渲染了');
+    onPanelRendered: function (panel) {
+        this.pId = panel.pId;
+        const data = controlData.getExt(panel.id), that = this;
+        data.forEach(d => {
+            panel.add(Ext.create(that.getDataModule(d.content, d.type, d.label, d.id, d.data)));
+        });
     },
     add: function (btn) {
         const that = this;
+        const id = btn.up('mode').id;
         Ext.create('Ext.window.Window', {
             title: '添加变量',
-            height: 180,
+            fixed: true,
             width: 400,
             layout: 'fit',
             animateTarget: btn,
@@ -64,7 +70,33 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         displayField: 'text',
                         valueField: 'id',
                         allowBlank: false,
-                        fieldLabel: '类型'
+                        listeners: {
+                            select: function (combo, record) {
+                                if (record.id == 'minicode') {
+                                    this.up('form').add(Ext.create({
+                                        xtype: 'combobox',
+                                        id: 'combo-language',
+                                        fieldLabel: '语言',
+                                        margin: '10',
+                                        labelWidth: 45,
+                                        store: {
+                                            fields: ['id', 'text'],
+                                            data: languageType
+                                        },
+                                        name: 'language',
+                                        queryMode: 'local',
+                                        displayField: 'text',
+                                        valueField: 'id',
+                                        allowBlank: false
+                                    }));
+                                } else {
+                                    const dom = Ext.getCmp('combo-language');
+                                    if (dom != undefined) {
+                                        dom.destroy();
+                                    }
+                                }
+                            }
+                        }
                     }
                 ]
             },
@@ -74,9 +106,14 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     text: '确定', handler: function () {
                         const form = this.up('window').down('form').getForm();
                         if (form.isValid()) {
-                            const {type, name} = form.getValues();
-                            btn.up('panel').add(Ext.create(that.getComponent(type, name)));
-                            this.up('window').close();
+                            const moduleData = controlData.getModuleData(that.pId);
+                            const {type, name, language} = form.getValues();
+                            if (moduleData[name] != undefined) {
+                                showToast(`已存在[${name}]!`);
+                            } else {
+                                btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
+                                this.up('window').close();
+                            }
                         }
                     }
                 },
@@ -93,8 +130,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
             eval(text);
         }, this);
     },
-    getComponent(type, label) {
-        const that = this;
+    getComponent(type, label, id, language) {
         let content = {};
         if (type == 'text') {
             content = {
@@ -114,20 +150,12 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 rootVisible: false,
                 hideCollapseTool: true,
                 lines: false,
-                plugins: 'cellediting',
-                viewConfig: {
-                    plugins: {
-                        ptype: 'gridviewdragdrop',
-                        dragText: '拖动排序...'
-                    }
+                plugins: {
+                    ptype: 'rowediting',
+                    clicksToMoveEditor: 1,
+                    autoUpdate: true,
+                    autoCancel: false
                 },
-                tbar: [{
-                    text: '添加',
-                    icon: 'images/add.png'
-                }, {
-                    text: '删除',
-                    icon: 'images/delete.png'
-                }],
                 columns: [
                     {
                         xtype: 'treecolumn',
@@ -138,12 +166,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
                             allowBlank: false,
                             allowOnlyWhitespace: false
                         }
-                    }],
-                store: Ext.create('Ext.data.TreeStore', {
-                    root: {
-                        expanded: true
                     }
-                }),
+                ],
                 style: {
                     border: '1px solid #c2c2c2'
                 }
@@ -161,22 +185,6 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     autoUpdate: true,
                     autoCancel: false
                 },
-                viewConfig: {
-                    plugins: {
-                        ptype: 'gridviewdragdrop',
-                        dragText: '拖动排序...'
-                    }
-                },
-                tbar: [{
-                    text: '编辑列',
-                    icon: 'images/table_edit.png'
-                }, {
-                    text: '添加',
-                    icon: 'images/add.png'
-                }, {
-                    text: '删除',
-                    icon: 'images/delete.png'
-                }],
                 columns: []
             };
         } else {
@@ -188,14 +196,97 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     border: '1px solid #c2c2c2'
                 },
                 items: {
+                    language: language,
                     xtype: 'minicode'
                 }
             };
         }
-        return that.getDataModule(content, type, label);
+        const bId = getUUID();
+        controlData.setExt({cId: id, content: content, type: type, label: label, id: bId, pId: this.pId});
+        return this.getDataModule(content, type, label, bId, null);
     },
-    getDataModule(content, type, label) {
+    getDataModule(content, type, label, id, value) {
         const that = this;
+        content = JSON.parse(JSON.stringify(content));
+        if (type == 'text') {
+            content.listeners = {
+                change: function (dom, val) {
+                    controlData.setDataValue(id, val);
+                }
+            };
+            content.value = value;
+        } else if (type == 'textarea') {
+            content.listeners = {
+                change: function (dom, val) {
+                    controlData.setDataValue(id, val);
+                }
+            };
+            content.value = value;
+        } else if (type == 'datalist') {
+            const data = [];
+            if (value != null) {
+                value.forEach(v => {
+                    data.push({text: v, leaf: true, cls: 'x-tree-no-icon'})
+                });
+            }
+            content.store = Ext.create('Ext.data.TreeStore', {
+                root: {
+                    expanded: true,
+                    children: data
+                },
+                listeners: {
+                    datachanged: function (store) {
+                        controlData.setDataValue(id, that.getListData(store));
+                    }
+                }
+            });
+            content.plugins.listeners = {
+                edit: function (editor, e, eOpts) {
+                    e.record.commit();
+                    controlData.setDataValue(id, that.getListData(editor.grid.getStore()));
+                }
+            };
+        } else if (type == 'datagrid') {
+            const data = [], fields = [], columns = [new Ext.grid.RowNumberer()];
+            if (value != null) {
+                value.forEach((v, i) => {
+                    data.push(v);
+                    if (i == 0) {
+                        for (let key in v) {
+                            fields.push(key);
+                            columns.push({
+                                text: key,
+                                align: 'center',
+                                dataIndex: key,
+                                editor: {xtype: 'textfield'},
+                                flex: 1
+                            });
+                        }
+                    }
+                });
+            }
+            content.store = Ext.create('Ext.data.Store', {
+                fields: fields,
+                data: data,
+                listeners: {
+                    datachanged: function (store) {
+                        controlData.setDataValue(id, that.getGridData(store));
+                    }
+                }
+            });
+            content.columns = columns;
+            content.plugins.listeners = {
+                edit: function (editor, e, eOpts) {
+                    e.record.commit();
+                    controlData.setDataValue(id, that.getGridData(editor.grid.getStore()));
+                }
+            };
+        } else {
+            content.items.changeValue = function () {
+                controlData.setDataValue(id, this.codeEditor.getValue());
+            };
+            content.items.value = value;
+        }
         return {
             xtype: 'container',
             layout: 'hbox',
@@ -221,6 +312,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                                 this.el.on('dblclick', function (e, t) {
                                     labelEditor.startEdit(t);
                                     labelEditor.field.focus(50, true);
+                                    editLabelId = id;
                                 });
                             }
                         }
@@ -230,6 +322,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     xtype: 'button',
                     icon: 'images/script_code.png',
                     tooltip: '从js脚本取值',
+                    bId: id,
                     handler: function (btn) {
                         that.getJavaScriptData(btn, type);
                     }
@@ -238,6 +331,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     xtype: 'button',
                     icon: 'images/cancel.png',
                     tooltip: '删除',
+                    bId: id,
                     handler: function (btn) {
                         that.deleteData(btn);
                     }
@@ -246,6 +340,11 @@ Ext.define('MyAppNamespace.controller.Mode', {
         }
     },
     getJavaScriptData(btn, type) {
+        const val = controlData.getCode(btn.bId);
+        let v = null;
+        if (val != undefined && val != null) {
+            v = val.value;
+        }
         Ext.create('Ext.window.Window', {
             title: '使用脚本',
             height: 160,
@@ -256,14 +355,16 @@ Ext.define('MyAppNamespace.controller.Mode', {
             constrain: true,
             modal: true,
             items: {
-                xtype: 'textareafield',
-                margin: '10'
+                value: v,
+                xtype: 'minicode'
             },
             buttonAlign: 'center',
             buttons: [
                 {
                     text: '确定', handler: function () {
-                        const d = eval(this.up('window').down('textareafield').getRawValue());
+                        const valStr = this.up('window').down('minicode').codeEditor.getValue();
+                        controlData.setCode(btn.bId, valStr);
+                        const d = eval(valStr);
                         if (type == 'text') {
                             btn.up('container').down('textfield').setValue(d);
                         } else if (type == 'textarea') {
@@ -296,15 +397,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
                                         dataIndex: key,
                                         editor: {xtype: 'textfield'},
                                         flex: 1
-                                    })
+                                    });
                                 }
                             }
-                            const store = Ext.create('Ext.data.Store', {
-                                fields: fields,
-                                data: d
-                            });
+                            const store = grid.getStore();
+                            store.setFields(fields);
+                            store.setData(d);
                             grid.reconfigure(store, columns);
-                            console.log(d);
                         } else {
 
                         }
@@ -322,6 +421,22 @@ Ext.define('MyAppNamespace.controller.Mode', {
     deleteData(btn) {
         showConfirm('是否删除?', function () {
             btn.up('container').destroy();
+            controlData.removeExt(btn.bId);
+            controlData.removeCode(btn.bId);
         });
+    },
+    getListData(store) {
+        const data = store.getData(), list = [];
+        data.items.forEach(d => {
+            list.push(d.data.text);
+        });
+        return list;
+    },
+    getGridData(store) {
+        const data = store.getData(), list = [];
+        data.items.forEach(d => {
+            list.push(d.data);
+        });
+        return list;
     }
 });
