@@ -62,7 +62,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
                                 {id: 'textarea', text: '多行文本框'},
                                 {id: 'datalist', text: '单一集合'},
                                 {id: 'datagrid', text: '表格数据'},
-                                {id: 'minicode', text: '代码块'}
+                                {id: 'minicode', text: '代码块'},
+                                {id: 'folder', text: '文件夹'},
+                                {id: 'file', text: '文件'}
                             ]
                         },
                         name: 'type',
@@ -187,6 +189,17 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 },
                 columns: []
             };
+        } else if (type == 'file') {
+            content = {
+                xtype: 'filefield',
+                flex: 1
+            };
+        } else if (type == 'folder') {
+            content = {
+                xtype: 'filefield',
+                flex: 1,
+                attr: 'webkitdirectory'
+            };
         } else {
             content = {
                 xtype: 'panel',
@@ -279,6 +292,24 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 edit: function (editor, e, eOpts) {
                     e.record.commit();
                     controlData.setDataValue(id, that.getGridData(editor.grid.getStore()));
+                }
+            };
+        } else if (type == 'file') {
+            content.listeners = {
+                render: function (dom) {
+                    dom.setRawValue(value);
+                },
+                change: function (dom, val) {
+                    controlData.setDataValue(id, val);
+                }
+            };
+        } else if (type == 'folder') {
+            content.listeners = {
+                render: function (dom) {
+                    dom.setRawValue(value);
+                },
+                change: function (dom, val) {
+                    controlData.setDataValue(id, val);
                 }
             };
         } else {
@@ -404,6 +435,10 @@ Ext.define('MyAppNamespace.controller.Mode', {
                             store.setFields(fields);
                             store.setData(d);
                             grid.reconfigure(store, columns);
+                        } else if (type == 'file') {
+                            btn.up('container').down('filefield').setRawValue(d);
+                        } else if (type == 'folder') {
+                            btn.up('container').down('filefield').setRawValue(d);
                         } else {
 
                         }

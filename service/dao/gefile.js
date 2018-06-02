@@ -10,7 +10,7 @@ class GeFile {
         gdb.defaults({data: []}).write();
     }
 
-    setDataEdit(pId, file, content) {
+    setDataEdit(pId, file, folder, content) {
         const v = this.getOneData(pId, file);
         if (v != undefined) {
             gdb.get('data').find({pId: pId, file: file})
@@ -18,12 +18,12 @@ class GeFile {
                 .write();
         } else {
             gdb.get('data')
-                .push({pId: pId, file: file, content: content, preview: null})
+                .push({pId: pId, file: file, content: content, preview: null, folder: folder})
                 .write();
         }
     }
 
-    setDataPreview(pId, file, preview) {
+    setDataPreview(pId, file, folder, preview) {
         const v = this.getOneData(pId, file);
         if (v != undefined) {
             gdb.get('data').find({pId: pId, file: file})
@@ -31,7 +31,7 @@ class GeFile {
                 .write();
         } else {
             gdb.get('data')
-                .push({pId: pId, file: file, content: null, preview: preview})
+                .push({pId: pId, file: file, content: null, preview: preview, folder: folder})
                 .write();
         }
     }
@@ -40,6 +40,19 @@ class GeFile {
         return gdb.get('data').find({pId: pId, file: file}).value();
     }
 
+    removeData(pId, folder) {
+        gdb.get('data')
+            .remove({pId: pId, folder: folder})
+            .write();
+    }
+
+    updateData(pId, folder, newFolder, newFile) {
+        gdb.get('data')
+            .find({pId: pId, folder: folder})
+            .set('folder', newFolder)
+            .set('file', newFolder + '\\' + newFile)
+            .write();
+    }
 }
 
 module.exports = new GeFile();

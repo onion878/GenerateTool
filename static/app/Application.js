@@ -255,7 +255,7 @@ Ext.application({
                     ]
                 }, {
                     xtype: 'treepanel',
-                    title: '生成文件',
+                    title: '生成模板',
                     store: fileStore,
                     id: 'ge-tree',
                     listeners: {
@@ -264,7 +264,11 @@ Ext.application({
                             var icon = event.data.icon;
                             var title = event.data.text;
                             if (event.childNodes.length == 0) {
-                                addbutton(item, 'generate', icon, title, {path: event.get('folder') + '\\' + title});
+                                addbutton(item, 'generate', icon, title, {
+                                    path: event.get('folder') + '\\' + title,
+                                    folder: event.get('folder'),
+                                    file: title
+                                });
                             }
                         },
                         itemcontextmenu: function (node, record, item, index, event, eOpts) {
@@ -276,7 +280,7 @@ Ext.application({
                                             text: '修改',
                                             icon: 'images/table_edit.png',
                                             handler: function () {
-                                                addGeFiles(record.get('id'));
+                                                addGeFiles(this, record.get('id'));
                                             }
                                         },
                                         {
@@ -286,7 +290,8 @@ Ext.application({
                                                 showConfirm(`是否删除[${record.data.text}]?`, function (text) {
                                                     record.parentNode.removeChild(record);
                                                     fileData.removeFile(record.get('id'));
-                                                });
+                                                    geFileData.removeData(pId, record.get('text'));
+                                                }, this);
                                             }
                                         }
                                     ]
@@ -303,7 +308,7 @@ Ext.application({
                         {
                             type: 'plus', qtip: '设置生成文件', listeners: {
                                 click: function () {
-                                    addGeFiles();
+                                    addGeFiles(this);
                                 }
                             }
                         },
@@ -336,7 +341,12 @@ Ext.application({
                         labelEditor.cancelEdit();
                     },
                     add: function (tabPanel, tab) {
-                        history.setTab({id: tab.config.id, params: tab.config.params, title: tab.config.title, type: tab.config.xtype});
+                        history.setTab({
+                            id: tab.config.id,
+                            params: tab.config.params,
+                            title: tab.config.title,
+                            type: tab.config.xtype
+                        });
                     },
                     remove: function (tabPanel, tab) {
                         history.removeTab(tab.config.id);
@@ -394,7 +404,7 @@ Ext.application({
             }
         }
 
-        function addGeFiles(id) {
+        function addGeFiles(btn, id) {
             let d = {};
             if (id != undefined) {
                 d = fileData.getFile(id);
@@ -405,6 +415,7 @@ Ext.application({
                 fixed: true,
                 layout: 'fit',
                 resizable: false,
+                animateTarget: btn,
                 constrain: true,
                 modal: true,
                 items: {

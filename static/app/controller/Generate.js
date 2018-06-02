@@ -19,10 +19,10 @@ Ext.define('MyAppNamespace.controller.Generate', {
         const that = this;
         dom.codeEditor.changeValue = function () {
             const val = dom.codeEditor.codeEditor.getValue();
-            if(that.type == "edit") {
-                geFileData.setDataEdit(dom.pId, dom.params.path, val);
+            if (that.type == "edit") {
+                geFileData.setDataEdit(dom.pId, dom.params.path, dom.params.folder, val);
             } else {
-                geFileData.setDataPreview(dom.pId, dom.params.path, val);
+                geFileData.setDataPreview(dom.pId, dom.params.path, dom.params.folder, val);
             }
         };
     },
@@ -37,10 +37,7 @@ Ext.define('MyAppNamespace.controller.Generate', {
         const code = btn.up('generate').down('minicode').codeEditor;
         code.updateOptions({readOnly: true});
         const tpl = swig.compile(code.getValue());
-        const output = tpl({
-            pagename: 'awesome people',
-            authors: ['Paul', 'Jim', 'Jane']
-        });
+        const output = tpl(controlData.getModuleData(btn.up('generate').pId));
         code.setValue(output);
     },
     getContent: function (that) {
