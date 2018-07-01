@@ -155,8 +155,8 @@ Ext.application({
                                                     while (root.firstChild) {
                                                         root.removeChild(root.firstChild);
                                                     }
-                                                    history.removeAll();
                                                     root.appendChild(data.getData(pId));
+                                                    history.removeAll();
                                                     Ext.getCmp('panel-model').setTitle(row.data.text);
                                                     Ext.getCmp('mainmenutab').removeAll();
                                                     getFilesData();
@@ -184,11 +184,11 @@ Ext.application({
                                         pId = parentData.setData(text);
                                         moduleId = pId;
                                         history.setMode(pId);
-                                        store.setRoot({
-                                            expanded: true,
-                                            text: '',
-                                            children: data.getData(pId)
-                                        });
+                                        const root = Ext.getCmp('panel-model').getRootNode();
+                                        while (root.firstChild) {
+                                            root.removeChild(root.firstChild);
+                                        }
+                                        root.appendChild(data.getData(pId));
                                         Ext.getCmp('panel-model').setTitle(text);
                                     }, this);
                                 }
@@ -248,11 +248,11 @@ Ext.application({
                                                         data.setData(t, pId);
                                                     }
                                                     this.up('window').close();
-                                                    store.setRoot({
-                                                        expanded: true,
-                                                        text: '',
-                                                        children: data.getData(pId)
-                                                    });
+                                                    const root = Ext.getCmp('panel-model').getRootNode();
+                                                    while (root.firstChild) {
+                                                        root.removeChild(root.firstChild);
+                                                    }
+                                                    root.appendChild(data.getData(pId));
                                                 }
                                             },
                                             {

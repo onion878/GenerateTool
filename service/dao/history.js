@@ -82,7 +82,6 @@ class History {
     }
 
     removeAll() {
-        m.set('mode', '').write();
         m.set('tab', []).write();
         m.set('tabshow', '').write();
         m.set('codeshow', '').write();

@@ -10,7 +10,9 @@ function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 800,
-        height: 600
+        height: 600,
+        title: '代码构建工具',
+        icon: path.join(__dirname, 'static/images/icon.ico')
     });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
