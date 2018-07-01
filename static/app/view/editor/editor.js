@@ -5,7 +5,11 @@ Ext.define('MyAppNamespace.view.editor.editor', {
     layout: 'border',
     listeners: {
         render: function (c) {
-
+            const tPanel = this.down('tabpanel')
+            history.getCode().forEach(c=> {
+                tPanel.add(c);
+            });
+            tPanel.setActiveTab(history.getShowCodeTab());
         }
     },
     initComponent: function () {
@@ -61,7 +65,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                         if (nowItem) {
                             tPanel.setActiveTab(nowItem);
                         } else {
-                            const jTab = tPanel.add({
+                            const data = {
                                 id: id,
                                 pId: pId,
                                 title: record.data.parentFolder,
@@ -69,7 +73,9 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                 fileContent: content,
                                 closable: true,
                                 xtype: 'code'
-                            });
+                            };
+                            const jTab = tPanel.add(data);
+                            history.setCode(data);
                             tPanel.setActiveTab(jTab);
                         }
                     }
@@ -111,13 +117,15 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                         if (nowItem) {
                                             tPanel.setActiveTab(nowItem);
                                         } else {
-                                            const jTab = tPanel.add({
+                                            const data = {
                                                 id: 'pkg-main',
                                                 pId: pId,
                                                 title: '安装包',
                                                 closable: true,
                                                 xtype: 'pkg'
-                                            });
+                                            };
+                                            const jTab = tPanel.add(data);
+                                            history.setCode(data);
                                             tPanel.setActiveTab(jTab);
                                         }
                                     }
@@ -131,14 +139,16 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                         if (nowItem) {
                                             tPanel.setActiveTab(nowItem);
                                         } else {
-                                            const jTab = tPanel.add({
+                                            const data = {
                                                 id: 'unpkg-main',
                                                 pId: pId,
                                                 title: '管理包',
                                                 closable: true,
                                                 xtype: 'unpkg'
-                                            });
+                                            };
+                                            const jTab = tPanel.add(data);
                                             tPanel.setActiveTab(jTab);
+                                            history.setCode(data);
                                         }
                                     }
                                 }
@@ -231,7 +241,15 @@ Ext.define('MyAppNamespace.view.editor.editor', {
             xtype: 'tabpanel',
             fullscreen: true,
             plugins: new Ext.ux.TabCloseMenu(),
-            fullscreen: true
+            fullscreen: true,
+            listeners: {
+                tabchange: function (tabPanel, tab) {
+                    history.setShowCodeTab(tab.id);
+                },
+                remove: function (tabPanel, tab) {
+                    history.removeCodeTab(tab.config.id);
+                }
+            }
         }];
         this.callParent(arguments);
     }

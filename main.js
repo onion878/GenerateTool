@@ -33,12 +33,15 @@ function createWindow() {
                     }
                 },
                 {
-                    label: 'stopspeaking'
+                    label: '停止loading',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`Ext.getBody().unmask()`);
+                    }
                 }
             ]
         },
         {
-            label: '调试',
+            label: '控制台',
             click() {
                 mainWindow.webContents.openDevTools();
             }

@@ -9,13 +9,14 @@ Ext.define('MyAppNamespace.view.generate.generate', {
         render: function (c) {
             const that = this;
             that.fileName = that.title;
-            const language = systemConfig.getCode(that.fileName);
-            const val = geFileData.getOneData(that.pId, that.params.path);
+            let language = systemConfig.getCode(that.fileName);
+            let val = geFileData.getOneData(that.params.fileId);
             let content = '';
             if( val != undefined) {
                 content = val.content;
             }
             if (language == undefined) {
+                language = 'html';
                 Ext.create('Ext.window.Window', {
                     title: that.fileName,
                     fixed: true,
@@ -56,12 +57,7 @@ Ext.define('MyAppNamespace.view.generate.generate', {
                                 if (form.isValid()) {
                                     const {language} = form.getValues();
                                     systemConfig.setCode(that.fileName, language);
-                                    that.codeEditor = Ext.create({
-                                        language: language,
-                                        value: content,
-                                        xtype: 'minicode'
-                                    });
-                                    that.add(that.codeEditor);
+                                    that.codeEditor.updateLanguage(content, language);
                                     this.up('window').close();
                                 }
                             }
@@ -73,14 +69,13 @@ Ext.define('MyAppNamespace.view.generate.generate', {
                         }
                     ]
                 }).show().focus();
-            } else {
-                that.codeEditor = Ext.create({
-                    language: language,
-                    value: content,
-                    xtype: 'minicode'
-                });
-                that.add(that.codeEditor);
             }
+            that.codeEditor = Ext.create({
+                language: language,
+                value: content,
+                xtype: 'minicode'
+            });
+            that.add(that.codeEditor);
         }
     },
     initComponent: function () {
@@ -100,9 +95,6 @@ Ext.define('MyAppNamespace.view.generate.generate', {
                     text: '预览',
                     action: 'preview'
                 }]
-            }, {
-                xtype: 'button',
-                text: '生成'
             }]
         };
         this.callParent(arguments);

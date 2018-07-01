@@ -7,29 +7,69 @@ const utils = require('../utils/utils');
 class File {
 
     constructor() {
-        fdb.defaults({data: []}).write();
+        fdb.defaults({
+            data: []
+        }).write();
     }
 
-    addFile(pId, folder, files, code, id) {
-        if (id != undefined)
-            this.removeFile(id);
+    saveOrUpdate(data, id) {
+        if (id != undefined) this.removeFile(id);
+        else id = utils.getUUID();
+        data.id = id;
         fdb.get('data')
-            .push({id: utils.getUUID(), pId: pId, folder: folder, files: files, code: code})
+            .push(data)
             .write();
+        return data;
     }
 
     removeFile(id) {
         fdb.get('data')
-            .remove({id: id})
+            .remove({
+                id: id
+            })
             .write();
     }
 
-    getFiles(pId) {
-        return fdb.get('data').filter({pId: pId}).value();
+    getFiles(pId, rootId) {
+        return fdb.get('data').filter({
+            pId: pId
+        }).filter({
+            rootId: rootId
+        }).value();
     }
 
     getFile(id) {
-        return fdb.get('data').find({id: id}).value();
+        return fdb.get('data').find({
+            id: id
+        }).value();
+    }
+
+    getTreeData(rootId, pId) {
+        const list = [];
+        this.getMoreData(rootId, pId, list);
+        return list;
+    }
+
+    getMoreData(rootId, pId, list) {
+        const data = fdb.get('data').filter({rootId: rootId,pId: pId}).value();
+        data.forEach(d=> {
+            list.push(d);
+            this.getMoreData(d.id, pId, list);
+        });
+    }
+
+    updateRootId(id, rootId) {
+        fdb.get('data').find({
+                id: id
+            }).set('rootId', rootId)
+            .write()
+    }
+
+    updateName(id, name) {
+        fdb.get('data').find({
+                id: id
+            }).set('text', name)
+            .write()
     }
 }
 

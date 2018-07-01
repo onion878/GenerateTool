@@ -8,7 +8,9 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
     codeEditor: null,
     listeners: {
         render: function (c) {
-            const {dom} = this.getEl().down('.code-editor-content'), that = this;
+            const {
+                dom
+            } = this.getEl().down('.code-editor-content'), that = this;
             that.language = that.language != undefined ? that.language : 'javascript';
             that.fileContent = that.fileContent != undefined ? that.fileContent : '';
             that.codeEditor = monaco.editor.create(dom, {
@@ -38,5 +40,17 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
     },
     changeValue: function () {
 
+    },
+    updateLanguage(val, language) {
+        const oldModel = this.codeEditor.getModel();
+        const newModel = monaco.editor.createModel(val, language);
+        this.codeEditor.setModel(newModel);
+        if (oldModel) {
+            oldModel.dispose();
+        }
+    },
+    updateTheme(theme) {
+        const newTheme = (theme === 1 ? 'vs-dark' : (theme === 0 ? 'vs' : 'hc-black'));
+        monaco.editor.setTheme(newTheme);
     }
 });

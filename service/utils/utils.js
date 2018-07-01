@@ -1,4 +1,5 @@
 const fs = require('fs');
+const shell = require('shelljs');
 
 class Utils {
 
@@ -91,6 +92,21 @@ class Utils {
 
     writeFile({path, content}) {
         try {
+            fs.writeFileSync(path, content, 'utf8');
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    }
+
+    createFile(path, content) {
+        try {
+            path = path.replace(/\//g, '\\');
+            const filePath = path.substring(0,path.lastIndexOf(`\\`));
+            if (!fs.existsSync(filePath)) {
+                shell.mkdir('-p', filePath);
+            }
             fs.writeFileSync(path, content, 'utf8');
             return true;
         } catch (e) {

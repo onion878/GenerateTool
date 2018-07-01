@@ -7,51 +7,94 @@ const utils = require('../utils/utils');
 class GeFile {
 
     constructor() {
-        gdb.defaults({data: []}).write();
+        gdb.defaults({
+            data: []
+        }).write();
     }
 
-    setDataEdit(pId, file, folder, content) {
-        const v = this.getOneData(pId, file);
+    save(id, pId) {
+        gdb.get('data')
+                .push({
+                    id: id,
+                    pId: pId,
+                    file: '',
+                    content: null,
+                    preview: null
+                })
+                .write();
+    }
+
+    setDataEdit(id, pId, content, preview) {
+        const v = this.getOneData(id);
         if (v != undefined) {
-            gdb.get('data').find({pId: pId, file: file})
+            gdb.get('data').find({
+                    id: id
+                })
                 .set('content', content)
-                .write();
-        } else {
-            gdb.get('data')
-                .push({pId: pId, file: file, content: content, preview: null, folder: folder})
-                .write();
-        }
-    }
-
-    setDataPreview(pId, file, folder, preview) {
-        const v = this.getOneData(pId, file);
-        if (v != undefined) {
-            gdb.get('data').find({pId: pId, file: file})
                 .set('preview', preview)
                 .write();
         } else {
             gdb.get('data')
-                .push({pId: pId, file: file, content: null, preview: preview, folder: folder})
+                .push({
+                    id: id,
+                    pId: pId,
+                    file: '',
+                    content: content,
+                    preview: preview
+                })
                 .write();
         }
     }
 
-    getOneData(pId, file) {
-        return gdb.get('data').find({pId: pId, file: file}).value();
+    setDataPreview(id, pId, preview) {
+        const v = this.getOneData(id);
+        if (v != undefined) {
+            gdb.get('data').find({
+                    id: id
+                })
+                .set('preview', preview)
+                .write();
+        } else {
+            gdb.get('data')
+                .push({
+                    id: id,
+                    pId: pId,
+                    file: '',
+                    content: null,
+                    preview: preview
+                })
+                .write();
+        }
     }
 
-    removeData(pId, folder) {
+    getOneData(id) {
+        return gdb.get('data').find({
+            id: id
+        }).value();
+    }
+
+    removeData(id) {
         gdb.get('data')
-            .remove({pId: pId, folder: folder})
+            .remove({
+                id: id
+            })
             .write();
     }
 
-    updateData(pId, folder, newFolder, newFile) {
+    updateDataFile(id, file) {
         gdb.get('data')
-            .find({pId: pId, folder: folder})
-            .set('folder', newFolder)
-            .set('file', newFolder + '\\' + newFile)
+            .find({
+                id: id
+            })
+            .set('file', file)
             .write();
+    }
+
+    getFileData(pId) {
+        return gdb.get('data')
+            .filter({
+                pId: pId
+            }).value();
     }
 }
 

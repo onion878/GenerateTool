@@ -17,7 +17,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
     },
     onPanelRendered: function (panel) {
         this.pId = panel.pId;
-        const data = controlData.getExt(panel.id), that = this;
+        const data = controlData.getExt(panel.id),
+            that = this;
         data.forEach(d => {
             panel.add(Ext.create(that.getDataModule(d.content, d.type, d.label, d.id, d.data)));
         });
@@ -41,8 +42,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     pack: 'start',
                     align: 'stretch'
                 },
-                items: [
-                    {
+                items: [{
                         xtype: 'textfield',
                         margin: '10',
                         labelWidth: 45,
@@ -57,14 +57,38 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         labelWidth: 45,
                         store: {
                             fields: ['id', 'text'],
-                            data: [
-                                {id: 'text', text: '文本框'},
-                                {id: 'textarea', text: '多行文本框'},
-                                {id: 'datalist', text: '单一集合'},
-                                {id: 'datagrid', text: '表格数据'},
-                                {id: 'minicode', text: '代码块'},
-                                {id: 'folder', text: '文件夹'},
-                                {id: 'file', text: '文件'}
+                            data: [{
+                                    id: 'text',
+                                    text: '文本框'
+                                },
+                                {
+                                    id: 'textarea',
+                                    text: '多行文本框'
+                                },
+                                {
+                                    id: 'datalist',
+                                    text: '单一集合'
+                                },
+                                {
+                                    id: 'datagrid',
+                                    text: '表格数据'
+                                },
+                                {
+                                    id: 'minicode',
+                                    text: '代码块'
+                                },
+                                {
+                                    id: 'folder',
+                                    text: '文件夹'
+                                },
+                                {
+                                    id: 'file',
+                                    text: '文件'
+                                },
+                                {
+                                    id: 'json',
+                                    text: 'JSON数据'
+                                }
                             ]
                         },
                         name: 'type',
@@ -103,13 +127,17 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 ]
             },
             buttonAlign: 'center',
-            buttons: [
-                {
-                    text: '确定', handler: function () {
+            buttons: [{
+                    text: '确定',
+                    handler: function () {
                         const form = this.up('window').down('form').getForm();
                         if (form.isValid()) {
                             const moduleData = controlData.getModuleData(that.pId);
-                            const {type, name, language} = form.getValues();
+                            const {
+                                type,
+                                name,
+                                language
+                            } = form.getValues();
                             if (moduleData[name] != undefined) {
                                 showToast(`已存在[${name}]!`);
                             } else {
@@ -120,7 +148,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     }
                 },
                 {
-                    text: '取消', handler: function () {
+                    text: '取消',
+                    handler: function () {
                         this.up('window').close();
                     }
                 }
@@ -158,18 +187,16 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     autoUpdate: true,
                     autoCancel: false
                 },
-                columns: [
-                    {
-                        xtype: 'treecolumn',
-                        dataIndex: 'text',
-                        flex: 1,
-                        editor: {
-                            xtype: 'textfield',
-                            allowBlank: false,
-                            allowOnlyWhitespace: false
-                        }
+                columns: [{
+                    xtype: 'treecolumn',
+                    dataIndex: 'text',
+                    flex: 1,
+                    editor: {
+                        xtype: 'textfield',
+                        allowBlank: false,
+                        allowOnlyWhitespace: false
                     }
-                ],
+                }],
                 style: {
                     border: '1px solid #c2c2c2'
                 }
@@ -200,6 +227,11 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 flex: 1,
                 attr: 'webkitdirectory'
             };
+        } else if (type == 'json') {
+            content = {
+                xtype: 'propertygrid',
+                flex: 1
+            };
         } else {
             content = {
                 xtype: 'panel',
@@ -215,7 +247,14 @@ Ext.define('MyAppNamespace.controller.Mode', {
             };
         }
         const bId = getUUID();
-        controlData.setExt({cId: id, content: content, type: type, label: label, id: bId, pId: this.pId});
+        controlData.setExt({
+            cId: id,
+            content: content,
+            type: type,
+            label: label,
+            id: bId,
+            pId: this.pId
+        });
         return this.getDataModule(content, type, label, bId, null);
     },
     getDataModule(content, type, label, id, value) {
@@ -239,7 +278,11 @@ Ext.define('MyAppNamespace.controller.Mode', {
             const data = [];
             if (value != null) {
                 value.forEach(v => {
-                    data.push({text: v, leaf: true, cls: 'x-tree-no-icon'})
+                    data.push({
+                        text: v,
+                        leaf: true,
+                        cls: 'x-tree-no-icon'
+                    })
                 });
             }
             content.store = Ext.create('Ext.data.TreeStore', {
@@ -260,7 +303,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 }
             };
         } else if (type == 'datagrid') {
-            const data = [], fields = [], columns = [new Ext.grid.RowNumberer()];
+            const data = [],
+                fields = [],
+                columns = [new Ext.grid.RowNumberer()];
             if (value != null) {
                 value.forEach((v, i) => {
                     data.push(v);
@@ -271,7 +316,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
                                 text: key,
                                 align: 'center',
                                 dataIndex: key,
-                                editor: {xtype: 'textfield'},
+                                editor: {
+                                    xtype: 'textfield'
+                                },
                                 flex: 1
                             });
                         }
@@ -312,6 +359,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     controlData.setDataValue(id, val);
                 }
             };
+        } else if (type == 'json') {
+            content.source = value;
+            content.listeners = {
+                propertychange: function (dom, recordId, val) {
+                    controlData.setDataValue(id, that.getGridJsonData(this.getStore()));
+                }
+            };
         } else {
             content.items.changeValue = function () {
                 controlData.setDataValue(id, this.codeEditor.getValue());
@@ -326,8 +380,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 right: 10,
                 bottom: 10
             },
-            items: [
-                {
+            items: [{
                     xtype: 'container',
                     flex: 1,
                     layout: 'hbox',
@@ -371,7 +424,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
         }
     },
     getJavaScriptData(btn, type) {
-        const val = controlData.getCode(btn.bId);
+        const val = controlData.getCode(btn.bId),
+            that = this;
         let v = null;
         if (val != undefined && val != null) {
             v = val.value;
@@ -381,7 +435,6 @@ Ext.define('MyAppNamespace.controller.Mode', {
             height: 160,
             width: 400,
             layout: 'fit',
-            animateTarget: this,
             resizable: true,
             constrain: true,
             modal: true,
@@ -390,63 +443,141 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 xtype: 'minicode'
             },
             buttonAlign: 'center',
-            buttons: [
-                {
-                    text: '确定', handler: function () {
+            buttons: [{
+                    text: '确定',
+                    handler: function () {
                         const valStr = this.up('window').down('minicode').codeEditor.getValue();
                         controlData.setCode(btn.bId, valStr);
-                        const d = eval(valStr);
-                        if (type == 'text') {
-                            btn.up('container').down('textfield').setValue(d);
-                        } else if (type == 'textarea') {
-                            btn.up('container').down('textareafield').setValue(d);
-                        } else if (type == 'datalist') {
-                            const tree = btn.up('container').down('treepanel');
-                            const child = [];
-                            d.forEach(function (r) {
-                                child.push({
-                                    leaf: true,
-                                    cls: 'x-tree-no-icon',
-                                    text: r
-                                });
-                            });
-                            const root = tree.getRootNode();
-                            while (root.firstChild) {
-                                root.removeChild(root.firstChild);
-                            }
-                            root.appendChild(child);
-                        } else if (type == 'datagrid') {
-                            const grid = btn.up('container').down('grid');
-                            const columns = [new Ext.grid.RowNumberer()], fields = [];
-                            if (d.length > 0) {
-                                const col = d[0];
-                                for (let key in col) {
-                                    fields.push(key);
-                                    columns.push({
-                                        text: key,
-                                        align: 'center',
-                                        dataIndex: key,
-                                        editor: {xtype: 'textfield'},
-                                        flex: 1
-                                    });
-                                }
-                            }
-                            const store = grid.getStore();
-                            store.setFields(fields);
-                            store.setData(d);
-                            grid.reconfigure(store, columns);
-                        } else if (type == 'file') {
-                            btn.up('container').down('filefield').setRawValue(d);
-                        } else if (type == 'folder') {
-                            btn.up('container').down('filefield').setRawValue(d);
-                        } else {
-
-                        }
+                        Ext.getBody().mask('执行中...');
                         this.up('window').close();
+                        let d = '';
+                        try {
+                            d = eval(valStr);
+                        } catch (e) {
+                            showError(e);
+                            Ext.getBody().unmask();
+                            throw e;
+                        }
+                        if (d instanceof Promise) {
+                            d.then(v => {
+                                if (type == 'text') {
+                                    btn.up('container').down('textfield').setValue(v);
+                                } else if (type == 'textarea') {
+                                    btn.up('container').down('textareafield').setValue(v);
+                                } else if (type == 'datalist') {
+                                    const tree = btn.up('container').down('treepanel');
+                                    const child = [];
+                                    v.forEach(function (r) {
+                                        child.push({
+                                            leaf: true,
+                                            cls: 'x-tree-no-icon',
+                                            text: r
+                                        });
+                                    });
+                                    const root = tree.getRootNode();
+                                    while (root.firstChild) {
+                                        root.removeChild(root.firstChild);
+                                    }
+                                    root.appendChild(child);
+                                } else if (type == 'datagrid') {
+                                    const grid = btn.up('container').down('grid');
+                                    const columns = [new Ext.grid.RowNumberer()],
+                                        fields = [];
+                                    if (v.length > 0) {
+                                        const col = v[0];
+                                        for (let key in col) {
+                                            fields.push(key);
+                                            columns.push({
+                                                text: key,
+                                                align: 'center',
+                                                dataIndex: key,
+                                                editor: {
+                                                    xtype: 'textfield'
+                                                },
+                                                flex: 1
+                                            });
+                                        }
+                                    }
+                                    const store = grid.getStore();
+                                    store.setFields(fields);
+                                    store.setData(v);
+                                    grid.reconfigure(store, columns);
+                                } else if (type == 'file') {
+                                    btn.up('container').down('filefield').setRawValue(v);
+                                } else if (type == 'folder') {
+                                    btn.up('container').down('filefield').setRawValue(v);
+                                } else if (type == 'json') {
+                                    const g = btn.up('container').down('propertygrid');
+                                    g.setSource(v);
+                                    controlData.setDataValue(btn.bId, that.getGridJsonData(g.getStore()));
+                                } else {
+
+                                }
+                                Ext.getBody().unmask();
+                            });
+                        } else {
+                            if (type == 'text') {
+                                btn.up('container').down('textfield').setValue(d);
+                            } else if (type == 'textarea') {
+                                btn.up('container').down('textareafield').setValue(d);
+                            } else if (type == 'datalist') {
+                                const tree = btn.up('container').down('treepanel');
+                                const child = [];
+                                d.forEach(function (r) {
+                                    child.push({
+                                        leaf: true,
+                                        cls: 'x-tree-no-icon',
+                                        text: r
+                                    });
+                                });
+                                const root = tree.getRootNode();
+                                while (root.firstChild) {
+                                    root.removeChild(root.firstChild);
+                                }
+                                root.appendChild(child);
+                            } else if (type == 'datagrid') {
+                                const grid = btn.up('container').down('grid');
+                                const columns = [new Ext.grid.RowNumberer()],
+                                    fields = [];
+                                if (d.length > 0) {
+                                    const col = d[0];
+                                    for (let key in col) {
+                                        fields.push(key);
+                                        columns.push({
+                                            text: key,
+                                            align: 'center',
+                                            dataIndex: key,
+                                            editor: {
+                                                xtype: 'textfield'
+                                            },
+                                            flex: 1
+                                        });
+                                    }
+                                }
+                                const store = grid.getStore();
+                                store.setFields(fields);
+                                store.setData(d);
+                                grid.reconfigure(store, columns);
+                            } else if (type == 'file') {
+                                btn.up('container').down('filefield').setRawValue(d);
+                            } else if (type == 'folder') {
+                                btn.up('container').down('filefield').setRawValue(d);
+                            } else if (type == 'json') {
+                                const g = btn.up('container').down('propertygrid');
+                                g.setSource(d);
+                                controlData.setDataValue(btn.bId, that.getGridJsonData(g.getStore()));
+                            } else {
+
+                            }
+                            Ext.getBody().unmask();
+                        }
+
+
                     }
                 },
                 {
-                    text: '取消', handler: function () {
+                    text: '取消',
+                    handler: function () {
                         this.up('window').close();
                     }
                 }
@@ -461,16 +592,26 @@ Ext.define('MyAppNamespace.controller.Mode', {
         });
     },
     getListData(store) {
-        const data = store.getData(), list = [];
+        const data = store.getData(),
+            list = [];
         data.items.forEach(d => {
             list.push(d.data.text);
         });
         return list;
     },
     getGridData(store) {
-        const data = store.getData(), list = [];
+        const data = store.getData(),
+            list = [];
         data.items.forEach(d => {
             list.push(d.data);
+        });
+        return list;
+    },
+    getGridJsonData(store) {
+        const data = store.getData(),
+            list = {};
+        data.items.forEach(d => {
+            list[d.data.name] = d.data.value;
         });
         return list;
     }

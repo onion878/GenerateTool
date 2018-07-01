@@ -44,3 +44,37 @@ body {
 .mode-controls .x-form-text:focus {
     border-bottom: 0.5px inset #3892D4;
 }
+
+.x-panel-header-default .x-tool-img-add {
+    background-image: url(../images/coins_add.png);
+    background-color: #e0ebf3;
+}
+
+.x-panel-header-default .x-tool-img-tag {
+    background-image: url(../images/tag.png);
+    background-color: #e0ebf3;
+}
+
+.x-panel-header-default .x-tool-img-save {
+    background-image: url(../images/database_save.png);
+    background-color: #e0ebf3;
+}
+
+.x-panel-header-default .x-tool-img-cd-go {
+    background-image: url(../images/cd_go.png);
+    background-color: #e0ebf3;
+}
+
+.x-panel-header-default .x-tool-img-add-folder {
+    background-image: url(../images/folder_add.png);
+    background-color: #e0ebf3;
+}
+
+.x-panel-header-default .x-tool-img-add-file {
+    background-image: url(../images/add.png);
+    background-color: #e0ebf3;
+}
+
+.color-blue {
+    color: blue;
+}

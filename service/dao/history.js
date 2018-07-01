@@ -9,6 +9,8 @@ class History {
         m.defaults({mode: ''}).write();
         m.defaults({tab: []}).write();
         m.defaults({tabshow: ''}).write();
+        m.defaults({codeshow: ''}).write();
+        m.defaults({code: []}).write();
     }
 
     setMode(name) {
@@ -47,6 +49,36 @@ class History {
 
     setShowTab(id) {
         m.set('tabshow', id).write();
+    }
+
+    setCode(data) {
+        const d = m.get('code')
+            .find({ id: data.id })
+            .value();
+        if(d == undefined || d == null) {
+            m.get('code')
+                .push(data)
+                .write();
+        }
+    }
+
+    getCode() {
+        return m.get('code').value();
+    }
+
+    getShowCodeTab() {
+        return m.get('codeshow').value();
+    }
+
+    setShowCodeTab(id) {
+        m.set('codeshow', id).write();
+    }
+
+    removeCodeTab(id) {
+        m.get('code')
+            .remove({id: id})
+            .write();
+        return this.getTab();
     }
 }
 

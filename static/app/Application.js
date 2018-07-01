@@ -8,6 +8,7 @@ const controlData = require('../service/dao/controls');
 const fileData = require('../service/dao/file');
 const geFileData = require('../service/dao/gefile');
 const swig = require('swig');
+const utils = require('../service/utils/utils');
 
 Ext.application({
     requires: ['Ext.container.Viewport'],
@@ -60,9 +61,10 @@ Ext.application({
                                 maximized: true,
                                 resizable: true,
                                 maximizable: true,
-                                minimizable: true,
+                                minimizable: false,
                                 constrain: true,
-                                modal: true,
+                                modal: false,
+                                animateTarget: this,
                                 layout: 'fit',
                                 items: {
                                     xtype: 'editor',
@@ -108,10 +110,11 @@ Ext.application({
                     closable: false,
                     rootVisible: false,
                     hideCollapseTool: true,
-                    tools: [
-                        {
-                            type: 'down',
+                    tools: [{
                             qtip: '切换模板',
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-tag" role="presentation"></div>'
+                            ],
                             listeners: {
                                 click: function () {
                                     Ext.create('Ext.window.Window', {
@@ -137,9 +140,9 @@ Ext.application({
                                             valueField: 'id'
                                         },
                                         buttonAlign: 'center',
-                                        buttons: [
-                                            {
-                                                text: '确定', handler: function () {
+                                        buttons: [{
+                                                text: '确定',
+                                                handler: function () {
                                                     const combo = this.up('window').down('combobox');
                                                     const row = combo.getSelectedRecord();
                                                     if (row !== null) {
@@ -157,7 +160,8 @@ Ext.application({
                                                 }
                                             },
                                             {
-                                                text: '取消', handler: function () {
+                                                text: '取消',
+                                                handler: function () {
                                                     this.up('window').close();
                                                 }
                                             }
@@ -167,8 +171,10 @@ Ext.application({
                             }
                         },
                         {
-                            type: 'save',
                             qtip: '保存模板',
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-save" role="presentation"></div>'
+                            ],
                             listeners: {
                                 click: function () {
                                     showPrompt('模板名称', '', function (text) {
@@ -186,7 +192,11 @@ Ext.application({
                             }
                         },
                         {
-                            type: 'plus', qtip: '添加模板详情', listeners: {
+                            qtip: '添加模板详情',
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add" role="presentation"></div>'
+                            ],
+                            listeners: {
                                 click: function () {
                                     if (pId === null) {
                                         showToast('请先设置模板名称');
@@ -220,9 +230,9 @@ Ext.application({
                                             valueField: 'id'
                                         },
                                         buttonAlign: 'center',
-                                        buttons: [
-                                            {
-                                                text: '确定', handler: function () {
+                                        buttons: [{
+                                                text: '确定',
+                                                handler: function () {
                                                     const combo = this.up('window').down('combobox');
                                                     const t = combo.getRawValue();
                                                     let ifAdd = true;
@@ -243,7 +253,8 @@ Ext.application({
                                                 }
                                             },
                                             {
-                                                text: '取消', handler: function () {
+                                                text: '取消',
+                                                handler: function () {
                                                     this.up('window').close();
                                                 }
                                             }
@@ -258,45 +269,259 @@ Ext.application({
                     title: '生成模板',
                     store: fileStore,
                     id: 'ge-tree',
+                    split: true,
+                    useArrows: true,
+                    viewConfig: {
+                        plugins: [{
+                            ptype: 'treeviewdragdrop',
+                            appendOnly: true
+                        }],
+                        listeners: {
+                            drop: function (node, data, overModel, dropPosition) {
+                                const paId = data.records[0].parentNode.data.id;
+                                const id = data.records[0].data.id;
+                                fileData.updateRootId(id, paId);
+                            }
+                        }
+                    },
                     listeners: {
                         itemdblclick: function (node, event) {
-                            var item = event.data.id;
-                            var icon = event.data.icon;
-                            var title = event.data.text;
-                            if (event.childNodes.length == 0) {
+                            const item = event.data.id;
+                            const icon = event.data.icon;
+                            const title = event.data.text;
+                            const type = event.data.type;
+                            if (type == 'file' && event.childNodes.length == 0) {
                                 addbutton(item, 'generate', icon, title, {
                                     path: event.get('folder') + '\\' + title,
                                     folder: event.get('folder'),
-                                    file: title
+                                    file: title,
+                                    fileId: event.get('id')
                                 });
                             }
                         },
-                        itemcontextmenu: function (node, record, item, index, event, eOpts) {
-                            if (record.childNodes.length > 0) {
-                                new Ext.menu.Menu({
-                                    minWidth: 60,
-                                    items: [
-                                        {
-                                            text: '修改',
-                                            icon: 'images/table_edit.png',
-                                            handler: function () {
-                                                addGeFiles(this, record.get('id'));
-                                            }
-                                        },
-                                        {
-                                            text: '删除',
-                                            icon: 'images/cross.png',
-                                            handler: function () {
-                                                showConfirm(`是否删除[${record.data.text}]?`, function (text) {
-                                                    record.parentNode.removeChild(record);
-                                                    fileData.removeFile(record.get('id'));
-                                                    geFileData.removeData(pId, record.get('text'));
-                                                }, this);
-                                            }
-                                        }
-                                    ]
-                                }).showAt(event.getPoint());
+                        afteritemexpand: function (node, index, item, eOpts) {
+                            while (node.firstChild) {
+                                node.removeChild(node.firstChild);
                             }
+                            const child = fileData.getFiles(pId, node.data.id);
+                            child.forEach(d => {
+                                d.children = undefined;
+                                d.loaded = false;
+                                d.expanded = false;
+                            });
+                            node.appendChild(child);
+                        },
+                        itemcontextmenu: function (node, record, item, index, event, eOpts) {
+                            const {
+                                type,
+                                id,
+                                text
+                            } = record.data;
+                            new Ext.menu.Menu({
+                                minWidth: 60,
+                                items: [{
+                                        text: '添加模板文件',
+                                        icon: 'images/add.png',
+                                        hidden: type != 'file'? false: true,
+                                        handler: function () {
+                                            Ext.create('Ext.window.Window', {
+                                                title: '模板文件',
+                                                fixed: true,
+                                                animateTarget: item,
+                                                width: 280,
+                                                layout: 'fit',
+                                                resizable: false,
+                                                constrain: true,
+                                                modal: true,
+                                                items: {
+                                                    xtype: 'form',
+                                                    layout: {
+                                                        type: 'vbox',
+                                                        pack: 'start',
+                                                        align: 'stretch'
+                                                    },
+                                                    items: [
+                                                        {
+                                                            xtype: 'textfield',
+                                                            fieldLabel: '名称',
+                                                            margin: '10',
+                                                            labelWidth: 45,
+                                                            name: 'name'
+                                                        },
+                                                        {
+                                                            xtype: 'radiogroup',
+                                                            fieldLabel: '类型',
+                                                            margin: '10',
+                                                            labelWidth: 45,
+                                                            name: 'type',
+                                                            items: [
+                                                                {boxLabel: '添加', inputValue: 'add', checked: true},
+                                                                {boxLabel: '修改', inputValue: 'update'}
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                buttonAlign: 'center',
+                                                buttons: [
+                                                    {
+                                                        text: '确定', handler: function () {
+                                                            const form = this.up('window').down('form').getForm();
+                                                            if (form.isValid()) {
+                                                                const {name, type} = form.getValues();
+                                                                const data = {
+                                                                    text: name,
+                                                                    type: 'file',
+                                                                    leaf: true,
+                                                                    parentFolder: text,
+                                                                    rootId: id,
+                                                                    cls: type == 'update'? 'color-blue': '',
+                                                                    updateType: type,
+                                                                    pId: pId
+                                                                };
+                                                                const child = fileData.saveOrUpdate(data);
+                                                                geFileData.save(child.id, pId);
+                                                                record.appendChild(child);
+                                                                this.up('window').close();
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        text: '取消', handler: function () {
+                                                            this.up('window').close();
+                                                        }
+                                                    }
+                                                ]
+                                            }).show().focus();
+                                        }
+                                    },
+                                    {
+                                        text: '添加模板文件夹',
+                                        icon: 'images/folder_add.png',
+                                        hidden: type != 'file'? false: true,
+                                        handler: function () {
+                                            showPrompt('模板文件', '', function (val) {
+                                                const data = {
+                                                    text: val,
+                                                    type: 'folder',
+                                                    folder: true,
+                                                    parentFolder: text,
+                                                    rootId: id,
+                                                    pId: pId
+                                                };
+                                                const child = fileData.saveOrUpdate(data);
+                                                record.appendChild(child);
+                                            }, item);
+                                        }
+                                    },
+                                    {
+                                        text: '设置生成路径',
+                                        hidden: type == 'file'? false: true,
+                                        icon: 'images/cog_add.png',
+                                        handler: function () {
+                                            const {file} = geFileData.getOneData(record.get('id'));
+                                            const fileTpl = swig.compile(file);
+                                            const fileOutput = fileTpl(controlData.getModuleData(pId));
+                                            Ext.create('Ext.window.Window', {
+                                                title: '设置路径',
+                                                fixed: true,
+                                                animateTarget: item,
+                                                width: 500,
+                                                layout: 'fit',
+                                                resizable: false,
+                                                constrain: true,
+                                                modal: true,
+                                                items: {
+                                                    xtype: 'form',
+                                                    layout: {
+                                                        type: 'vbox',
+                                                        pack: 'start',
+                                                        align: 'stretch'
+                                                    },
+                                                    items: [
+                                                        {
+                                                            xtype: 'textfield',
+                                                            fieldLabel: '文件',
+                                                            margin: '10',
+                                                            emptyText: '如:{{folder}}/{{file.mapper}}',
+                                                            labelWidth: 45,
+                                                            name: 'file',
+                                                            value: file,
+                                                            listeners: {
+                                                                change: function (dom, val) {
+                                                                    let output = val;
+                                                                    try{
+                                                                        const tpl = swig.compile(val);
+                                                                        output = tpl(controlData.getModuleData(pId));
+                                                                    }catch(e) {}
+                                                                    this.up('form').down('textareafield').setValue(output);
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            xtype: 'textareafield',
+                                                            fieldLabel: '预览',
+                                                            margin: '10',
+                                                            readOnly: true,
+                                                            labelWidth: 45,
+                                                            value: fileOutput
+                                                        }
+                                                    ]
+                                                },
+                                                buttonAlign: 'center',
+                                                buttons: [
+                                                    {
+                                                        text: '确定', handler: function () {
+                                                            const form = this.up('window').down('form').getForm();
+                                                            if (form.isValid()) {
+                                                                const d = form.getValues();
+                                                                geFileData.updateDataFile(record.get('id'), d.file);
+                                                                this.up('window').close();
+                                                            }
+                                                        }
+                                                    },
+                                                    {
+                                                        text: '取消', handler: function () {
+                                                            this.up('window').close();
+                                                        }
+                                                    }
+                                                ]
+                                            }).show().focus();
+                                        }
+                                    },
+                                    {
+                                        text: '修改',
+                                        icon: 'images/table_edit.png',
+                                        handler: function () {
+                                            showPrompt('名称', '', function (val) {
+                                                if(val.trim().length>0) {
+                                                    fileData.updateName(record.get('id'), val);
+                                                    record.set('text', val);
+                                                    node.refresh();
+                                                }
+                                            }, item);
+                                        }
+                                    },
+                                    {
+                                        text: '删除',
+                                        icon: 'images/cross.png',
+                                        handler: function () {
+                                            showConfirm(`是否删除[${record.data.text}]?`, function (text) {
+                                                record.parentNode.removeChild(record);
+                                                const rId = record.get('id');
+                                                fileData.removeFile(rId);
+                                                geFileData.removeData(rId);
+                                                Ext.getCmp('mainmenutab').remove(rId);
+                                                const removeList = fileData.getTreeData(record.get('id'), pId);
+                                                removeList.forEach(r=> {
+                                                    fileData.removeFile(r.id);
+                                                    geFileData.removeData(r.id);
+                                                    Ext.getCmp('mainmenutab').remove(r.id);
+                                                });
+                                            }, item);
+                                        }
+                                    }
+                                ]
+                            }).showAt(event.getPoint());
                         }
                     },
                     hideCollapseTool: true,
@@ -304,25 +529,92 @@ Ext.application({
                     checkPropagation: 'both',
                     useArrows: true,
                     rootVisible: false,
-                    tools: [
-                        {
-                            type: 'plus', qtip: '设置生成文件', listeners: {
+                    tools: [{
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-file" role="presentation"></div>'
+                            ],
+                            qtip: '添加模板文件',
+                            listeners: {
                                 click: function () {
-                                    addGeFiles(this);
+                                    setGeFile(this);
                                 }
                             }
                         },
                         {
-                            type: 'save', qtip: '开始创建', listeners: {
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-folder" role="presentation"></div>'
+                            ],
+                            qtip: '添加模板文件夹',
+                            listeners: {
                                 click: function () {
-                                    const records = Ext.getCmp('ge-tree').getView().getChecked(),
-                                        files = [];
-                                    Ext.Array.each(records, function (r) {
-                                        if (r.childNodes.length == 0) {
-                                            files.push(r.get('folder') + '\\' + r.get('text'));
+                                    setGeFolder(this);
+                                }
+                            }
+                        },
+                        {
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-cd-go" role="presentation"></div>'
+                            ],
+                            qtip: '开始创建',
+                            listeners: {
+                                click: function () {
+                                    const files = [];
+                                    geFileData.getFileData(pId).forEach(f=> {
+                                        if(f.file.trim().length > 0) {
+                                            const tpl = swig.compile(f.file);
+                                            const tplPre = swig.compile(f.content);
+                                            const allModuleData = controlData.getModuleData(pId);
+                                            f.name = tpl(allModuleData);
+                                            f.preview = tplPre(allModuleData);
+                                            files.push(f);
                                         }
                                     });
-                                    console.log(files);
+                                    Ext.create('Ext.window.Window', {
+                                        title: '生成文件',
+                                        fixed: true,
+                                        width: 500,
+                                        layout: 'fit',
+                                        resizable: false,
+                                        constrain: true,
+                                        modal: true,
+                                        items: {
+                                            xtype: 'grid',
+                                            layout: 'fit',
+                                            selType: 'checkboxmodel',
+                                            columnLines:true,
+                                            enableLocking: true,
+                                            store: Ext.create('Ext.data.Store', {
+                                                data: files
+                                            }),
+                                            columns: [
+                                                new Ext.grid.RowNumberer(),
+                                                { text: '名称', align:'center', dataIndex: 'name', flex: 1 },
+                                                { text: '类型', align:'center', dataIndex: 'type' }
+                                            ],
+                                            listeners: {
+                                                render: function(dom) {
+                                                    dom.getSelectionModel().selectAll();
+                                                }
+                                            }
+                                        },
+                                        buttonAlign: 'center',
+                                        buttons: [
+                                            {
+                                                text: '生成', handler: function () {
+                                                    files.forEach(f=> {
+                                                        
+                                                        utils.createFile(f.name, f.preview);
+                                                    });
+                                                    this.up('window').close();
+                                                }
+                                            },
+                                            {
+                                                text: '取消', handler: function () {
+                                                    this.up('window').close();
+                                                }
+                                            }
+                                        ]
+                                    }).show().focus();
                                 }
                             }
                         }
@@ -357,29 +649,17 @@ Ext.application({
         });
 
         function getFilesData() {
-            let GfData = fileData.getFiles(pId), data = [];
-            GfData.forEach(function (d) {
-                const child = [];
-                d.files.forEach(function (e) {
-                    child.push({
-                        text: e,
-                        checked: true,
-                        folder: d.folder,
-                        leaf: true
-                    })
-                });
-                data.push({
-                    text: d.folder,
-                    id: d.id,
-                    checked: true,
-                    children: child
-                });
+            let GfData = fileData.getFiles(pId, '0');
+            GfData.forEach(d => {
+                d.children = undefined;
+                d.loaded = false;
+                d.expanded = false;
             });
             const root = Ext.getCmp('ge-tree').getRootNode();
             while (root.firstChild) {
                 root.removeChild(root.firstChild);
             }
-            root.appendChild(data);
+            root.appendChild(GfData);
         }
 
         getFilesData();
@@ -404,18 +684,20 @@ Ext.application({
             }
         }
 
-        function addGeFiles(btn, id) {
+        function setGeFile(btn, id) {
             let d = {};
             if (id != undefined) {
                 d = fileData.getFile(id);
             }
+            const tree = btn.up('treepanel');
+            const root = tree.getRootNode();
             Ext.create('Ext.window.Window', {
-                title: '设置生成文件',
-                width: 400,
+                title: '模板文件',
                 fixed: true,
+                animateTarget: btn,
+                width: 280,
                 layout: 'fit',
                 resizable: false,
-                animateTarget: btn,
                 constrain: true,
                 modal: true,
                 items: {
@@ -427,162 +709,21 @@ Ext.application({
                     },
                     items: [
                         {
-                            xtype: 'filefield',
+                            xtype: 'textfield',
+                            fieldLabel: '名称',
                             margin: '10',
                             labelWidth: 45,
-                            name: 'folder',
-                            allowBlank: false,
-                            fieldLabel: '文件夹',
-                            attr: 'webkitdirectory',
-                            listeners: {
-                                render: function () {
-                                    this.setRawValue(d.folder);
-                                }
-                            }
+                            name: 'name'
                         },
                         {
-                            xtype: 'textareafield',
+                            xtype: 'radiogroup',
+                            fieldLabel: '类型',
                             margin: '10',
                             labelWidth: 45,
-                            name: 'code',
-                            value: d.code,
-                            hidden: true,
-                            fieldLabel: '代码块'
-                        },
-                        {
-                            xtype: 'container',
-                            layout: 'hbox',
-                            margin: {
-                                left: 10,
-                                right: 10,
-                                bottom: 10
-                            },
+                            name: 'type',
                             items: [
-                                {
-                                    xtype: 'container',
-                                    flex: 1,
-                                    layout: 'hbox',
-                                    items: [{
-                                        xtype: 'label',
-                                        text: '文件名:',
-                                        width: 50,
-                                        name: 'fileName',
-                                        margin: {
-                                            top: 3
-                                        }
-                                    }, {
-                                        xtype: 'treepanel',
-                                        flex: 1,
-                                        closable: false,
-                                        rootVisible: false,
-                                        hideCollapseTool: true,
-                                        lines: false,
-                                        plugins: {
-                                            ptype: 'rowediting',
-                                            clicksToMoveEditor: 1,
-                                            autoUpdate: true,
-                                            autoCancel: false
-                                        },
-                                        columns: [
-                                            {
-                                                xtype: 'treecolumn',
-                                                dataIndex: 'text',
-                                                flex: 1,
-                                                editor: {
-                                                    xtype: 'textfield',
-                                                    allowBlank: false,
-                                                    allowOnlyWhitespace: false
-                                                }
-                                            }
-                                        ],
-                                        style: {
-                                            border: '1px solid #c2c2c2'
-                                        },
-                                        listeners: {
-                                            render: function () {
-                                                const f = d.files;
-                                                const child = [];
-                                                if (f instanceof Array) {
-                                                    f.forEach(function (r) {
-                                                        child.push({
-                                                            leaf: true,
-                                                            cls: 'x-tree-no-icon',
-                                                            text: r
-                                                        });
-                                                    });
-                                                }
-                                                const root = this.getRootNode();
-                                                while (root.firstChild) {
-                                                    root.removeChild(root.firstChild);
-                                                }
-                                                root.appendChild(child);
-                                            }
-                                        }
-                                    }]
-                                },
-                                {
-                                    xtype: 'button',
-                                    icon: 'images/script_code.png',
-                                    tooltip: '从js脚本取值',
-                                    bId: id,
-                                    handler: function (btn) {
-                                        const val = btn.up('window').down('textareafield').getValue();
-                                        Ext.create('Ext.window.Window', {
-                                            title: '使用脚本',
-                                            height: 160,
-                                            width: 400,
-                                            layout: 'fit',
-                                            animateTarget: this,
-                                            resizable: true,
-                                            constrain: true,
-                                            modal: true,
-                                            items: {
-                                                xtype: 'minicode',
-                                                value: val,
-                                                changeValue: function () {
-                                                    btn.up('window').down('textareafield').setValue(this.codeEditor.getValue());
-                                                }
-                                            },
-                                            buttonAlign: 'center',
-                                            buttons: [
-                                                {
-                                                    text: '确定', handler: function () {
-                                                        const valStr = this.up('window').down('minicode').codeEditor.getValue();
-                                                        const d = eval(valStr);
-                                                        const tree = btn.up('container').down('treepanel');
-                                                        const child = [];
-                                                        if (d instanceof Array) {
-                                                            d.forEach(function (r) {
-                                                                child.push({
-                                                                    leaf: true,
-                                                                    cls: 'x-tree-no-icon',
-                                                                    text: r
-                                                                });
-                                                            });
-                                                        } else {
-                                                            child.push({
-                                                                leaf: true,
-                                                                cls: 'x-tree-no-icon',
-                                                                text: d
-                                                            });
-                                                        }
-                                                        const root = tree.getRootNode();
-                                                        while (root.firstChild) {
-                                                            root.removeChild(root.firstChild);
-                                                        }
-                                                        root.appendChild(child);
-                                                        this.up('window').close();
-                                                    }
-                                                },
-                                                {
-                                                    text: '取消', handler: function () {
-                                                        this.up('window').close();
-                                                    }
-                                                }
-                                            ]
-                                        }).show().focus();
-                                    }
-                                }
+                                {boxLabel: '添加', inputValue: 'add', checked: true},
+                                {boxLabel: '修改', inputValue: 'update'}
                             ]
                         }
                     ]
@@ -593,20 +734,21 @@ Ext.application({
                         text: '确定', handler: function () {
                             const form = this.up('window').down('form').getForm();
                             if (form.isValid()) {
-                                const {code} = form.getValues();
-                                if (code.trim().length == 0) {
-                                    showToast('请设置文件名!');
-                                    return;
-                                }
-                                const data = this.up('window').down('treepanel').getStore().getData(),
-                                    files = [];
-                                data.items.forEach(function (d) {
-                                    files.push(d.data.text);
-                                });
-                                const folder = this.up('window').down('filefield').getValue();
-                                fileData.addFile(pId, folder, files, code, id);
+                                const {name, type} = form.getValues();
+                                const data = {
+                                    text: name,
+                                    type: 'file',
+                                    leaf: true,
+                                    parentFolder: '',
+                                    rootId: '0',
+                                    cls: type == 'update'? 'color-blue': '',
+                                    updateType: type,
+                                    pId: pId
+                                };
+                                const child = fileData.saveOrUpdate(data, id);
+                                geFileData.save(child.id, pId);
+                                root.appendChild(child);
                                 this.up('window').close();
-                                getFilesData();
                             }
                         }
                     },
@@ -619,6 +761,27 @@ Ext.application({
             }).show().focus();
         }
 
+        function setGeFolder(btn, id) {
+            let d = {};
+            if (id != undefined) {
+                d = fileData.getFile(id);
+            }
+            const tree = btn.up('treepanel');
+            const root = tree.getRootNode();
+            showPrompt('模板文件夹', '', function (text) {
+                const data = {
+                    text: text,
+                    type: 'folder',
+                    folder: true,
+                    parentFolder: '',
+                    rootId: '0',
+                    pId: pId
+                };
+                const child = fileData.saveOrUpdate(data, id);
+                root.appendChild(child);
+            }, btn, d.text);
+        }
+
         const tabData = history.getTab();
         const showTab = history.getShowTab();
         for (let i = 0; i < tabData.length; i++) {
@@ -629,7 +792,12 @@ Ext.application({
     }
 });
 
-function openSome({id, title, type, params}) {
+function openSome({
+    id,
+    title,
+    type,
+    params
+}) {
     const panel = "mainmenutab";
     const tabPanel = Ext.getCmp(panel);
     const taa = Ext.getCmp(id);
@@ -668,7 +836,7 @@ function showError(s) {
     });
 }
 
-function showPrompt(title, msg, fn, dom) {
+function showPrompt(title, msg, fn, dom, value) {
     let options = {
         title: title,
         width: 300,
@@ -679,6 +847,7 @@ function showPrompt(title, msg, fn, dom) {
     };
     if (title !== undefined) options.title = title;
     if (msg !== undefined) options.msg = msg;
+    if (value !== undefined) options.value = value;
     if (fn !== undefined) options.fn = function (btn, text) {
         if (btn === 'ok')
             fn(text);

@@ -20,28 +20,39 @@ Ext.define('MyAppNamespace.controller.Generate', {
         dom.codeEditor.changeValue = function () {
             const val = dom.codeEditor.codeEditor.getValue();
             if (that.type == "edit") {
-                geFileData.setDataEdit(dom.pId, dom.params.path, dom.params.folder, val);
+                let output = val;
+                try{
+                    const tpl = swig.compile(val);
+                    output = tpl(controlData.getModuleData(dom.pId));
+                }catch(e){}
+                geFileData.setDataEdit(dom.params.fileId, dom.pId, val, output);
             } else {
-                geFileData.setDataPreview(dom.pId, dom.params.path, dom.params.folder, val);
+                geFileData.setDataPreview(dom.params.fileId, dom.pId, val);
             }
         };
     },
     editFile: function (btn) {
         this.type = 'edit';
-        const code = btn.up('generate').down('minicode').codeEditor;
+        const vsCode = btn.up('generate').down('minicode');
+        const code = vsCode.codeEditor;
         code.setValue(this.getContent(btn.up('generate')));
-        code.updateOptions({readOnly: false});
+        code.updateOptions({
+            readOnly: false
+        });
     },
     preview: function (btn) {
         this.type = 'view';
-        const code = btn.up('generate').down('minicode').codeEditor;
-        code.updateOptions({readOnly: true});
+        const vsCode = btn.up('generate').down('minicode');
+        const code = vsCode.codeEditor;
+        code.updateOptions({
+            readOnly: true
+        });
         const tpl = swig.compile(code.getValue());
         const output = tpl(controlData.getModuleData(btn.up('generate').pId));
         code.setValue(output);
     },
     getContent: function (that) {
-        const val = geFileData.getOneData(that.pId, that.params.path);
+        const val = geFileData.getOneData(that.params.fileId);
         let content = '';
         if (val != undefined) {
             content = val.content;

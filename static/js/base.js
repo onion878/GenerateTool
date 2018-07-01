@@ -45,6 +45,11 @@ let req = (module) => {
     return need(`${jsC.getFolder(moduleId)}/${module}`);
 };
 
+//获取已经定义的数据
+let getAllData = ()=> {
+    return controlData.getModuleData(moduleId);
+};
+
 const getUUID = () => {
     let d = new Date().getTime();
     let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
