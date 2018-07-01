@@ -63,7 +63,7 @@ Ext.application({
                                 maximizable: true,
                                 minimizable: false,
                                 constrain: true,
-                                modal: false,
+                                modal: true,
                                 animateTarget: this,
                                 layout: 'fit',
                                 items: {
@@ -151,12 +151,15 @@ Ext.application({
                                                         history.setMode(pId);
                                                     }
                                                     this.up('window').close();
-                                                    store.setRoot({
-                                                        expanded: true,
-                                                        text: '',
-                                                        children: data.getData(pId)
-                                                    });
+                                                    const root = Ext.getCmp('panel-model').getRootNode();
+                                                    while (root.firstChild) {
+                                                        root.removeChild(root.firstChild);
+                                                    }
+                                                    history.removeAll();
+                                                    root.appendChild(data.getData(pId));
                                                     Ext.getCmp('panel-model').setTitle(row.data.text);
+                                                    Ext.getCmp('mainmenutab').removeAll();
+                                                    getFilesData();
                                                 }
                                             },
                                             {

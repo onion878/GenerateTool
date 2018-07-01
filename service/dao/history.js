@@ -80,6 +80,14 @@ class History {
             .write();
         return this.getTab();
     }
+
+    removeAll() {
+        m.set('mode', '').write();
+        m.set('tab', []).write();
+        m.set('tabshow', '').write();
+        m.set('codeshow', '').write();
+        m.set('code', []).write();
+    }
 }
 
 module.exports = new History();
