@@ -78,3 +78,7 @@ body {
 .color-blue {
     color: blue;
 }
+
+.color-blue span {
+    color: blue;
+}

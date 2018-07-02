@@ -1,4 +1,4 @@
-const {app, BrowserWindow, dialog, Menu, MenuItem} = require('electron');
+const {app, BrowserWindow, dialog, Menu, MenuItem, webFrame} = require('electron');
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
@@ -38,6 +38,24 @@ function createWindow() {
                     label: '停止loading',
                     click() {
                         mainWindow.webContents.executeJavaScript(`Ext.getBody().unmask()`);
+                    }
+                },
+                {
+                    label: '放大',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`setZoom('+')`);
+                    }
+                },
+                {
+                    label: '缩小',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`setZoom('-')`);
+                    }
+                },
+                {
+                    label: '重置',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`resetZoom()`);
                     }
                 }
             ]

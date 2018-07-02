@@ -1,6 +1,9 @@
+const {webFrame} = require('electron');
 const jsC = require('../service/utils/JscodeUtil');
 const need = require('require-uncached');
 let moduleId = null, editLabelId = null;
+webFrame.setZoomFactor(systemConfig.getZoom());
+
 amdRequire.config({
     paths: {'vs': 'vs'}, 'vs/nls': {
         availableLanguages: {
@@ -105,3 +108,20 @@ const languageType = [{id: "bat", text: "bat"},
     {id: "vb", text: "vb"},
     {id: "xml", text: "xml"},
     {id: "yaml", text: "yaml"}];
+let setZoom = (type) => {
+    const old = webFrame.getZoomFactor();
+    if(type == '+') {
+        const val = old + 0.1;
+        systemConfig.setZoom(val);
+        webFrame.setZoomFactor(val);
+    } else {
+        const val = old - 0.1;
+        systemConfig.setZoom(val);
+        webFrame.setZoomFactor(val);
+    }
+};
+
+let resetZoom = () => {
+    webFrame.setZoomFactor(1);
+    systemConfig.setZoom(1);
+};

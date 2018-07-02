@@ -80,6 +80,7 @@ Ext.define('MyAppNamespace.view.generate.generate', {
     },
     initComponent: function () {
         const pId = this.pId;
+        const {updateType} = this.params;
         this.tbar = {
             dock: 'top',
             layout: {
@@ -90,10 +91,12 @@ Ext.define('MyAppNamespace.view.generate.generate', {
                 items: [{
                     text: '编辑',
                     pressed: true,
-                    action: 'edit'
+                    action: 'edit',
+                    cls: updateType == 'update'? 'color-blue': ''
                 }, {
                     text: '预览',
-                    action: 'preview'
+                    action: 'preview',
+                    cls: updateType == 'update'? 'color-blue': ''
                 }]
             }]
         };

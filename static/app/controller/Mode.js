@@ -10,8 +10,11 @@ Ext.define('MyAppNamespace.controller.Mode', {
             'toolbar button[action=add]': {
                 click: this.add
             },
-            'toolbar button[action=save]': {
-                click: this.save
+            'toolbar button[action=reload]': {
+                click: this.reload
+            },
+            'toolbar button[action=sort]': {
+                click: this.sort
             }
         });
     },
@@ -43,13 +46,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     align: 'stretch'
                 },
                 items: [{
-                        xtype: 'textfield',
-                        margin: '10',
-                        labelWidth: 45,
-                        name: 'name',
-                        allowBlank: false,
-                        fieldLabel: '变量名'
-                    },
+                    xtype: 'textfield',
+                    margin: '10',
+                    labelWidth: 45,
+                    name: 'name',
+                    allowBlank: false,
+                    fieldLabel: '变量名'
+                },
                     {
                         xtype: 'combobox',
                         fieldLabel: '名称',
@@ -58,9 +61,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         store: {
                             fields: ['id', 'text'],
                             data: [{
-                                    id: 'text',
-                                    text: '文本框'
-                                },
+                                id: 'text',
+                                text: '文本框'
+                            },
                                 {
                                     id: 'textarea',
                                     text: '多行文本框'
@@ -128,25 +131,25 @@ Ext.define('MyAppNamespace.controller.Mode', {
             },
             buttonAlign: 'center',
             buttons: [{
-                    text: '确定',
-                    handler: function () {
-                        const form = this.up('window').down('form').getForm();
-                        if (form.isValid()) {
-                            const moduleData = controlData.getModuleData(that.pId);
-                            const {
-                                type,
-                                name,
-                                language
-                            } = form.getValues();
-                            if (moduleData[name] != undefined) {
-                                showToast(`已存在[${name}]!`);
-                            } else {
-                                btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
-                                this.up('window').close();
-                            }
+                text: '确定',
+                handler: function () {
+                    const form = this.up('window').down('form').getForm();
+                    if (form.isValid()) {
+                        const moduleData = controlData.getModuleData(that.pId);
+                        const {
+                            type,
+                            name,
+                            language
+                        } = form.getValues();
+                        if (moduleData[name] != undefined) {
+                            showToast(`已存在[${name}]!`);
+                        } else {
+                            btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
+                            this.up('window').close();
                         }
                     }
-                },
+                }
+            },
                 {
                     text: '取消',
                     handler: function () {
@@ -155,11 +158,6 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 }
             ]
         }).show().focus();
-    },
-    save: function (btn) {
-        showPrompt('模板名称', '', function (text) {
-            eval(text);
-        }, this);
     },
     getComponent(type, label, id, language) {
         let content = {};
@@ -374,6 +372,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
         }
         return {
             xtype: 'container',
+            cls: 'mode-content',
             layout: 'hbox',
             margin: {
                 left: 10,
@@ -381,34 +380,36 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 bottom: 10
             },
             items: [{
-                    xtype: 'container',
-                    flex: 1,
-                    layout: 'hbox',
-                    items: [{
-                        xtype: 'label',
-                        text: label,
-                        width: 105,
-                        margin: {
-                            top: 3
-                        },
-                        listeners: {
-                            'render': function () {
-                                this.el.on('dblclick', function (e, t) {
-                                    labelEditor.startEdit(t);
-                                    labelEditor.field.focus(50, true);
-                                    editLabelId = id;
-                                });
-                            }
+                xtype: 'container',
+                flex: 1,
+                layout: 'hbox',
+                items: [{
+                    xtype: 'label',
+                    text: label,
+                    width: 105,
+                    margin: {
+                        top: 3
+                    },
+                    listeners: {
+                        'render': function () {
+                            this.el.on('dblclick', function (e, t) {
+                                labelEditor.startEdit(t);
+                                labelEditor.field.focus(50, true);
+                                editLabelId = id;
+                            });
                         }
-                    }, content]
-                },
+                    }
+                }, content]
+            },
                 {
                     xtype: 'button',
                     icon: 'images/script_code.png',
                     tooltip: '从js脚本取值',
                     bId: id,
+                    id: id,
+                    bType: type,
                     handler: function (btn) {
-                        that.getJavaScriptData(btn, type);
+                        that.getJavaScriptData(btn);
                     }
                 },
                 {
@@ -423,9 +424,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
             ]
         }
     },
-    getJavaScriptData(btn, type) {
+    getJavaScriptData(btn) {
         const val = controlData.getCode(btn.bId),
-            that = this;
+            that = this, cId = btn.up('mode').id;
         let v = null;
         if (val != undefined && val != null) {
             v = val.value;
@@ -437,6 +438,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
             layout: 'fit',
             resizable: true,
             constrain: true,
+            animateTarget: btn,
             modal: true,
             items: {
                 value: v,
@@ -444,144 +446,18 @@ Ext.define('MyAppNamespace.controller.Mode', {
             },
             buttonAlign: 'center',
             buttons: [{
-                    text: '确定',
-                    handler: function () {
-                        const valStr = this.up('window').down('minicode').codeEditor.getValue();
-                        controlData.setCode(btn.bId, valStr);
-                        Ext.getBody().mask('执行中...');
-                        this.up('window').close();
-                        let d = '';
-                        try {
-                            d = eval(valStr);
-                        } catch (e) {
-                            showError(e);
-                            Ext.getBody().unmask();
-                            throw e;
-                        }
-                        if (d instanceof Promise) {
-                            d.then(v => {
-                                if (type == 'text') {
-                                    btn.up('container').down('textfield').setValue(v);
-                                } else if (type == 'textarea') {
-                                    btn.up('container').down('textareafield').setValue(v);
-                                } else if (type == 'datalist') {
-                                    const tree = btn.up('container').down('treepanel');
-                                    const child = [];
-                                    v.forEach(function (r) {
-                                        child.push({
-                                            leaf: true,
-                                            cls: 'x-tree-no-icon',
-                                            text: r
-                                        });
-                                    });
-                                    const root = tree.getRootNode();
-                                    while (root.firstChild) {
-                                        root.removeChild(root.firstChild);
-                                    }
-                                    root.appendChild(child);
-                                } else if (type == 'datagrid') {
-                                    const grid = btn.up('container').down('grid');
-                                    const columns = [new Ext.grid.RowNumberer()],
-                                        fields = [];
-                                    if (v.length > 0) {
-                                        const col = v[0];
-                                        for (let key in col) {
-                                            fields.push(key);
-                                            columns.push({
-                                                text: key,
-                                                align: 'center',
-                                                dataIndex: key,
-                                                editor: {
-                                                    xtype: 'textfield'
-                                                },
-                                                flex: 1
-                                            });
-                                        }
-                                    }
-                                    const store = grid.getStore();
-                                    store.setFields(fields);
-                                    store.setData(v);
-                                    grid.reconfigure(store, columns);
-                                } else if (type == 'file') {
-                                    btn.up('container').down('filefield').setRawValue(v);
-                                } else if (type == 'folder') {
-                                    btn.up('container').down('filefield').setRawValue(v);
-                                } else if (type == 'json') {
-                                    const g = btn.up('container').down('propertygrid');
-                                    g.setSource(v);
-                                    controlData.setDataValue(btn.bId, that.getGridJsonData(g.getStore()));
-                                } else {
-
-                                }
-                                Ext.getBody().unmask();
-                            });
-                        } else {
-                            if (type == 'text') {
-                                btn.up('container').down('textfield').setValue(d);
-                            } else if (type == 'textarea') {
-                                btn.up('container').down('textareafield').setValue(d);
-                            } else if (type == 'datalist') {
-                                const tree = btn.up('container').down('treepanel');
-                                const child = [];
-                                d.forEach(function (r) {
-                                    child.push({
-                                        leaf: true,
-                                        cls: 'x-tree-no-icon',
-                                        text: r
-                                    });
-                                });
-                                const root = tree.getRootNode();
-                                while (root.firstChild) {
-                                    root.removeChild(root.firstChild);
-                                }
-                                root.appendChild(child);
-                            } else if (type == 'datagrid') {
-                                const grid = btn.up('container').down('grid');
-                                const columns = [new Ext.grid.RowNumberer()],
-                                    fields = [];
-                                if (d.length > 0) {
-                                    const col = d[0];
-                                    for (let key in col) {
-                                        fields.push(key);
-                                        columns.push({
-                                            text: key,
-                                            align: 'center',
-                                            dataIndex: key,
-                                            editor: {
-                                                xtype: 'textfield'
-                                            },
-                                            flex: 1
-                                        });
-                                    }
-                                }
-                                const store = grid.getStore();
-                                store.setFields(fields);
-                                store.setData(d);
-                                grid.reconfigure(store, columns);
-                            } else if (type == 'file') {
-                                btn.up('container').down('filefield').setRawValue(d);
-                            } else if (type == 'folder') {
-                                btn.up('container').down('filefield').setRawValue(d);
-                            } else if (type == 'json') {
-                                const g = btn.up('container').down('propertygrid');
-                                g.setSource(d);
-                                controlData.setDataValue(btn.bId, that.getGridJsonData(g.getStore()));
-                            } else {
-
-                            }
-                            Ext.getBody().unmask();
-                        }
-
-
-                    }
-                },
-                {
-                    text: '取消',
-                    handler: function () {
-                        this.up('window').close();
-                    }
+                text: '确定',
+                handler: function () {
+                    const valStr = this.up('window').down('minicode').codeEditor.getValue();
+                    this.up('window').close();
+                    that.getCodeData(valStr, btn.bId, cId)
                 }
-            ]
+            }, {
+                text: '取消',
+                handler: function () {
+                    this.up('window').close();
+                }
+            }]
         }).show().focus();
     },
     deleteData(btn) {
@@ -589,7 +465,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
             btn.up('container').destroy();
             controlData.removeExt(btn.bId);
             controlData.removeCode(btn.bId);
-        });
+        }, btn, Ext.MessageBox.ERROR);
     },
     getListData(store) {
         const data = store.getData(),
@@ -614,5 +490,196 @@ Ext.define('MyAppNamespace.controller.Mode', {
             list[d.data.name] = d.data.value;
         });
         return list;
+    },
+    sort(btn) {
+        const that = this;
+        const id = btn.up('mode').id;
+        const data = controlData.getExt(id);
+        Ext.create('Ext.window.Window', {
+            title: '排序',
+            fixed: true,
+            width: 300,
+            maxHeight: 400,
+            layout: 'fit',
+            animateTarget: btn,
+            resizable: false,
+            constrain: true,
+            modal: true,
+            items: {
+                xtype: 'grid',
+                layout: 'fit',
+                columnLines: true,
+                viewConfig: {
+                    plugins: {
+                        ptype: 'gridviewdragdrop',
+                        dragText: '拖动排序'
+                    }
+                },
+                enableLocking: true,
+                store: Ext.create('Ext.data.Store', {
+                    data: data
+                }),
+                hideHeaders: true,
+                columns: [
+                    new Ext.grid.RowNumberer(),
+                    {text: '名称', align: 'center', dataIndex: 'label', flex: 1}
+                ],
+                buttonAlign: 'center',
+                buttons: [{
+                    text: '确定',
+                    handler: function () {
+                        const newData = this.up('window').down('grid').getStore().getData(), sortData = [];
+                        newData.items.forEach(d => {
+                            sortData.push(d.data);
+                        });
+                        controlData.sortExt(sortData, id, that.pId);
+                        const panel = btn.up('mode');
+                        panel.removeAll();
+                        sortData.forEach(d => {
+                            panel.add(Ext.create(that.getDataModule(d.content, d.type, d.label, d.id, d.data)));
+                        });
+                        this.up('window').close();
+                    }
+                }, {
+                    text: '取消',
+                    handler: function () {
+                        this.up('window').close();
+                    }
+                }]
+            }
+        }).show().focus();
+    },
+    reload(btn) {
+        const that = this, id = btn.up('mode').id;
+        showConfirm('是否重新获取数据?', function () {
+            controlData.getAllCode(id).forEach(d => {
+                that.getCodeData(d.value, d.id, d.cId)
+            });
+        }, btn, Ext.MessageBox.QUESTION);
+    },
+    getCodeData(valStr, bId, cId) {
+        controlData.setCode(bId, valStr, cId);
+        Ext.getBody().mask('执行中...');
+        let d = '', btn = Ext.getCmp(bId), type = btn.bType;
+        try {
+            d = eval(valStr);
+        } catch (e) {
+            showError(e);
+            Ext.getBody().unmask();
+            throw e;
+        }
+        if (d instanceof Promise) {
+            d.then(v => {
+                if (type == 'text') {
+                    btn.up('container').down('textfield').setValue(v);
+                } else if (type == 'textarea') {
+                    btn.up('container').down('textareafield').setValue(v);
+                } else if (type == 'datalist') {
+                    const tree = btn.up('container').down('treepanel');
+                    const child = [];
+                    v.forEach(function (r) {
+                        child.push({
+                            leaf: true,
+                            cls: 'x-tree-no-icon',
+                            text: r
+                        });
+                    });
+                    const root = tree.getRootNode();
+                    while (root.firstChild) {
+                        root.removeChild(root.firstChild);
+                    }
+                    root.appendChild(child);
+                } else if (type == 'datagrid') {
+                    const grid = btn.up('container').down('grid');
+                    const columns = [new Ext.grid.RowNumberer()],
+                        fields = [];
+                    if (v.length > 0) {
+                        const col = v[0];
+                        for (let key in col) {
+                            fields.push(key);
+                            columns.push({
+                                text: key,
+                                align: 'center',
+                                dataIndex: key,
+                                editor: {
+                                    xtype: 'textfield'
+                                },
+                                flex: 1
+                            });
+                        }
+                    }
+                    const store = grid.getStore();
+                    store.setFields(fields);
+                    store.setData(v);
+                    grid.reconfigure(store, columns);
+                } else if (type == 'file') {
+                    btn.up('container').down('filefield').setRawValue(v);
+                } else if (type == 'folder') {
+                    btn.up('container').down('filefield').setRawValue(v);
+                } else if (type == 'json') {
+                    const g = btn.up('container').down('propertygrid');
+                    g.setSource(v);
+                    controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
+                } else {
+
+                }
+                Ext.getBody().unmask();
+            });
+        } else {
+            if (type == 'text') {
+                btn.up('container').down('textfield').setValue(d);
+            } else if (type == 'textarea') {
+                btn.up('container').down('textareafield').setValue(d);
+            } else if (type == 'datalist') {
+                const tree = btn.up('container').down('treepanel');
+                const child = [];
+                d.forEach(function (r) {
+                    child.push({
+                        leaf: true,
+                        cls: 'x-tree-no-icon',
+                        text: r
+                    });
+                });
+                const root = tree.getRootNode();
+                while (root.firstChild) {
+                    root.removeChild(root.firstChild);
+                }
+                root.appendChild(child);
+            } else if (type == 'datagrid') {
+                const grid = btn.up('container').down('grid');
+                const columns = [new Ext.grid.RowNumberer()],
+                    fields = [];
+                if (d.length > 0) {
+                    const col = d[0];
+                    for (let key in col) {
+                        fields.push(key);
+                        columns.push({
+                            text: key,
+                            align: 'center',
+                            dataIndex: key,
+                            editor: {
+                                xtype: 'textfield'
+                            },
+                            flex: 1
+                        });
+                    }
+                }
+                const store = grid.getStore();
+                store.setFields(fields);
+                store.setData(d);
+                grid.reconfigure(store, columns);
+            } else if (type == 'file') {
+                btn.up('container').down('filefield').setRawValue(d);
+            } else if (type == 'folder') {
+                btn.up('container').down('filefield').setRawValue(d);
+            } else if (type == 'json') {
+                const g = btn.up('container').down('propertygrid');
+                g.setSource(d);
+                controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
+            } else {
+
+            }
+            Ext.getBody().unmask();
+        }
     }
 });

@@ -25,7 +25,9 @@ Ext.define('MyAppNamespace.view.code.code', {
     },
     writeValue: function () {
         if (this.filePath != undefined && this.filePath != null && this.filePath != '') {
-            jsC.writeFile(this.filePath, this.codeEditor.getValue());
+            const val = this.codeEditor.getValue();
+            jsC.writeFile(this.filePath, val);
+            history.setCode({id: this.id, fileContent: val});
         }
     },
     editorLayout: function () {

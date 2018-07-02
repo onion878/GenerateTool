@@ -35,25 +35,26 @@ class Controls {
     }
 
     setDataValue(id, value) {
-        if(value == undefined || value == null) value = '';
+        if (value == undefined || value == null) value = '';
         con.get('ext')
             .find({id: id})
             .set('data', value)
             .write();
     }
 
-    setCode(id, val) {
+    setCode(id, val, cId) {
         const d = con.get('code')
             .find({id: id})
             .value();
         if (d == undefined || d == null) {
             con.get('code')
-                .push({id: id, value: val})
+                .push({id: id, value: val, cId: cId})
                 .write();
         } else {
             con.get('code')
                 .find({id: id})
                 .set('value', val)
+                .set('cId', cId)
                 .write();
         }
     }
@@ -68,6 +69,9 @@ class Controls {
         return con.get('code').find({id: id}).value();
     }
 
+    getAllCode(cId) {
+        return con.get('code').filter({cId: cId}).value();
+    }
     //获取当前设置的控件数据集
     getModuleData(pId) {
         const data = con.get('ext').filter({pId: pId}).value();
@@ -76,6 +80,18 @@ class Controls {
             json[d.label] = d.data;
         });
         return json;
+    }
+
+    sortExt(data, cId, pId) {
+        con.get('ext')
+            .remove({pId: pId, cId: cId})
+            .write();
+        data.forEach(v=> {
+            con.get('ext')
+                .push(v)
+                .write();
+        });
+        return data;
     }
 }
 

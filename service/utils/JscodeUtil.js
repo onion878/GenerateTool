@@ -194,6 +194,10 @@ class JscodeUtil {
             }
         });
     }
+
+    runNodeJs(content) {
+        return eval(content);
+    }
 }
 
 module.exports = new JscodeUtil();

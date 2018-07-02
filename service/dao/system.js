@@ -8,6 +8,7 @@ class System {
     constructor() {
         sdb.defaults({data: []}).write();
         sdb.defaults({code: {}}).write();
+        sdb.defaults({zoom: 1}).write();
     }
 
     setCode(name, language) {
@@ -21,6 +22,14 @@ class System {
         const index = name.lastIndexOf(".");
         name = name.substr(index + 1);
         return sdb.get('code.' + name).value();
+    }
+
+    setZoom(val) {
+        sdb.set('zoom', val).write();
+    }
+
+    getZoom() {
+        return sdb.get('zoom').value();
     }
 }
 

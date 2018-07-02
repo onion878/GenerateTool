@@ -59,6 +59,8 @@ class History {
             m.get('code')
                 .push(data)
                 .write();
+        } else {
+            m.get('code').find({ id: data.id }).set('fileContent', data.fileContent).write();
         }
     }
 

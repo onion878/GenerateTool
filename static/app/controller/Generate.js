@@ -42,14 +42,32 @@ Ext.define('MyAppNamespace.controller.Generate', {
     },
     preview: function (btn) {
         this.type = 'view';
+        const params = btn.up('generate').params;
         const vsCode = btn.up('generate').down('minicode');
         const code = vsCode.codeEditor;
         code.updateOptions({
             readOnly: true
         });
-        const tpl = swig.compile(code.getValue());
-        const output = tpl(controlData.getModuleData(btn.up('generate').pId));
-        code.setValue(output);
+        if(params.updateType == 'add') {
+            const tpl = swig.compile(code.getValue());
+            const output = tpl(controlData.getModuleData(btn.up('generate').pId));
+            code.setValue(output);
+        } else {
+            const {file} = geFileData.getOneData(params.fileId);
+            if(file.trim().length == 0) {
+                showError('未设置修改文件,无法预览!');
+                return;
+            }
+            const d = jsCode.runNodeJs(`const file = '${file}';` + code.getValue());
+            if (d instanceof Promise) {
+                d.then(v => {
+                    code.setValue(v);
+                });
+            } else {
+                if(d != undefined)
+                    code.setValue(d);
+            }
+        }
     },
     getContent: function (that) {
         const val = geFileData.getOneData(that.params.fileId);

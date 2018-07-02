@@ -101,7 +101,7 @@ Ext.application({
                                                 text: '',
                                                 children: data.getData(pId)
                                             });
-                                        }, this);
+                                        }, this, Ext.MessageBox.ERROR);
                                     }
                                 }]
                             }).showAt(event.getPoint());
@@ -211,7 +211,7 @@ Ext.application({
                                     }
                                     const modes = data.getData(pId);
                                     Ext.create('Ext.window.Window', {
-                                        title: '模板名称',
+                                        title: '模板详情名称',
                                         height: 120,
                                         width: 400,
                                         layout: 'fit',
@@ -295,6 +295,7 @@ Ext.application({
                             const type = event.data.type;
                             if (type == 'file' && event.childNodes.length == 0) {
                                 addbutton(item, 'generate', icon, title, {
+                                    updateType: event.get('updateType'),
                                     path: event.get('folder') + '\\' + title,
                                     folder: event.get('folder'),
                                     file: title,
@@ -370,7 +371,10 @@ Ext.application({
                                                         text: '确定', handler: function () {
                                                             const form = this.up('window').down('form').getForm();
                                                             if (form.isValid()) {
-                                                                const {name, type} = form.getValues();
+                                                                let {name, type} = form.getValues();
+                                                                if(type == 'update') {
+                                                                    name = name + '.js';
+                                                                }
                                                                 const data = {
                                                                     text: name,
                                                                     type: 'file',
@@ -520,7 +524,7 @@ Ext.application({
                                                     geFileData.removeData(r.id);
                                                     Ext.getCmp('mainmenutab').remove(r.id);
                                                 });
-                                            }, item);
+                                            }, item, Ext.MessageBox.ERROR);
                                         }
                                     }
                                 ]
@@ -592,7 +596,7 @@ Ext.application({
                                             columns: [
                                                 new Ext.grid.RowNumberer(),
                                                 { text: '名称', align:'center', dataIndex: 'name', flex: 1 },
-                                                { text: '类型', align:'center', dataIndex: 'type' }
+                                                { text: '类型', align:'center', dataIndex: 'type', width: 70, locked: true }
                                             ],
                                             listeners: {
                                                 render: function(dom) {
@@ -605,7 +609,6 @@ Ext.application({
                                             {
                                                 text: '生成', handler: function () {
                                                     files.forEach(f=> {
-                                                        
                                                         utils.createFile(f.name, f.preview);
                                                     });
                                                     this.up('window').close();
@@ -737,7 +740,10 @@ Ext.application({
                         text: '确定', handler: function () {
                             const form = this.up('window').down('form').getForm();
                             if (form.isValid()) {
-                                const {name, type} = form.getValues();
+                                let {name, type} = form.getValues();
+                                if(type == 'update') {
+                                    name = name + '.js';
+                                }
                                 const data = {
                                     text: name,
                                     type: 'file',
@@ -859,11 +865,12 @@ function showPrompt(title, msg, fn, dom, value) {
     Ext.MessageBox.show(options).focus();
 }
 
-function showConfirm(msg, fn, dom) {
+function showConfirm(msg, fn, dom, icon) {
     let options = {
         title: '提示',
         width: 300,
         msg: msg,
+        icon: icon,
         buttons: Ext.MessageBox.YESNO,
         scope: this
     };
