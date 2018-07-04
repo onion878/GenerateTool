@@ -573,59 +573,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
             Promise.all(reData).then(values => {
                 values.forEach((v, i) => {
                     const btn = Ext.getCmp(conData[i].id), type = btn.bType;
-                    if (type == 'text') {
-                        btn.up('container').down('textfield').setValue(v);
-                    } else if (type == 'textarea') {
-                        btn.up('container').down('textareafield').setValue(v);
-                    } else if (type == 'datalist') {
-                        const tree = btn.up('container').down('treepanel');
-                        const child = [];
-                        v.forEach(function (r) {
-                            child.push({
-                                leaf: true,
-                                cls: 'x-tree-no-icon',
-                                text: r
-                            });
-                        });
-                        const root = tree.getRootNode();
-                        while (root.firstChild) {
-                            root.removeChild(root.firstChild);
-                        }
-                        root.appendChild(child);
-                    } else if (type == 'datagrid') {
-                        const grid = btn.up('container').down('grid');
-                        const columns = [new Ext.grid.RowNumberer()],
-                            fields = [];
-                        if (v.length > 0) {
-                            const col = v[0];
-                            for (let key in col) {
-                                fields.push(key);
-                                columns.push({
-                                    text: key,
-                                    align: 'center',
-                                    dataIndex: key,
-                                    editor: {
-                                        xtype: 'textfield'
-                                    },
-                                    flex: 1
-                                });
-                            }
-                        }
-                        const store = grid.getStore();
-                        store.setFields(fields);
-                        store.setData(v);
-                        grid.reconfigure(store, columns);
-                    } else if (type == 'file') {
-                        btn.up('container').down('filefield').setRawValue(v);
-                    } else if (type == 'folder') {
-                        btn.up('container').down('filefield').setRawValue(v);
-                    } else if (type == 'json') {
-                        const g = btn.up('container').down('propertygrid');
-                        g.setSource(v);
-                        controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
-                    } else {
-
-                    }
+                    that.setComponentValue(type, btn, v);
                 });
                 Ext.getBody().unmask();
             });
@@ -656,116 +604,67 @@ Ext.define('MyAppNamespace.controller.Mode', {
         }
         if (d instanceof Promise) {
             d.then(v => {
-                if (type == 'text') {
-                    btn.up('container').down('textfield').setValue(v);
-                } else if (type == 'textarea') {
-                    btn.up('container').down('textareafield').setValue(v);
-                } else if (type == 'datalist') {
-                    const tree = btn.up('container').down('treepanel');
-                    const child = [];
-                    v.forEach(function (r) {
-                        child.push({
-                            leaf: true,
-                            cls: 'x-tree-no-icon',
-                            text: r
-                        });
-                    });
-                    const root = tree.getRootNode();
-                    while (root.firstChild) {
-                        root.removeChild(root.firstChild);
-                    }
-                    root.appendChild(child);
-                } else if (type == 'datagrid') {
-                    const grid = btn.up('container').down('grid');
-                    const columns = [new Ext.grid.RowNumberer()],
-                        fields = [];
-                    if (v.length > 0) {
-                        const col = v[0];
-                        for (let key in col) {
-                            fields.push(key);
-                            columns.push({
-                                text: key,
-                                align: 'center',
-                                dataIndex: key,
-                                editor: {
-                                    xtype: 'textfield'
-                                },
-                                flex: 1
-                            });
-                        }
-                    }
-                    const store = grid.getStore();
-                    store.setFields(fields);
-                    store.setData(v);
-                    grid.reconfigure(store, columns);
-                } else if (type == 'file') {
-                    btn.up('container').down('filefield').setRawValue(v);
-                } else if (type == 'folder') {
-                    btn.up('container').down('filefield').setRawValue(v);
-                } else if (type == 'json') {
-                    const g = btn.up('container').down('propertygrid');
-                    g.setSource(v);
-                    controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
-                } else {
-
-                }
+                this.setComponentValue(type, btn, v);
                 Ext.getBody().unmask();
             });
         } else {
-            if (type == 'text') {
-                btn.up('container').down('textfield').setValue(d);
-            } else if (type == 'textarea') {
-                btn.up('container').down('textareafield').setValue(d);
-            } else if (type == 'datalist') {
-                const tree = btn.up('container').down('treepanel');
-                const child = [];
-                d.forEach(function (r) {
-                    child.push({
-                        leaf: true,
-                        cls: 'x-tree-no-icon',
-                        text: r
-                    });
-                });
-                const root = tree.getRootNode();
-                while (root.firstChild) {
-                    root.removeChild(root.firstChild);
-                }
-                root.appendChild(child);
-            } else if (type == 'datagrid') {
-                const grid = btn.up('container').down('grid');
-                const columns = [new Ext.grid.RowNumberer()],
-                    fields = [];
-                if (d.length > 0) {
-                    const col = d[0];
-                    for (let key in col) {
-                        fields.push(key);
-                        columns.push({
-                            text: key,
-                            align: 'center',
-                            dataIndex: key,
-                            editor: {
-                                xtype: 'textfield'
-                            },
-                            flex: 1
-                        });
-                    }
-                }
-                const store = grid.getStore();
-                store.setFields(fields);
-                store.setData(d);
-                grid.reconfigure(store, columns);
-            } else if (type == 'file') {
-                btn.up('container').down('filefield').setRawValue(d);
-            } else if (type == 'folder') {
-                btn.up('container').down('filefield').setRawValue(d);
-            } else if (type == 'json') {
-                const g = btn.up('container').down('propertygrid');
-                g.setSource(d);
-                controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
-            } else {
-
-            }
+            this.setComponentValue(type, btn, d);
             Ext.getBody().unmask();
+        }
+    },
+    setComponentValue(type, btn, v) {
+        if (type == 'text') {
+            btn.up('container').down('textfield').setValue(v);
+        } else if (type == 'textarea') {
+            btn.up('container').down('textareafield').setValue(v);
+        } else if (type == 'datalist') {
+            const tree = btn.up('container').down('treepanel');
+            const child = [];
+            v.forEach(function (r) {
+                child.push({
+                    leaf: true,
+                    cls: 'x-tree-no-icon',
+                    text: r
+                });
+            });
+            const root = tree.getRootNode();
+            while (root.firstChild) {
+                root.removeChild(root.firstChild);
+            }
+            root.appendChild(child);
+        } else if (type == 'datagrid') {
+            const grid = btn.up('container').down('grid');
+            const columns = [new Ext.grid.RowNumberer()],
+                fields = [];
+            if (v.length > 0) {
+                const col = v[0];
+                for (let key in col) {
+                    fields.push(key);
+                    columns.push({
+                        text: key,
+                        align: 'center',
+                        dataIndex: key,
+                        editor: {
+                            xtype: 'textfield'
+                        },
+                        flex: 1
+                    });
+                }
+            }
+            const store = grid.getStore();
+            store.setFields(fields);
+            store.setData(v);
+            grid.reconfigure(store, columns);
+        } else if (type == 'file') {
+            btn.up('container').down('filefield').setRawValue(v);
+        } else if (type == 'folder') {
+            btn.up('container').down('filefield').setRawValue(v);
+        } else if (type == 'json') {
+            const g = btn.up('container').down('propertygrid');
+            g.setSource(v);
+            controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
+        } else {
+
         }
     }
 });
