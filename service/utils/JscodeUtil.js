@@ -86,8 +86,8 @@ class JscodeUtil {
         return data;
     }
 
-    unLinkFile(id, file) {
-        let path = this.getFolder(id);
+    unLinkFile(id, folder) {
+        let path = this.getFolder(id)+ '\\' + folder;
         del([path]).then(paths => {
             console.log('Deleted files and folders:\n', paths.join('\n'));
         });

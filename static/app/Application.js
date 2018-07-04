@@ -608,10 +608,13 @@ Ext.application({
                                         buttons: [
                                             {
                                                 text: '生成', handler: function () {
+                                                    this.up('window').close();
+                                                    Ext.getBody().mask('执行中...');
                                                     files.forEach(f=> {
                                                         utils.createFile(f.name, f.preview);
                                                     });
-                                                    this.up('window').close();
+                                                    Ext.getBody().unmask();
+                                                    showToast('执行完成');
                                                 }
                                             },
                                             {
