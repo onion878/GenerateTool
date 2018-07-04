@@ -60,7 +60,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                     if (record.data.type == 'file') {
                         const {file, content} = jsCode.readFile(pId, record.data.parentFolder);
                         const tPanel = this.up('editor').down('tabpanel');
-                        const id = record.data.id;
+                        const id = record.data.parentFolder;
                         const nowItem = Ext.getCmp(id);
                         if (nowItem) {
                             tPanel.setActiveTab(nowItem);

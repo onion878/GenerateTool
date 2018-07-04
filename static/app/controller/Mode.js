@@ -477,9 +477,18 @@ Ext.define('MyAppNamespace.controller.Mode', {
     },
     getGridData(store) {
         const data = store.getData(),
-            list = [];
+            list = [], fields = store.getModel().getFields(), noFields = [];
+        fields.forEach(f => {
+            if(f.generated) {
+                noFields.push(f.name);
+            }
+        });
         data.items.forEach(d => {
-            list.push(d.data);
+            const row = d.data;
+            noFields.forEach( f=> {
+                delete row[f];
+            });
+            list.push(row);
         });
         return list;
     },
@@ -552,12 +561,89 @@ Ext.define('MyAppNamespace.controller.Mode', {
     reload(btn) {
         const that = this, id = btn.up('mode').id;
         showConfirm('是否重新获取数据?', function () {
-            controlData.getAllCode(id).forEach(d => {
-                that.getCodeData(d.value, d.id, d.cId)
+            Ext.getBody().mask('执行中...');
+            const reData = [], conData = controlData.getAllCode(id);
+            conData.forEach(d => {
+                try {
+                    reData.push(that.getCodeValue(d.value, d.id, d.cId));
+                }catch (e) {
+                    reData.push("");
+                }
+            });
+            Promise.all(reData).then(values => {
+                values.forEach((v, i) => {
+                    const btn = Ext.getCmp(conData[i].id), type = btn.bType;
+                    if (type == 'text') {
+                        btn.up('container').down('textfield').setValue(v);
+                    } else if (type == 'textarea') {
+                        btn.up('container').down('textareafield').setValue(v);
+                    } else if (type == 'datalist') {
+                        const tree = btn.up('container').down('treepanel');
+                        const child = [];
+                        v.forEach(function (r) {
+                            child.push({
+                                leaf: true,
+                                cls: 'x-tree-no-icon',
+                                text: r
+                            });
+                        });
+                        const root = tree.getRootNode();
+                        while (root.firstChild) {
+                            root.removeChild(root.firstChild);
+                        }
+                        root.appendChild(child);
+                    } else if (type == 'datagrid') {
+                        const grid = btn.up('container').down('grid');
+                        const columns = [new Ext.grid.RowNumberer()],
+                            fields = [];
+                        if (v.length > 0) {
+                            const col = v[0];
+                            for (let key in col) {
+                                fields.push(key);
+                                columns.push({
+                                    text: key,
+                                    align: 'center',
+                                    dataIndex: key,
+                                    editor: {
+                                        xtype: 'textfield'
+                                    },
+                                    flex: 1
+                                });
+                            }
+                        }
+                        const store = grid.getStore();
+                        store.setFields(fields);
+                        store.setData(v);
+                        grid.reconfigure(store, columns);
+                    } else if (type == 'file') {
+                        btn.up('container').down('filefield').setRawValue(v);
+                    } else if (type == 'folder') {
+                        btn.up('container').down('filefield').setRawValue(v);
+                    } else if (type == 'json') {
+                        const g = btn.up('container').down('propertygrid');
+                        g.setSource(v);
+                        controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
+                    } else {
+
+                    }
+                });
+                Ext.getBody().unmask();
             });
         }, btn, Ext.MessageBox.QUESTION);
     },
+    getCodeValue(valStr, bId, cId) {
+        if(valStr.trim().length == 0) {
+            controlData.removeCode(bId);
+            return;
+        }
+        controlData.setCode(bId, valStr, cId);
+        return eval(valStr);
+    },
     getCodeData(valStr, bId, cId) {
+        if(valStr.trim().length == 0) {
+            controlData.removeCode(bId);
+            return;
+        }
         controlData.setCode(bId, valStr, cId);
         Ext.getBody().mask('执行中...');
         let d = '', btn = Ext.getCmp(bId), type = btn.bType;
