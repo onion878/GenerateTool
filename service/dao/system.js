@@ -9,6 +9,7 @@ class System {
         sdb.defaults({data: []}).write();
         sdb.defaults({code: {}}).write();
         sdb.defaults({zoom: 1}).write();
+        sdb.defaults({theme: 'neptune'}).write();
     }
 
     setCode(name, language) {
@@ -30,6 +31,14 @@ class System {
 
     getZoom() {
         return sdb.get('zoom').value();
+    }
+
+    setTheme(name) {
+        sdb.set('theme', name).write();
+    }
+
+    getTheme() {
+        return sdb.get('theme').value();
     }
 }
 

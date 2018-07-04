@@ -2,6 +2,7 @@ const {app, BrowserWindow, dialog, Menu, MenuItem, webFrame} = require('electron
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
+const config = require('./service/dao/system');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
@@ -14,13 +15,14 @@ function createWindow() {
         title: '代码构建工具',
         icon: path.join(__dirname, 'static/images/icon.ico')
     });
+    const theme = config.getTheme();
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'static/index.html'),
+        pathname: path.join(__dirname, `static/${theme}.html`),
         protocol: 'file:',
         slashes: true
     }));
-
+    // mainWindow.reload();
     // Open the DevTools. debug
     //mainWindow.webContents.openDevTools();
     const menu = Menu.buildFromTemplate([
@@ -57,6 +59,65 @@ function createWindow() {
                     click() {
                         mainWindow.webContents.executeJavaScript(`resetZoom()`);
                     }
+                },
+                {
+                    label: '重载界面',
+                    click() {
+                        mainWindow.reload();
+                    }
+                },
+                {
+                    label: '主题',
+                    submenu: [
+                        {
+                            label: 'aria',
+                            type: 'radio',
+                            checked: theme == 'aria',
+                            click() {
+                                setTheme('aria');
+                            }
+                        },
+                        {
+                            label: 'classic',
+                            type: 'radio',
+                            checked: theme == 'classic',
+                            click() {
+                                setTheme('classic');
+                            }
+                        },
+                        {
+                            label: 'crisp',
+                            type: 'radio',
+                            checked: theme == 'crisp',
+                            click() {
+                                setTheme('crisp');
+                            }
+                        },
+                        {
+                            label: 'gray',
+                            type: 'radio',
+                            checked: theme == 'gray',
+                            click() {
+                                setTheme('gray');
+                            }
+                        },
+                        {
+                            label: 'neptune',
+                            type: 'radio',
+                            checked: theme == 'neptune',
+                            click() {
+                                setTheme('neptune');
+                            }
+                        },
+                        {
+                            label: 'triton',
+                            type: 'radio',
+                            checked: theme == 'triton',
+                            click() {
+                                setTheme('triton');
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -68,6 +129,15 @@ function createWindow() {
         }
     ]);
     Menu.setApplicationMenu(menu);
+
+    function setTheme(name) {
+        config.setTheme(name);
+        mainWindow.loadURL(url.format({
+            pathname: path.join(__dirname, `static/${name}.html`),
+            protocol: 'file:',
+            slashes: true
+        }));
+    }
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {

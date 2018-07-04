@@ -119,9 +119,9 @@ Ext.application({
                                 click: function () {
                                     Ext.create('Ext.window.Window', {
                                         title: '选择模板',
-                                        height: 120,
                                         width: 400,
                                         layout: 'fit',
+                                        fixed: true,
                                         animateTarget: this,
                                         resizable: false,
                                         constrain: true,
@@ -212,7 +212,7 @@ Ext.application({
                                     const modes = data.getData(pId);
                                     Ext.create('Ext.window.Window', {
                                         title: '模板详情名称',
-                                        height: 120,
+                                        fixed: true,
                                         width: 400,
                                         layout: 'fit',
                                         animateTarget: this,
@@ -583,6 +583,7 @@ Ext.application({
                                         layout: 'fit',
                                         resizable: false,
                                         constrain: true,
+                                        animateTarget: this,
                                         modal: true,
                                         items: {
                                             xtype: 'grid',
