@@ -58,7 +58,7 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
                                 el.unmask();
                                 showError(`安装失败-> ${e}`);
                             });
-                        });
+                        }, this);
                     }
                 }, {
                     icon: 'images/find.png',

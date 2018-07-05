@@ -52,7 +52,7 @@ Ext.define('MyAppNamespace.view.unpkg.unpkg', {
                                 el.unmask();
                                 showError(`删除失败-> ${e}`);
                             });
-                        });
+                        }, this, Ext.MessageBox.ERROR);
                     }
                 }, {
                     icon: 'images/coins_add.png',

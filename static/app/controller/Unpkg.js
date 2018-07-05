@@ -47,7 +47,7 @@ Ext.define('MyAppNamespace.controller.Unpkg', {
                     showError(`删除失败-> ${e}`);
                 });
             }
-        });
+        }, dom, Ext.MessageBox.ERROR);
     },
     installAll: function(dom) {
         const grid = dom.up('unpkg');
