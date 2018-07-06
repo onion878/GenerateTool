@@ -28,7 +28,7 @@ npm start
 ```
 
 
-## Resources for Learning Electron
+## 相关文档
 
 - [electron.atom.io/docs](http://electron.atom.io/docs) - electron官方文档(有中文)
 - [extjs-gpl](https://docs.sencha.com/extjs/6.5.0/classic/Ext.html) - extjs官方文档
