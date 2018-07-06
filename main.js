@@ -126,6 +126,12 @@ function createWindow() {
             click() {
                 mainWindow.webContents.openDevTools();
             }
+        },
+        {
+            label: 'github',
+            click() {
+                require("open")('https://github.com/onion878/GenaretorTool');
+            }
         }
     ]);
     Menu.setApplicationMenu(menu);
