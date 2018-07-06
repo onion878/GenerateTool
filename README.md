@@ -21,7 +21,7 @@ git clone https://github.com/onion878/GenaretorTool.git
 # package app
 npm install -g electron-packager
 # Go into the repository
-cd GenaretorTool
+cd GenaretorTool 
 # Install dependencies
 npm install
 # Run the app
