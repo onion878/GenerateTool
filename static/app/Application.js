@@ -578,7 +578,12 @@ Ext.application({
                                                 f.preview = tplPre(allModuleData);
                                             } else {
                                                 const filePath = f.name.replace(/\//g, '\\').replace(/\\/g, '\\\\');
-                                                f.preview = jsCode.runNodeJs(`const file = '${filePath}';` + f.content);
+                                                try {
+                                                    f.preview = jsCode.runNodeJs(`const file = '${filePath}';` + f.content);
+                                                } catch (e) {
+                                                    showError(e);
+                                                    throw e;
+                                                }
                                             }
                                             f.type = type;
                                             files.push(f);
