@@ -603,6 +603,10 @@ Ext.application({
                                             store: Ext.create('Ext.data.Store', {
                                                 data: files
                                             }),
+                                            plugins: [{
+                                                ptype: 'rowexpander',
+                                                rowBodyTpl: ['<p><b>名称:</b> {file}</p>','<p><b>文件:</b> {name}</p>']
+                                            }],
                                             columns: [
                                                 new Ext.grid.RowNumberer(),
                                                 {text: '名称', align: 'center', dataIndex: 'name', flex: 1},
