@@ -24,14 +24,13 @@ class GeFile {
                 .write();
     }
 
-    setDataEdit(id, pId, content, preview) {
+    setDataEdit(id, pId, content) {
         const v = this.getOneData(id);
         if (v != undefined) {
             gdb.get('data').find({
                     id: id
                 })
                 .set('content', content)
-                .set('preview', preview)
                 .write();
         } else {
             gdb.get('data')
@@ -40,7 +39,7 @@ class GeFile {
                     pId: pId,
                     file: '',
                     content: content,
-                    preview: preview
+                    preview: null
                 })
                 .write();
         }

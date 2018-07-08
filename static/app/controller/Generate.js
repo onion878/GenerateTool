@@ -20,12 +20,7 @@ Ext.define('MyAppNamespace.controller.Generate', {
         dom.codeEditor.changeValue = function () {
             const val = dom.codeEditor.codeEditor.getValue();
             if (that.type == "edit") {
-                let output = val;
-                try{
-                    const tpl = swig.compile(val);
-                    output = tpl(controlData.getModuleData(dom.pId));
-                }catch(e){}
-                geFileData.setDataEdit(dom.params.fileId, dom.pId, val, output);
+                geFileData.setDataEdit(dom.params.fileId, dom.pId, val);
             } else {
                 geFileData.setDataPreview(dom.params.fileId, dom.pId, val);
             }
@@ -58,14 +53,17 @@ Ext.define('MyAppNamespace.controller.Generate', {
                 showError('未设置修改文件,无法预览!');
                 return;
             }
-            const d = jsCode.runNodeJs(`const file = '${file}';` + code.getValue());
+            const tplFile = swig.compile(file);
+            const f = tplFile(controlData.getModuleData(btn.up('generate').pId)).replace(/\//g, '\\').replace(/\\/g, '\\\\');
+            const d = jsCode.runNodeJs(`const file = '${f}';` + code.getValue());
             if (d instanceof Promise) {
                 d.then(v => {
                     code.setValue(v);
                 });
             } else {
-                if(d != undefined)
+                if(d != undefined) {
                     code.setValue(d);
+                }
             }
         }
     },

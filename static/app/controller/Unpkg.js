@@ -23,7 +23,7 @@ Ext.define('MyAppNamespace.controller.Unpkg', {
     },
     deletePkg: function (dom) {
         const grid = dom.up('unpkg');
-        var sm = grid.getSelectionModel().getSelection();
+        const sm = grid.getSelectionModel().getSelection();
         if (sm.length == 0) {
             showError('请选择至少一条数据!');
             return;
