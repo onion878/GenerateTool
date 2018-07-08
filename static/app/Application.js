@@ -566,9 +566,8 @@ Ext.application({
                             qtip: '开始创建',
                             listeners: {
                                 click: function () {
-                                    const files = [];
-                                    geFileData.getFileData(pId).forEach(f => {
-
+                                    const files = [], generatorData = geFileData.getFileData(pId);
+                                    generatorData.forEach(f => {
                                         if (!utils.isEmpty(f.file) && !utils.isEmpty(f.content)) {
                                             const type = fileData.getFile(f.id).updateType;
                                             const allModuleData = controlData.getModuleData(pId);
