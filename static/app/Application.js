@@ -588,9 +588,10 @@ Ext.application({
                                     Ext.create('Ext.window.Window', {
                                         title: '生成文件',
                                         fixed: true,
+                                        maxHeight: 500,
                                         width: 500,
                                         layout: 'fit',
-                                        resizable: false,
+                                        resizable: true,
                                         constrain: true,
                                         animateTarget: this,
                                         modal: true,
