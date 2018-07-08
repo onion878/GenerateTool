@@ -55,7 +55,7 @@ Ext.define('MyAppNamespace.controller.Generate', {
             }
             const tplFile = swig.compile(file);
             const f = tplFile(controlData.getModuleData(btn.up('generate').pId)).replace(/\//g, '\\').replace(/\\/g, '\\\\');
-            const d = jsCode.runNodeJs(`const file = '${f}';` + code.getValue());
+            const d = jsCode.runNodeJs(`const content = '${require('fs').readFileSync(f, 'utf8')}';` + code.getValue());
             if (d instanceof Promise) {
                 d.then(v => {
                     code.setValue(v);
