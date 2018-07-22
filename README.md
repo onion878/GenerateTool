@@ -12,20 +12,22 @@
 - 自动生成文件
 
 使用无需安装node，无需node相关知识。
-## 修改源码
+## 构建项目
 
 
 ```bash
-# Clone this repository
+# 下载源码
 git clone https://github.com/onion878/GenaretorTool.git
-# package app
+# 安装打包工具
 npm install -g electron-packager
-# Go into the repository
+# 进入项目
 cd GenaretorTool 
-# Install dependencies
+# 安装依赖
 npm install
-# Run the app
+# 启动项目
 npm start
+# 构建win平台exe运行程序
+npm run package-win
 ```
 
 
