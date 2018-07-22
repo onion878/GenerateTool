@@ -13,7 +13,7 @@ class Mode {
     setData(name) {
         const id = utils.getUUID();
         m.get('data')
-            .push({id: id, text: name})
+            .push({id: id, text: name, date: utils.getNowTime()})
             .write();
         return id;
     }
@@ -36,6 +36,7 @@ class Mode {
 
     addAllData({data}) {
         const oldData = m.get('data').value();
+        data.forEach(d => d.date = utils.getNowTime());
         const newData = oldData.concat(data);
         m.set('data', newData).write();
     }
@@ -51,7 +52,7 @@ class Mode {
 
     removeAll(pId) {
         m.get('data')
-            .remove({ id: pId })
+            .remove({id: pId})
             .write();
     }
 }

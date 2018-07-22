@@ -41,6 +41,9 @@ Ext.define('MyAppNamespace.view.templet.templet', {
                 }
             },
             {
+                text: '创建时间', align: 'center', dataIndex: 'date', flex: 1
+            },
+            {
                 text: '操作',
                 width: 100,
                 align: 'center',
