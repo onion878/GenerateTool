@@ -93,6 +93,36 @@ class Controls {
         });
         return data;
     }
+
+    getExtByPid(id) {
+        return con.get('ext').filter({pId: id}).value();
+    }
+
+    getCodeById(id) {
+        return con.get('code').find({id: id}).value();
+    }
+
+    addAllData({ext, code}) {
+        const oldExt = con.get('ext').value();
+        const oldCode = con.get('code').value();
+        const newExt = oldExt.concat(ext);
+        const newCode = oldCode.concat(code);
+        con.set('ext', newExt)
+            .set('code', newCode)
+            .write();
+    }
+
+    removeAll(pId) {
+        const oldExt = con.get('ext').filter({pId: pId}).value();
+        oldExt.forEach( e => {
+            con.get('code')
+                .remove({ id: e.id })
+                .write();
+        });
+        con.get('ext')
+            .remove({ pId: pId })
+            .write();
+    }
 }
 
 module.exports = new Controls();

@@ -31,6 +31,18 @@ class ModeData {
     removeByPId(pId) {
         mdb.get('data').remove({pId: pId}).write();
     }
+
+    addAllData({data}) {
+        const oldData = mdb.get('data').value();
+        const newData = oldData.concat(data);
+        mdb.set('data', newData).write();
+    }
+
+    removeAll(pId) {
+        mdb.get('data')
+            .remove({ pId: pId })
+            .write();
+    }
 }
 
 module.exports = new ModeData();

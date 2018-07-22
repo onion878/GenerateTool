@@ -95,6 +95,18 @@ class GeFile {
                 pId: pId
             }).value();
     }
+
+    addAllData({data}) {
+        const oldData = gdb.get('data').value();
+        const newData = oldData.concat(data);
+        gdb.set('data', newData).write();
+    }
+
+    removeAll(pId) {
+        gdb.get('data')
+            .remove({ pId: pId })
+            .write();
+    }
 }
 
 module.exports = new GeFile();

@@ -7,13 +7,13 @@ const utils = require('../utils/utils');
 class Mode {
 
     constructor() {
-        m.defaults({ data: [] }).write();
+        m.defaults({data: []}).write();
     }
 
     setData(name) {
         const id = utils.getUUID();
         m.get('data')
-            .push({id: id,text: name})
+            .push({id: id, text: name})
             .write();
         return id;
     }
@@ -32,6 +32,27 @@ class Mode {
 
     removeById(id) {
         m.get('data').remove({id: id}).write();
+    }
+
+    addAllData({data}) {
+        const oldData = m.get('data').value();
+        const newData = oldData.concat(data);
+        m.set('data', newData).write();
+    }
+
+    updateText({id, text}) {
+        m.get('data')
+            .find({
+                id: id
+            })
+            .set('text', text)
+            .write();
+    }
+
+    removeAll(pId) {
+        m.get('data')
+            .remove({ id: pId })
+            .write();
     }
 }
 

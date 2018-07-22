@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
+    "archiver": "^2.1.1",
     "decompress": "^4.2.0",
     "del": "^3.0.0",
     "lowdb": "^1.0.0",

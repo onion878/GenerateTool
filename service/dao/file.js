@@ -51,8 +51,8 @@ class File {
     }
 
     getMoreData(rootId, pId, list) {
-        const data = fdb.get('data').filter({rootId: rootId,pId: pId}).value();
-        data.forEach(d=> {
+        const data = fdb.get('data').filter({rootId: rootId, pId: pId}).value();
+        data.forEach(d => {
             list.push(d);
             this.getMoreData(d.id, pId, list);
         });
@@ -60,16 +60,32 @@ class File {
 
     updateRootId(id, rootId) {
         fdb.get('data').find({
-                id: id
-            }).set('rootId', rootId)
+            id: id
+        }).set('rootId', rootId)
             .write()
     }
 
     updateName(id, name) {
         fdb.get('data').find({
-                id: id
-            }).set('text', name)
+            id: id
+        }).set('text', name)
             .write()
+    }
+
+    getExportData(id) {
+        return fdb.get('data').filter({pId: id}).value();
+    }
+
+    addAllData({data}) {
+        const oldData = fdb.get('data').value();
+        const newData = oldData.concat(data);
+        fdb.set('data', newData).write();
+    }
+
+    removeAll(pId) {
+        fdb.get('data')
+            .remove({ pId: pId })
+            .write();
     }
 }
 

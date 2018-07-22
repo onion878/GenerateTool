@@ -5,6 +5,7 @@ const appRoot = require('app-root-path');
 const npmi = require('npmi');
 const del = require('del');
 const npmu = require('./npmu');
+const archiver = require('archiver');
 
 class JscodeUtil {
 
@@ -87,7 +88,7 @@ class JscodeUtil {
     }
 
     unLinkFile(id, folder) {
-        let path = this.getFolder(id)+ '\\' + folder;
+        let path = this.getFolder(id) + '\\' + folder;
         del([path]).then(paths => {
             console.log('Deleted files and folders:\n', paths.join('\n'));
         });
@@ -183,7 +184,7 @@ class JscodeUtil {
                     }
                 };
                 npmu(options, function (err, result) {
-                    names.forEach( fileName => {
+                    names.forEach(fileName => {
                         pack.remove(fileName);
                     });
                     resolve(options.names.join(','));
@@ -197,6 +198,137 @@ class JscodeUtil {
 
     runNodeJs(content) {
         return eval(content);
+    }
+
+    exportModule({id, text, folder}) {
+        const path = appRoot.path.replace('\\resources\\app.asar', ''), that = this;
+        return new Promise(function (resolve, reject) {
+            const output = fs.createWriteStream(`${folder}/${text}.zip`);
+            const archive = archiver('zip', {
+                zlib: {level: 9}
+            });
+
+            output.on('close', function () {
+                resolve('ok');
+            });
+
+            output.on('end', function () {
+                console.log('Data has been drained');
+            });
+
+            archive.on('error', function (err) {
+                reject(err);
+            });
+
+            if (fs.existsSync(`${path}/jscode/${id}/node_modules`)) {
+                const dir = `${path}/jscode/${id}_lib`;
+                if (!fs.existsSync(dir)) {
+                    fs.mkdirSync(dir);
+                }
+
+                fs.rename(`${path}/jscode/${id}/node_modules`, `${dir}/node_modules`, (err) => {
+                    if (err) throw err;
+                    archive.pipe(output);
+                    archive.append(that.getAllExportData(id), {name: 'data.json'});
+                    archive.directory(`jscode/${id}/`, id);
+                    archive.finalize();
+                    fs.rename(`${dir}/node_modules`, `${path}/jscode/${id}/node_modules`, (err) => {
+                        if (err) throw err;
+                        del([dir]);
+                    });
+                });
+            } else {
+                archive.pipe(output);
+                archive.append(that.getAllExportData(id), {name: 'data.json'});
+                archive.directory(`jscode/${id}/`, id);
+                archive.finalize();
+            }
+        });
+    }
+
+    getAllExportData(id) {
+        const data = {controls: {}, file: {}, gefile: {}, mode: {}, modeData: {}, package: {}};
+        const controls = require('../dao/controls.js');
+        const controlsData = controls.getExtByPid(id);
+        data.controls['ext'] = controlsData;
+        const controlsDataCode = [];
+        controlsData.forEach(c => {
+            const code = controls.getCodeById(c.id);
+            if (code != undefined) {
+                controlsDataCode.push(code);
+            }
+        });
+        data.controls['code'] = controlsDataCode;
+        const file = require('../dao/file.js');
+        data.file['data'] = file.getExportData(id);
+        const gefile = require('../dao/gefile.js');
+        data.gefile['data'] = gefile.getFileData(id);
+        const mode = require('../dao/mode.js');
+        data.mode['data'] = [mode.getById(id)];
+        const modeData = require('../dao/modeData.js');
+        data.modeData['data'] = modeData.getData(id);
+        const pack = require('../dao/package.js');
+        data.package['data'] = pack.getAll(id);
+        return JSON.stringify(data);
+    }
+
+    importModule(file) {
+        const unZip = require('decompress');
+        const path = appRoot.path.replace('\\resources\\app.asar', ''), that = this;
+        return new Promise((resolve, reject) => {
+            const dir = `${path}\\data\\cache`;
+            try {
+                unZip(file, dir).then(files => {
+                    const data = JSON.parse(utils.readFile(`${dir}\\data.json`));
+                    const controls = data['controls'], file = data['file'], gefile = data['gefile'], mode = data['mode'], modeData = data['modeData'], pack= data['package'];
+                    const oldPid = mode.data[0].id;
+                    let pId = that.getNewPid(oldPid);
+                    const modeFolder = dir + '\\' + mode.data[0].id;
+                    fs.rename(modeFolder, `${path}\\jscode\\${pId}`, (err) => {
+                        if (err) throw err;
+                        controls['ext'].forEach( e => e.pId = pId);
+                        file['data'].forEach( e => e.pId = pId);
+                        gefile['data'].forEach( e => e.pId = pId);
+                        mode['data'].forEach( e => e.id = pId);
+                        modeData['data'].forEach( e => e.pId = pId);
+                        pack['data'].forEach( e => e.pId = pId);
+                        require('../dao/controls.js').addAllData(controls);
+                        require('../dao/file.js').addAllData(file);
+                        require('../dao/gefile.js').addAllData(gefile);
+                        require('../dao/mode.js').addAllData(mode);
+                        require('../dao/modeData.js').addAllData(modeData);
+                        require('../dao/package.js').addAllData(pack);
+                        del([dir]);
+                        resolve(`[${mode.data[0].text}]导入成功!`);
+                    });
+                });
+            }catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    getNewPid(pId) {
+        const modules = require('../dao/mode.js').getAll(), that = this;
+        modules.some( ({id}) => {
+            if(id == pId) {
+                pId = utils.getUUID();
+                that.getNewPid(pId);
+                return true;
+            }
+        });
+        return pId;
+    }
+
+    removeModule(pId) {
+        require('../dao/controls.js').removeAll(pId);
+        require('../dao/file.js').removeAll(pId);
+        require('../dao/gefile.js').removeAll(pId);
+        require('../dao/mode.js').removeAll(pId);
+        require('../dao/modeData.js').removeAll(pId);
+        require('../dao/package.js').removeAll(pId);
+        const path = appRoot.path.replace('\\resources\\app.asar', ''), that = this;
+        del([`${path}\\jscode\\${pId}`]);
     }
 }
 

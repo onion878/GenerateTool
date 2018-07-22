@@ -14,7 +14,7 @@ Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'MyAppNamespace',
     appFolder: 'app',
-    controllers: ['Welcome', 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Generate'],
+    controllers: [ 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome','Generate', 'Templet'],
     launch: function () {
         let pId = history.getMode();
         moduleId = pId;

@@ -1,4 +1,11 @@
-const {app, BrowserWindow, dialog, Menu, MenuItem, webFrame} = require('electron');
+const {
+    app,
+    BrowserWindow,
+    dialog,
+    Menu,
+    MenuItem,
+    webFrame
+} = require('electron');
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
@@ -25,14 +32,12 @@ function createWindow() {
     // mainWindow.reload();
     // Open the DevTools. debug
     //mainWindow.webContents.openDevTools();
-    const menu = Menu.buildFromTemplate([
-        {
+    const menu = Menu.buildFromTemplate([{
             label: '系统',
-            submenu: [
-                {
-                    label: '设置',
+            submenu: [{
+                    label: '帮助',
                     click() {
-                        let code = `openSome({id:'set-demo',title:'系统设置',type:'code'})`;
+                        let code = `openSome({id:'welcome',title:'帮助',type:'welcome'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },
@@ -68,8 +73,7 @@ function createWindow() {
                 },
                 {
                     label: '主题',
-                    submenu: [
-                        {
+                    submenu: [{
                             label: 'aria',
                             type: 'radio',
                             checked: theme == 'aria',
@@ -122,13 +126,20 @@ function createWindow() {
             ]
         },
         {
+            label: '模板管理',
+            click() {
+                let code = `openSome({id:'templet',title:'模板管理',type:'templet'})`;
+                mainWindow.webContents.executeJavaScript(code);
+            }
+        },
+        {
             label: '控制台',
             click() {
                 mainWindow.webContents.openDevTools();
             }
         },
         {
-            label: 'github',
+            label: 'Github',
             click() {
                 require("open")('https://github.com/onion878/GenaretorTool');
             }

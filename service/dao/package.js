@@ -37,6 +37,18 @@ class Package {
             .remove({name: name})
             .write();
     }
+
+    addAllData({data}) {
+        const oldData = db.get('data').value();
+        const newData = oldData.concat(data);
+        db.set('data', newData).write();
+    }
+
+    removeAll(pId) {
+        db.get('data')
+            .remove({ pId: pId })
+            .write();
+    }
 }
 
 module.exports = new Package();
