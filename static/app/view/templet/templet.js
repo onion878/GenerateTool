@@ -80,7 +80,9 @@ Ext.define('MyAppNamespace.view.templet.templet', {
                                 showConfirm(`是否删除模板[${data.text}]?`, function (text) {
                                     jsCode.removeModule(data.id);
                                     btn.up('templet').getStore().setData(parentData.getAll());
-                                    history.setMode('');
+                                    if(data.id == history.getMode()) {
+                                        history.setMode('');
+                                    }
                                     showToast('删除成功请重载界面!');
                                 }, this, Ext.MessageBox.ERROR);
                             }
