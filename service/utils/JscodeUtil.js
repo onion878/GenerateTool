@@ -284,8 +284,7 @@ class JscodeUtil {
                     const oldPid = mode.data[0].id;
                     let pId = that.getNewPid(oldPid);
                     const modeFolder = dir + '\\' + mode.data[0].id;
-                    fs.rename(modeFolder, `${path}\\jscode\\${pId}`, (err) => {
-                        if (err) throw err;
+                    if (!fs.existsSync(modeFolder)) { 
                         controls['ext'].forEach( e => e.pId = pId);
                         file['data'].forEach( e => e.pId = pId);
                         gefile['data'].forEach( e => e.pId = pId);
@@ -300,7 +299,25 @@ class JscodeUtil {
                         require('../dao/package.js').addAllData(pack);
                         del([dir]);
                         resolve(`[${mode.data[0].text}]导入成功!`);
-                    });
+                    } else {
+                        fs.rename(modeFolder, `${path}\\jscode\\${pId}`, (err) => {
+                            if (err) throw err;
+                            controls['ext'].forEach( e => e.pId = pId);
+                            file['data'].forEach( e => e.pId = pId);
+                            gefile['data'].forEach( e => e.pId = pId);
+                            mode['data'].forEach( e => e.id = pId);
+                            modeData['data'].forEach( e => e.pId = pId);
+                            pack['data'].forEach( e => e.pId = pId);
+                            require('../dao/controls.js').addAllData(controls);
+                            require('../dao/file.js').addAllData(file);
+                            require('../dao/gefile.js').addAllData(gefile);
+                            require('../dao/mode.js').addAllData(mode);
+                            require('../dao/modeData.js').addAllData(modeData);
+                            require('../dao/package.js').addAllData(pack);
+                            del([dir]);
+                            resolve(`[${mode.data[0].text}]导入成功!`);
+                        });
+                    }
                 });
             }catch (e) {
                 reject(e);
