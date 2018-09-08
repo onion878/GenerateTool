@@ -46,13 +46,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     align: 'stretch'
                 },
                 items: [{
-                    xtype: 'textfield',
-                    margin: '10',
-                    labelWidth: 45,
-                    name: 'name',
-                    allowBlank: false,
-                    fieldLabel: '变量名'
-                },
+                        xtype: 'textfield',
+                        margin: '10',
+                        labelWidth: 45,
+                        name: 'name',
+                        allowBlank: false,
+                        fieldLabel: '变量名'
+                    },
                     {
                         xtype: 'combobox',
                         fieldLabel: '名称',
@@ -61,9 +61,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         store: {
                             fields: ['id', 'text'],
                             data: [{
-                                id: 'text',
-                                text: '文本框'
-                            },
+                                    id: 'text',
+                                    text: '文本框'
+                                },
                                 {
                                     id: 'textarea',
                                     text: '多行文本框'
@@ -131,25 +131,25 @@ Ext.define('MyAppNamespace.controller.Mode', {
             },
             buttonAlign: 'center',
             buttons: [{
-                text: '确定',
-                handler: function () {
-                    const form = this.up('window').down('form').getForm();
-                    if (form.isValid()) {
-                        const moduleData = controlData.getModuleData(that.pId);
-                        const {
-                            type,
-                            name,
-                            language
-                        } = form.getValues();
-                        if (moduleData[name] != undefined) {
-                            showToast(`已存在[${name}]!`);
-                        } else {
-                            btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
-                            this.up('window').close();
+                    text: '确定',
+                    handler: function () {
+                        const form = this.up('window').down('form').getForm();
+                        if (form.isValid()) {
+                            const moduleData = controlData.getModuleData(that.pId);
+                            const {
+                                type,
+                                name,
+                                language
+                            } = form.getValues();
+                            if (moduleData[name] != undefined) {
+                                showToast(`已存在[${name}]!`);
+                            } else {
+                                btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
+                                this.up('window').close();
+                            }
                         }
                     }
-                }
-            },
+                },
                 {
                     text: '取消',
                     handler: function () {
@@ -274,7 +274,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
             content.value = value;
         } else if (type == 'datalist') {
             const data = [];
-            if (value != null) {
+            if (value instanceof Array) {
                 value.forEach(v => {
                     data.push({
                         text: v,
@@ -304,7 +304,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
             const data = [],
                 fields = [],
                 columns = [new Ext.grid.RowNumberer()];
-            if (value != null) {
+            if (value instanceof Array) {
                 value.forEach((v, i) => {
                     data.push(v);
                     if (i == 0) {
@@ -380,27 +380,27 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 bottom: 10
             },
             items: [{
-                xtype: 'container',
-                flex: 1,
-                layout: 'hbox',
-                items: [{
-                    xtype: 'label',
-                    text: label,
-                    width: 105,
-                    margin: {
-                        top: 3
-                    },
-                    listeners: {
-                        'render': function () {
-                            this.el.on('dblclick', function (e, t) {
-                                labelEditor.startEdit(t);
-                                labelEditor.field.focus(50, true);
-                                editLabelId = id;
-                            });
+                    xtype: 'container',
+                    flex: 1,
+                    layout: 'hbox',
+                    items: [{
+                        xtype: 'label',
+                        text: label,
+                        width: 105,
+                        margin: {
+                            top: 3
+                        },
+                        listeners: {
+                            'render': function () {
+                                this.el.on('dblclick', function (e, t) {
+                                    labelEditor.startEdit(t);
+                                    labelEditor.field.focus(50, true);
+                                    editLabelId = id;
+                                });
+                            }
                         }
-                    }
-                }, content]
-            },
+                    }, content]
+                },
                 {
                     xtype: 'button',
                     icon: 'images/script_code.png',
@@ -426,7 +426,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
     },
     getJavaScriptData(btn) {
         const val = controlData.getCode(btn.bId),
-            that = this, cId = btn.up('mode').id;
+            that = this,
+            cId = btn.up('mode').id;
         let v = null;
         if (val != undefined && val != null) {
             v = val.value;
@@ -477,15 +478,17 @@ Ext.define('MyAppNamespace.controller.Mode', {
     },
     getGridData(store) {
         const data = store.getData(),
-            list = [], fields = store.getModel().getFields(), noFields = [];
+            list = [],
+            fields = store.getModel().getFields(),
+            noFields = [];
         fields.forEach(f => {
-            if(f.generated) {
+            if (f.generated) {
                 noFields.push(f.name);
             }
         });
         data.items.forEach(d => {
             const row = d.data;
-            noFields.forEach( f=> {
+            noFields.forEach(f => {
                 delete row[f];
             });
             list.push(row);
@@ -531,13 +534,19 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 hideHeaders: true,
                 columns: [
                     new Ext.grid.RowNumberer(),
-                    {text: '名称', align: 'center', dataIndex: 'label', flex: 1}
+                    {
+                        text: '名称',
+                        align: 'center',
+                        dataIndex: 'label',
+                        flex: 1
+                    }
                 ],
                 buttonAlign: 'center',
                 buttons: [{
                     text: '确定',
                     handler: function () {
-                        const newData = this.up('window').down('grid').getStore().getData(), sortData = [];
+                        const newData = this.up('window').down('grid').getStore().getData(),
+                            sortData = [];
                         newData.items.forEach(d => {
                             sortData.push(d.data);
                         });
@@ -559,28 +568,34 @@ Ext.define('MyAppNamespace.controller.Mode', {
         }).show().focus();
     },
     reload(btn) {
-        const that = this, id = btn.up('mode').id;
+        const that = this,
+            id = btn.up('mode').id;
         showConfirm('是否重新获取数据?', function () {
             Ext.getBody().mask('执行中...');
-            const reData = [], conData = controlData.getAllCode(id);
+            const reData = [],
+                conData = controlData.getAllCode(id);
             conData.forEach(d => {
                 try {
                     reData.push(that.getCodeValue(d.value, d.id, d.cId));
-                }catch (e) {
-                    reData.push("");
+                } catch (e) {
+                    reData.push(null);
                 }
             });
             Promise.all(reData).then(values => {
                 values.forEach((v, i) => {
-                    const btn = Ext.getCmp(conData[i].id), type = btn.bType;
+                    const btn = Ext.getCmp(conData[i].id),
+                        type = btn.bType;
                     that.setComponentValue(type, btn, v);
                 });
+                Ext.getBody().unmask();
+            }).catch(e => {
+                showError('错误:' + e.toString());
                 Ext.getBody().unmask();
             });
         }, btn, Ext.MessageBox.QUESTION);
     },
     getCodeValue(valStr, bId, cId) {
-        if(valStr.trim().length == 0) {
+        if (valStr.trim().length == 0) {
             controlData.removeCode(bId);
             return;
         }
@@ -588,13 +603,15 @@ Ext.define('MyAppNamespace.controller.Mode', {
         return eval(valStr);
     },
     getCodeData(valStr, bId, cId) {
-        if(valStr.trim().length == 0) {
+        if (valStr.trim().length == 0) {
             controlData.removeCode(bId);
             return;
         }
         controlData.setCode(bId, valStr, cId);
         Ext.getBody().mask('执行中...');
-        let d = '', btn = Ext.getCmp(bId), type = btn.bType;
+        let d = '',
+            btn = Ext.getCmp(bId),
+            type = btn.bType;
         try {
             d = eval(valStr);
         } catch (e) {
@@ -605,6 +622,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
         if (d instanceof Promise) {
             d.then(v => {
                 this.setComponentValue(type, btn, v);
+                Ext.getBody().unmask();
+            }).catch(e => {
                 Ext.getBody().unmask();
             });
         } else {

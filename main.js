@@ -2,15 +2,12 @@ const {
     app,
     BrowserWindow,
     dialog,
-    Menu,
-    MenuItem,
-    webFrame
+    Menu
 } = require('electron');
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
 const config = require('./service/dao/system');
-// Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
@@ -127,10 +124,22 @@ function createWindow() {
         },
         {
             label: '模板管理',
-            click() {
-                let code = `openSome({id:'templet',title:'模板管理',type:'templet'})`;
-                mainWindow.webContents.executeJavaScript(code);
-            }
+            submenu: [
+                {
+                    label: '本地模板',
+                    click() {
+                        let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                },
+                {
+                    label: '模板下载',
+                    click() {
+                        let code = `openSome({id:'templet',title:'模板下载',type:'templet'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                }
+            ]
         },
         {
             label: '控制台',

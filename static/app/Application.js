@@ -189,7 +189,10 @@ Ext.application({
                                             root.removeChild(root.firstChild);
                                         }
                                         root.appendChild(data.getData(pId));
+                                        history.removeAll();
                                         Ext.getCmp('panel-model').setTitle(text);
+                                        Ext.getCmp('mainmenutab').removeAll();
+                                        getFilesData();
                                     }, this);
                                 }
                             }
@@ -577,7 +580,7 @@ Ext.application({
                                                 const tplPre = swig.compile(f.content);
                                                 f.preview = tplPre(allModuleData);
                                             } else {
-                                                const filePath = f.name.replace(/\//g, '\\').replace(/\\/g, '\\\\');
+                                                const filePath = f.name.replace(/\\/g, '\/');
                                                 try {
                                                     f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').replace(/\$/g, '\\\$').replace(/\`/g, '\\\`')}\`;` + f.content);
                                                 } catch (e) {

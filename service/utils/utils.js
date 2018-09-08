@@ -102,8 +102,8 @@ class Utils {
 
     createFile(path, content) {
         try {
-            path = path.replace(/\//g, '\\');
-            const filePath = path.substring(0,path.lastIndexOf(`\\`));
+            path = path.replace(/\\/g, '/');
+            const filePath = path.substring(0,path.lastIndexOf(`/`));
             if (!fs.existsSync(filePath)) {
                 shell.mkdir('-p', filePath);
             }

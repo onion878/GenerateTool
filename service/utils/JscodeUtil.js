@@ -12,9 +12,9 @@ class JscodeUtil {
     getFolder(id) {
         let path = appRoot.path;
         if (path.indexOf('app.asar') > -1) {
-            path = path.replace('app.asar', '').replace('resources\\', '');
+            path = path.replace('app.asar', '').replace('resources/', '');
         }
-        return path + '\\jscode\\' + id;
+        return path + '/jscode/' + id;
     }
 
     //创建脚本文件夹
@@ -22,10 +22,10 @@ class JscodeUtil {
         let dir = this.getFolder(id);
         if (!utils.isEmpty(folder)) {
             if (utils.notEmpty(parentFolder)) {
-                dir = dir + '\\' + parentFolder + '\\' + folder;
-                parentFolder = parentFolder + '\\' + folder;
+                dir = dir + '/' + parentFolder + '/' + folder;
+                parentFolder = parentFolder + '/' + folder;
             } else {
-                dir = dir + '\\' + folder;
+                dir = dir + '/' + folder;
                 parentFolder = folder;
             }
         }
@@ -35,13 +35,14 @@ class JscodeUtil {
         return {text: folder, type: 'folder', folder: true, parentFolder: parentFolder};
     }
 
+    //创建文件夹
     createFile(id, fileName, parentFolder) {
         let path = '';
         if (utils.notEmpty(parentFolder)) {
-            path = this.getFolder(id) + '\\' + parentFolder + '\\' + fileName;
-            parentFolder = parentFolder + '\\' + fileName;
+            path = this.getFolder(id) + '/' + parentFolder + '/' + fileName;
+            parentFolder = parentFolder + '/' + fileName;
         } else {
-            path = this.getFolder(id) + '\\' + fileName;
+            path = this.getFolder(id) + '/' + fileName;
             parentFolder = fileName;
         }
         let status = utils.writeFile({path: path, content: ''});
@@ -51,23 +52,23 @@ class JscodeUtil {
     reName(id, oldName, newName, parentFolder) {
         let dir = '';
         if (utils.notEmpty(parentFolder)) {
-            dir = this.getFolder(id) + '\\' + parentFolder + '\\';
+            dir = this.getFolder(id) + '/' + parentFolder + '/';
         } else {
-            dir = this.getFolder(id) + '\\';
+            dir = this.getFolder(id) + '/';
         }
-        fs.renameSync(`${dir}\\${oldName}`, `${dir}\\${newName}`);
+        fs.renameSync(`${dir}/${oldName}`, `${dir}/${newName}`);
     }
 
     moveFile(id, oldFolder, newFolder, fileName) {
         let dir = this.getFolder(id);
-        fs.renameSync(`${dir}\\${oldFolder}`, `${dir}\\${newFolder}\\${fileName}`);
+        fs.renameSync(`${dir}/${oldFolder}`, `${dir}/${newFolder}/${fileName}`);
     }
 
     getFileAndFolder(id, parentFolder) {
         let path = this.getFolder(id);
         if (utils.notEmpty(parentFolder)) {
-            path = path + '\\' + parentFolder;
-            parentFolder = parentFolder + '\\';
+            path = path + '/' + parentFolder;
+            parentFolder = parentFolder + '/';
         } else {
             parentFolder = '';
         }
@@ -75,7 +76,7 @@ class JscodeUtil {
         const data = [];
         lists.forEach(item => {
             const d = {text: item, parentFolder: parentFolder + item};
-            if (fs.statSync(path + '\\' + item).isDirectory()) {
+            if (fs.statSync(path + '/' + item).isDirectory()) {
                 d.type = 'folder';
                 d.folder = true;
             } else {
@@ -88,21 +89,21 @@ class JscodeUtil {
     }
 
     unLinkFile(id, folder) {
-        let path = this.getFolder(id) + '\\' + folder;
+        let path = this.getFolder(id) + '/' + folder;
         del([path]).then(paths => {
             console.log('Deleted files and folders:\n', paths.join('\n'));
         });
     }
 
     unLinkFolder(id, file) {
-        let path = this.getFolder(id) + '\\' + file;
+        let path = this.getFolder(id) + '/' + file;
         del([path]).then(paths => {
             console.log('Deleted files and folders:\n', paths.join('\n'));
         });
     }
 
     readFile(id, file) {
-        const dir = this.getFolder(id) + '\\' + file;
+        const dir = this.getFolder(id) + '/' + file;
         return {file: dir, content: utils.readFile(dir)};
     }
 
@@ -201,7 +202,7 @@ class JscodeUtil {
     }
 
     exportModule({id, text, folder}) {
-        const path = appRoot.path.replace('\\resources\\app.asar', ''), that = this;
+        const path = appRoot.path.replace('/resources/app.asar', ''), that = this;
         return new Promise(function (resolve, reject) {
             const output = fs.createWriteStream(`${folder}/${text}.zip`);
             const archive = archiver('zip', {
@@ -274,16 +275,16 @@ class JscodeUtil {
 
     importModule(file) {
         const unZip = require('decompress');
-        const path = appRoot.path.replace('\\resources\\app.asar', ''), that = this;
+        const path = appRoot.path.replace(/\\/g,'/').replace('/resources/app.asar', ''), that = this;
         return new Promise((resolve, reject) => {
-            const dir = `${path}\\data\\cache`;
+            const dir = `${path}/data/cache`;
             try {
                 unZip(file, dir).then(files => {
-                    const data = JSON.parse(utils.readFile(`${dir}\\data.json`));
+                    const data = JSON.parse(utils.readFile(`${dir}/data.json`));
                     const controls = data['controls'], file = data['file'], gefile = data['gefile'], mode = data['mode'], modeData = data['modeData'], pack= data['package'];
                     const oldPid = mode.data[0].id;
                     let pId = that.getNewPid(oldPid);
-                    const modeFolder = dir + '\\' + mode.data[0].id;
+                    const modeFolder = dir + '/' + mode.data[0].id;
                     if (!fs.existsSync(modeFolder)) { 
                         controls['ext'].forEach( e => e.pId = pId);
                         file['data'].forEach( e => e.pId = pId);
@@ -300,7 +301,7 @@ class JscodeUtil {
                         del([dir]);
                         resolve(`[${mode.data[0].text}]导入成功!`);
                     } else {
-                        fs.rename(modeFolder, `${path}\\jscode\\${pId}`, (err) => {
+                        fs.rename(modeFolder, `${path}/jscode/${pId}`, (err) => {
                             if (err) throw err;
                             controls['ext'].forEach( e => e.pId = pId);
                             file['data'].forEach( e => e.pId = pId);
@@ -344,8 +345,8 @@ class JscodeUtil {
         require('../dao/mode.js').removeAll(pId);
         require('../dao/modeData.js').removeAll(pId);
         require('../dao/package.js').removeAll(pId);
-        const path = appRoot.path.replace('\\resources\\app.asar', ''), that = this;
-        del([`${path}\\jscode\\${pId}`]);
+        const path = appRoot.path.replace('/resources/app.asar', ''), that = this;
+        del([`${path}/jscode/${pId}`]);
     }
 }
 

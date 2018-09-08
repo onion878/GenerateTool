@@ -45,12 +45,26 @@ Ext.define('MyAppNamespace.view.templet.templet', {
             },
             {
                 text: '操作',
-                width: 100,
+                flex: 1,
                 align: 'center',
                 xtype: 'widgetcolumn',
                 widget: {
                     xtype: 'container',
                     items: [
+                        {
+                            xtype: 'button',
+                            text: '上传',
+                            handler: function (btn) {
+
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            text: '详情',
+                            handler: function (btn) {
+
+                            }
+                        },
                         {
                             xtype: 'button',
                             text: '导出',

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "package-win": "electron-packager . --overwrite --asar --platform=win32 --arch=x64 --electron-version 2.0.2 --icon=static/images/icon.ico --out=release-builds --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\" && node renderer.js",
-    "electron-build": "ng build --prod && electron ."
+    "package-linux": "electron-packager . --overwrite --asar --platform=linux --arch=x64 --electron-version 2.0.2 --icon=static/images/icon.ico --out=release-builds --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\""
   },
   "keywords": [
     "Electron",
