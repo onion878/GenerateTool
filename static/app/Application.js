@@ -14,7 +14,7 @@ Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'MyAppNamespace',
     appFolder: 'app',
-    controllers: [ 'Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome','Generate', 'Templet'],
+    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet'],
     launch: function () {
         let pId = history.getMode();
         moduleId = pId;
@@ -613,7 +613,7 @@ Ext.application({
                                             }),
                                             plugins: [{
                                                 ptype: 'rowexpander',
-                                                rowBodyTpl: ['<p><b>名称:</b> {file}</p>','<p><b>文件:</b> {name}</p>']
+                                                rowBodyTpl: ['<p><b>名称:</b> {file}</p>', '<p><b>文件:</b> {name}</p>']
                                             }],
                                             columns: [
                                                 new Ext.grid.RowNumberer(),

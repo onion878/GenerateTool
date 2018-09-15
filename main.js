@@ -119,6 +119,18 @@ function createWindow() {
                             }
                         }
                     ]
+                },
+                {
+                    label: '登录',
+                    click() {
+                        mainWindow.webContents.executeJavaScript('showLoginWindow()');
+                    }
+                },
+                {
+                    label: '注册',
+                    click() {
+                        mainWindow.webContents.executeJavaScript('showRegisterWindow()');
+                    }
                 }
             ]
         },
