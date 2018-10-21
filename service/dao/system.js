@@ -10,6 +10,8 @@ class System {
         sdb.defaults({code: {}}).write();
         sdb.defaults({zoom: 1}).write();
         sdb.defaults({theme: 'neptune'}).write();
+        sdb.defaults({user: {}}).write();
+        sdb.defaults({auth: ''}).write();
     }
 
     setCode(name, language) {
@@ -40,6 +42,25 @@ class System {
     getTheme() {
         return sdb.get('theme').value();
     }
+
+    setUser(username, password) {
+        sdb.set('user', {username: username, password: password})
+            .write();
+    }
+
+    getUser() {
+        return sdb.get('user').value();
+    }
+
+    setAuth(token) {
+        sdb.set('auth', token)
+            .write();
+    }
+
+    getAuth() {
+        return sdb.get('auth').value();
+    }
+
 }
 
 module.exports = new System();

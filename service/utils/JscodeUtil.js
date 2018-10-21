@@ -10,7 +10,7 @@ const archiver = require('archiver');
 class JscodeUtil {
 
     getFolder(id) {
-        let path = appRoot.path;
+        let path = appRoot.path.replace(/\\/g, '/');
         if (path.indexOf('app.asar') > -1) {
             path = path.replace('app.asar', '').replace('resources/', '');
         }
@@ -202,7 +202,7 @@ class JscodeUtil {
     }
 
     exportModule({id, text, folder}) {
-        const path = appRoot.path.replace('/resources/app.asar', ''), that = this;
+        const path = appRoot.path.replace(/\\/g, '/').replace('/resources/app.asar', ''), that = this;
         return new Promise(function (resolve, reject) {
             const output = fs.createWriteStream(`${folder}/${text}.zip`);
             const archive = archiver('zip', {
@@ -345,7 +345,7 @@ class JscodeUtil {
         require('../dao/mode.js').removeAll(pId);
         require('../dao/modeData.js').removeAll(pId);
         require('../dao/package.js').removeAll(pId);
-        const path = appRoot.path.replace('/resources/app.asar', ''), that = this;
+        const path = appRoot.path.replace(/\\/g, '/').replace('/resources/app.asar', ''), that = this;
         del([`${path}/jscode/${pId}`]);
     }
 }
