@@ -11,7 +11,7 @@ https://blog.csdn.net/qq_36224522/article/details/81268630
 
 ## 实现功能
 
-- 自定义模板(需要node基础知识)
+- 自定义模板
 - 自动生成文件
 
 使用无需安装node，无需node相关知识。
