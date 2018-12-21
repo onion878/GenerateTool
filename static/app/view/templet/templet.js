@@ -53,20 +53,6 @@ Ext.define('MyAppNamespace.view.templet.templet', {
                     items: [
                         {
                             xtype: 'button',
-                            text: '上传',
-                            handler: function (btn) {
-
-                            }
-                        },
-                        {
-                            xtype: 'button',
-                            text: '详情',
-                            handler: function (btn) {
-
-                            }
-                        },
-                        {
-                            xtype: 'button',
                             text: '导出',
                             handler: function (btn) {
                                 const data = btn.up().getWidgetRecord().getData();

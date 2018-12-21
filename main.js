@@ -93,22 +93,10 @@ function createMainWindow() {
     },
         {
             label: '模板管理',
-            submenu: [
-                {
-                    label: '本地模板',
-                    click() {
-                        let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
-                        mainWindow.webContents.executeJavaScript(code);
-                    }
-                },
-                {
-                    label: '模板下载',
-                    click() {
-                        let code = `openSome({id:'templet',title:'模板下载',type:'templet'})`;
-                        mainWindow.webContents.executeJavaScript(code);
-                    }
-                }
-            ]
+            click() {
+                let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
+                mainWindow.webContents.executeJavaScript(code);
+            }
         },
         {
             label: '控制台',
