@@ -8,7 +8,6 @@ const {
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
-const config = require('./service/dao/system');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading;
 
@@ -42,10 +41,9 @@ function createMainWindow() {
         title: '代码构建工具',
         icon: path.join(__dirname, 'static/images/icon.ico')
     });
-    const theme = config.getTheme();
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, `static/${theme}.html`),
+        pathname: path.join(__dirname, `static/index.html`),
         protocol: 'file:',
         slashes: true
     }));
@@ -90,70 +88,6 @@ function createMainWindow() {
                 click() {
                     mainWindow.reload();
                 }
-            },
-            {
-                label: '主题',
-                submenu: [{
-                    label: 'aria',
-                    type: 'radio',
-                    checked: theme == 'aria',
-                    click() {
-                        setTheme('aria');
-                    }
-                },
-                    {
-                        label: 'classic',
-                        type: 'radio',
-                        checked: theme == 'classic',
-                        click() {
-                            setTheme('classic');
-                        }
-                    },
-                    {
-                        label: 'crisp',
-                        type: 'radio',
-                        checked: theme == 'crisp',
-                        click() {
-                            setTheme('crisp');
-                        }
-                    },
-                    {
-                        label: 'gray',
-                        type: 'radio',
-                        checked: theme == 'gray',
-                        click() {
-                            setTheme('gray');
-                        }
-                    },
-                    {
-                        label: 'neptune',
-                        type: 'radio',
-                        checked: theme == 'neptune',
-                        click() {
-                            setTheme('neptune');
-                        }
-                    },
-                    {
-                        label: 'triton',
-                        type: 'radio',
-                        checked: theme == 'triton',
-                        click() {
-                            setTheme('triton');
-                        }
-                    }
-                ]
-            },
-            {
-                label: '登录',
-                click() {
-                    mainWindow.webContents.executeJavaScript('showLoginWindow()');
-                }
-            },
-            {
-                label: '注册',
-                click() {
-                    mainWindow.webContents.executeJavaScript('showRegisterWindow()');
-                }
             }
         ]
     },
@@ -190,15 +124,6 @@ function createMainWindow() {
         }
     ]);
     Menu.setApplicationMenu(menu);
-
-    function setTheme(name) {
-        config.setTheme(name);
-        mainWindow.loadURL(url.format({
-            pathname: path.join(__dirname, `static/${name}.html`),
-            protocol: 'file:',
-            slashes: true
-        }));
-    }
 
     let msgIndex = 0;
 
