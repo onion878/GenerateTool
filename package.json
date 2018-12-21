@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "package-win": "electron-packager . --overwrite --asar --platform=win32 --arch=x64 --electron-version 3.0.9 --icon=static/images/icon.ico --out=dist --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\" && node renderer.js",
-    "package-linux": "electron-packager . --overwrite --asar --platform=linux --arch=x64 --electron-version 3.0.9 --icon=static/images/icon.ico --out=dist --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\""
+    "package-win": "electron-packager . --overwrite --asar --platform=win32 --arch=x64 --electron-version 4.0.0 --icon=static/images/icon.ico --out=dist --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\" && node renderer.js",
+    "package-linux": "electron-packager . --overwrite --asar --platform=linux --arch=x64 --electron-version 4.0.0 --icon=static/images/icon.ico --out=dist --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\""
   },
   "keywords": [
     "Electron",
@@ -17,7 +17,7 @@
   "author": "Onion",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^3.0.9"
+    "electron": "^4.0.0"
   },
   "dependencies": {
     "app-root-path": "^2.0.1",
