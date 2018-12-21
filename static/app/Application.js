@@ -1,3 +1,4 @@
+const ipcRenderer = require('electron').ipcRenderer;
 const data = require('../service/dao/modeData');
 const parentData = require('../service/dao/mode');
 const history = require('../service/dao/history');
@@ -10,12 +11,14 @@ const geFileData = require('../service/dao/gefile');
 const swig = require('swig');
 const utils = require('../service/utils/utils');
 
+ipcRenderer.send('loading-msg', '服务加载中...');
 Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'MyAppNamespace',
     appFolder: 'app',
     controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet'],
     launch: function () {
+        ipcRenderer.send('loading-msg', '模块加载中...');
         let pId = history.getMode();
         moduleId = pId;
         let store = Ext.create('Ext.data.TreeStore', {
@@ -35,6 +38,8 @@ Ext.application({
         if (pId !== '') {
             title = parentData.getById(pId).text;
         }
+
+        ipcRenderer.send('loading-msg', '界面加载中...');
         const viewport = Ext.create('Ext.Viewport', {
             id: 'border-example',
             layout: 'border',
@@ -692,7 +697,7 @@ Ext.application({
                 }
             }]
         });
-
+        ipcRenderer.send('loading-msg', '缓存加载中...');
         function getFilesData() {
             let GfData = fileData.getFiles(pId, '0');
             GfData.forEach(d => {
@@ -830,13 +835,14 @@ Ext.application({
             }, btn, d.text);
         }
 
+        ipcRenderer.send('loading-msg', '历史加载中...');
         const tabData = history.getTab();
         const showTab = history.getShowTab();
         for (let i = 0; i < tabData.length; i++) {
             openSome(tabData[i]);
         }
         Ext.getCmp('mainmenutab').setActiveTab(Ext.getCmp(showTab));
-        Ext.getBody().addCls('loaded');
+        ipcRenderer.send('loading-success', '加载完成!');
     }
 });
 
