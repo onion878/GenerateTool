@@ -34,11 +34,15 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
                     icon: 'images/coins_add.png',
                     tooltip: '安装最新版',
                     handler: function(view, recIndex, cellIndex, item, e, {data}) {
+                        showToast(`安装成功后会重启软件!`);
                         const el = this.up('pkg').getEl();
                         el.mask('安装中...');
                         jsCode.downloadPkg(pId, data.name).then( fileName => {
                             el.unmask();
                             showToast(`${fileName},安装成功!`);
+                            const remote = require('electron').remote;
+                            remote.app.relaunch();
+                            remote.app.exit(0);
                         }).catch(e => {
                             el.unmask();
                             showError(`安装失败-> ${e}`);
