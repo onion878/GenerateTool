@@ -2,34 +2,34 @@ const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('data/gefile.json');
 const gdb = low(adapter);
-const utils = require('../utils/utils');
 
 class GeFile {
 
     constructor() {
         gdb.defaults({
-            data: []
+            data: [],
+            swig: []
         }).write();
     }
 
     save(id, pId) {
         gdb.get('data')
-                .push({
-                    id: id,
-                    pId: pId,
-                    file: '',
-                    content: null,
-                    preview: null
-                })
-                .write();
+            .push({
+                id: id,
+                pId: pId,
+                file: '',
+                content: null,
+                preview: null
+            })
+            .write();
     }
 
     setDataEdit(id, pId, content) {
         const v = this.getOneData(id);
         if (v != undefined) {
             gdb.get('data').find({
-                    id: id
-                })
+                id: id
+            })
                 .set('content', content)
                 .write();
         } else {
@@ -49,8 +49,8 @@ class GeFile {
         const v = this.getOneData(id);
         if (v != undefined) {
             gdb.get('data').find({
-                    id: id
-                })
+                id: id
+            })
                 .set('preview', preview)
                 .write();
         } else {
@@ -104,8 +104,27 @@ class GeFile {
 
     removeAll(pId) {
         gdb.get('data')
-            .remove({ pId: pId })
+            .remove({pId: pId})
             .write();
+    }
+
+    getSwig(pId) {
+        let v = gdb.get('swig').find({pId: pId}).value();
+        if (v != undefined) {
+            v = v.content;
+        } else {
+            v = '';
+        }
+        return v;
+    }
+
+    setSwig(pId, content) {
+        const v = gdb.get('swig').find({pId: pId});
+        if (v.value() === undefined) {
+            gdb.get('swig').push({pId: pId, content: content}).write();
+        } else {
+            v.set('content', content).write();
+        }
     }
 }
 

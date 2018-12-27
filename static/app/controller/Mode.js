@@ -46,13 +46,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     align: 'stretch'
                 },
                 items: [{
-                        xtype: 'textfield',
-                        margin: '10',
-                        labelWidth: 45,
-                        name: 'name',
-                        allowBlank: false,
-                        fieldLabel: '变量名'
-                    },
+                    xtype: 'textfield',
+                    margin: '10',
+                    labelWidth: 45,
+                    name: 'name',
+                    allowBlank: false,
+                    fieldLabel: '变量名'
+                },
                     {
                         xtype: 'combobox',
                         fieldLabel: '名称',
@@ -61,9 +61,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         store: {
                             fields: ['id', 'text'],
                             data: [{
-                                    id: 'text',
-                                    text: '文本框'
-                                },
+                                id: 'text',
+                                text: '文本框'
+                            },
                                 {
                                     id: 'textarea',
                                     text: '多行文本框'
@@ -131,25 +131,25 @@ Ext.define('MyAppNamespace.controller.Mode', {
             },
             buttonAlign: 'center',
             buttons: [{
-                    text: '确定',
-                    handler: function () {
-                        const form = this.up('window').down('form').getForm();
-                        if (form.isValid()) {
-                            const moduleData = controlData.getModuleData(that.pId);
-                            const {
-                                type,
-                                name,
-                                language
-                            } = form.getValues();
-                            if (moduleData[name] != undefined) {
-                                showToast(`已存在[${name}]!`);
-                            } else {
-                                btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
-                                this.up('window').close();
-                            }
+                text: '确定',
+                handler: function () {
+                    const form = this.up('window').down('form').getForm();
+                    if (form.isValid()) {
+                        const moduleData = controlData.getModuleData(that.pId);
+                        const {
+                            type,
+                            name,
+                            language
+                        } = form.getValues();
+                        if (moduleData[name] != undefined) {
+                            showToast(`已存在[${name}]!`);
+                        } else {
+                            btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
+                            this.up('window').close();
                         }
                     }
-                },
+                }
+            },
                 {
                     text: '取消',
                     handler: function () {
@@ -380,27 +380,27 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 bottom: 10
             },
             items: [{
-                    xtype: 'container',
-                    flex: 1,
-                    layout: 'hbox',
-                    items: [{
-                        xtype: 'label',
-                        text: label,
-                        width: 105,
-                        margin: {
-                            top: 3
-                        },
-                        listeners: {
-                            'render': function () {
-                                this.el.on('dblclick', function (e, t) {
-                                    labelEditor.startEdit(t);
-                                    labelEditor.field.focus(50, true);
-                                    editLabelId = id;
-                                });
-                            }
+                xtype: 'container',
+                flex: 1,
+                layout: 'hbox',
+                items: [{
+                    xtype: 'label',
+                    text: label,
+                    width: 105,
+                    margin: {
+                        top: 3
+                    },
+                    listeners: {
+                        'render': function () {
+                            this.el.on('dblclick', function (e, t) {
+                                labelEditor.startEdit(t);
+                                labelEditor.field.focus(50, true);
+                                editLabelId = id;
+                            });
                         }
-                    }, content]
-                },
+                    }
+                }, content]
+            },
                 {
                     xtype: 'button',
                     icon: 'images/script_code.png',

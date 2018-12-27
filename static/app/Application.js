@@ -16,7 +16,7 @@ Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'MyAppNamespace',
     appFolder: 'app',
-    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet'],
+    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate'],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
         let pId = history.getMode();
@@ -164,6 +164,11 @@ Ext.application({
                                             history.removeAll();
                                             Ext.getCmp('panel-model').setTitle(row.data.text);
                                             Ext.getCmp('mainmenutab').removeAll();
+                                            try {
+                                                eval(geFileData.getSwig(pId));
+                                            } catch (e) {
+                                                console.error(e);
+                                            }
                                             getFilesData();
                                         }
                                     },
@@ -197,6 +202,11 @@ Ext.application({
                                         history.removeAll();
                                         Ext.getCmp('panel-model').setTitle(text);
                                         Ext.getCmp('mainmenutab').removeAll();
+                                        try {
+                                            eval(geFileData.getSwig(pId));
+                                        } catch (e) {
+                                            console.error(e);
+                                        }
                                         getFilesData();
                                     }, this);
                                 }
@@ -545,17 +555,29 @@ Ext.application({
                     checkPropagation: 'both',
                     useArrows: true,
                     rootVisible: false,
-                    tools: [{
-                        renderTpl: [
-                            '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-file" role="presentation"></div>'
-                        ],
-                        qtip: '添加模板文件',
-                        listeners: {
-                            click: function () {
-                                setGeFile(this);
+                    tools: [
+                        {
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-cog-add" role="presentation"></div>'
+                            ],
+                            qtip: '配置swig',
+                            listeners: {
+                                click: function () {
+                                    addbutton('swig-template', 'swig-template', '', 'Swig配置', {});
+                                }
                             }
-                        }
-                    },
+                        },
+                        {
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-file" role="presentation"></div>'
+                            ],
+                            qtip: '添加模板文件',
+                            listeners: {
+                                click: function () {
+                                    setGeFile(this);
+                                }
+                            }
+                        },
                         {
                             renderTpl: [
                                 '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-folder" role="presentation"></div>'
@@ -698,6 +720,7 @@ Ext.application({
             }]
         });
         ipcRenderer.send('loading-msg', '缓存加载中...');
+
         function getFilesData() {
             let GfData = fileData.getFiles(pId, '0');
             GfData.forEach(d => {
@@ -834,7 +857,11 @@ Ext.application({
                 root.appendChild(child);
             }, btn, d.text);
         }
-
+        try {
+            eval(geFileData.getSwig(pId));
+        } catch (e) {
+            console.error(e);
+        }
         ipcRenderer.send('loading-msg', '历史加载中...');
         const tabData = history.getTab();
         const showTab = history.getShowTab();

@@ -2,6 +2,20 @@ body {
     font-family: 微软雅黑;
 }
 
+/* 定义滚动条宽度 */
+::-webkit-scrollbar {
+    width: 10px;
+}
+/* 定义那个轨道的样式 */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+/* 定义滚动按钮的样式，就是那个bar */
+::-webkit-scrollbar-thumb {
+    background: rgba(166, 166, 168, 0.49);
+    transition: opacity .8s linear;
+}
+
 .code-content {
     width: 100%;
     height: 100%;
@@ -54,6 +68,11 @@ body {
 
 .x-panel-header-default .x-tool-img-add-file {
     background-image: url(../images/add.png);
+    background-color: #e0ebf3;
+}
+
+.x-panel-header-default .x-tool-img-cog-add {
+    background-image: url(../images/cog_add.png);
     background-color: #e0ebf3;
 }
 
