@@ -90,7 +90,7 @@ Ext.application({
                             const item = event.data.id;
                             const icon = event.data.icon;
                             const title = event.data.text;
-                            addbutton(item, 'mode', icon, title, {});
+                            addbutton(item, 'mode', './images/coins_add.png', title, {});
                         },
                         itemcontextmenu: function (node, record, item, index, event, eOpts) {
                             new Ext.menu.Menu({
@@ -312,7 +312,7 @@ Ext.application({
                             const title = event.data.text;
                             const type = event.data.type;
                             if (type == 'file' && event.childNodes.length == 0) {
-                                addbutton(item, 'generate', icon, title, {
+                                addbutton(item, 'generate', './images/tag.png', title, {
                                     updateType: event.get('updateType'),
                                     path: event.get('folder') + '\\' + title,
                                     folder: event.get('folder'),
@@ -563,7 +563,7 @@ Ext.application({
                             qtip: '配置swig',
                             listeners: {
                                 click: function () {
-                                    addbutton('swig-template', 'swig-template', '', 'Swig配置', {});
+                                    addbutton('swig-template', 'swig-template', './images/cog_add.png', 'Swig配置', {});
                                 }
                             }
                         },
@@ -709,7 +709,8 @@ Ext.application({
                             id: tab.config.id,
                             params: tab.config.params,
                             title: tab.config.title,
-                            type: tab.config.xtype
+                            type: tab.config.xtype,
+                            icon: tab.config.icon
                         });
                     },
                     remove: function (tabPanel, tab) {
@@ -857,6 +858,7 @@ Ext.application({
                 root.appendChild(child);
             }, btn, d.text);
         }
+
         try {
             eval(geFileData.getSwig(pId));
         } catch (e) {
@@ -873,12 +875,7 @@ Ext.application({
     }
 });
 
-function openSome({
-                      id,
-                      title,
-                      type,
-                      params
-                  }) {
+function openSome({id, title, type, params, icon}) {
     const panel = "mainmenutab";
     const tabPanel = Ext.getCmp(panel);
     const taa = Ext.getCmp(id);
@@ -890,6 +887,7 @@ function openSome({
             title: title,
             pId: history.getMode(),
             closable: true,
+            icon: icon,
             params: params,
             xtype: type
         });

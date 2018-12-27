@@ -5,7 +5,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
     layout: 'border',
     listeners: {
         render: function (c) {
-            const tPanel = this.down('tabpanel')
+            const tPanel = this.down('tabpanel');
             history.getCode().forEach(c=> {
                 tPanel.add(c);
             });
@@ -72,6 +72,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                 filePath: file,
                                 fileContent: content,
                                 closable: true,
+                                icon: './images/script_code.png',
                                 xtype: 'code'
                             };
                             const jTab = tPanel.add(data);
@@ -122,6 +123,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                                 pId: pId,
                                                 title: '安装包',
                                                 closable: true,
+                                                icon: './images/npm.jpg',
                                                 xtype: 'pkg'
                                             };
                                             const jTab = tPanel.add(data);
@@ -144,6 +146,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                                 pId: pId,
                                                 title: '管理包',
                                                 closable: true,
+                                                icon: './images/npm.jpg',
                                                 xtype: 'unpkg'
                                             };
                                             const jTab = tPanel.add(data);
