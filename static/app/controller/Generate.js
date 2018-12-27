@@ -44,9 +44,14 @@ Ext.define('MyAppNamespace.controller.Generate', {
             readOnly: true
         });
         if(params.updateType == 'add') {
-            const tpl = swig.compile(code.getValue());
-            const output = tpl(controlData.getModuleData(btn.up('generate').pId));
-            code.setValue(output);
+            try {
+                const tpl = swig.compile(code.getValue());
+                const output = tpl(controlData.getModuleData(btn.up('generate').pId));
+                code.setValue(output);
+            }catch (e) {
+                console.log(e);
+                showError('模板错误无法预览!');
+            }
         } else {
             const {file} = geFileData.getOneData(params.fileId);
             if(file.trim().length == 0) {
