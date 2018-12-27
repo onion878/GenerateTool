@@ -96,10 +96,20 @@ class GeFile {
             }).value();
     }
 
-    addAllData({data}) {
+    getFileSwig(pId) {
+        return gdb.get('swig')
+            .filter({
+                pId: pId
+            }).value();
+    }
+
+    addAllData({data, swig}) {
         const oldData = gdb.get('data').value();
         const newData = oldData.concat(data);
         gdb.set('data', newData).write();
+        swig.forEach(s => {
+            gdb.get('swig').push(s).write();
+        });
     }
 
     removeAll(pId) {

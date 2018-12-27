@@ -40,35 +40,46 @@ Ext.define('MyAppNamespace.controller.Generate', {
         const params = btn.up('generate').params;
         const vsCode = btn.up('generate').down('minicode');
         const code = vsCode.codeEditor;
-        code.updateOptions({
-            readOnly: true
-        });
-        if(params.updateType == 'add') {
+        if (params.updateType == 'add') {
             try {
                 const tpl = swig.compile(code.getValue());
                 const output = tpl(controlData.getModuleData(btn.up('generate').pId));
                 code.setValue(output);
-            }catch (e) {
+                code.updateOptions({
+                    readOnly: true
+                });
+            } catch (e) {
                 console.log(e);
                 showError('模板错误无法预览!');
             }
         } else {
             const {file} = geFileData.getOneData(params.fileId);
-            if(file.trim().length == 0) {
+            if (file.trim().length == 0) {
                 showError('未设置修改文件,无法预览!');
                 return;
             }
-            const tplFile = swig.compile(file);
-            const f = tplFile(controlData.getModuleData(btn.up('generate').pId)).replace(/\\/g, '\/');
-            const d = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(f, 'utf8').replace(/\$/g, '\\\$').replace(/\`/g, '\\\`')}\`;` + code.getValue());
-            if (d instanceof Promise) {
-                d.then(v => {
-                    code.setValue(v);
-                });
-            } else {
-                if(d != undefined) {
-                    code.setValue(d);
+            try {
+                const tplFile = swig.compile(file);
+                const f = tplFile(controlData.getModuleData(btn.up('generate').pId)).replace(/\\/g, '\/');
+                const d = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(f, 'utf8').replace(/\$/g, '\\\$').replace(/\`/g, '\\\`')}\`;` + code.getValue());
+                if (d instanceof Promise) {
+                    d.then(v => {
+                        code.setValue(v);
+                        code.updateOptions({
+                            readOnly: true
+                        });
+                    });
+                } else {
+                    if (d != undefined) {
+                        code.setValue(d);
+                        code.updateOptions({
+                            readOnly: true
+                        });
+                    }
                 }
+            } catch (e) {
+                console.log(e);
+                showError('模板错误无法预览!');
             }
         }
     },
