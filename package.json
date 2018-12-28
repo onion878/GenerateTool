@@ -30,6 +30,7 @@
     "open": "0.0.5",
     "require-uncached": "^1.0.3",
     "shelljs": "^0.8.2",
-    "swig": "^1.4.2"
+    "swig": "^1.4.2",
+    "monaco-editor": "^0.15.6"
   }
 }
