@@ -15,7 +15,7 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
         action: 'search'
     }],
     initComponent: function () {
-        const pId = this.pId;
+        const pId = this.pId, that = this;
         this.columns = [
             {text: '名称', align: 'center', dataIndex: 'name', flex: 1},
             {text: '最新版本', align: 'center', dataIndex: 'version', flex: 1},
@@ -33,46 +33,44 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
                 items: [{
                     icon: 'images/coins_add.png',
                     tooltip: '安装最新版',
-                    handler: function(view, recIndex, cellIndex, item, e, {data}) {
-                        showToast(`安装成功后会重启软件!`);
-                        const el = this.up('pkg').getEl();
-                        el.mask('安装中...');
-                        jsCode.downloadPkg(pId, data.name).then( fileName => {
-                            el.unmask();
-                            showToast(`${fileName},安装成功!`);
-                            const remote = require('electron').remote;
-                            remote.app.relaunch();
-                            remote.app.exit(0);
-                        }).catch(e => {
-                            el.unmask();
-                            showError(`安装失败-> ${e}`);
-                        });
+                    handler: function (view, recIndex, cellIndex, item, e, {data}) {
+                        showToast(`安装中...,安装成功后使用需要重新启动!`);
+                        jsCode.savePkg(pId, data.name);
+                        that.installPkg(pId, data.name);
                     }
-                },{
+                }, {
                     icon: 'images/cog_add.png',
                     tooltip: '安装其它版本',
-                    handler: function(view, recIndex, cellIndex, item, e, {data}) {
+                    handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         const el = this.up('pkg').getEl();
                         showPrompt('输入版本号', '', function (text) {
-                            el.mask('安装中...');
-                            jsCode.downloadPkg(pId, data.name, text).then( fileName => {
-                                el.unmask();
-                                showToast(`${fileName},安装成功!`);
-                            }).catch(e => {
-                                el.unmask();
-                                showError(`安装失败-> ${e}`);
-                            });
+                            showToast(`安装中...,安装成功后使用需要重新启动!`);
+                            jsCode.savePkg(pId, data.name, text);
+                            that.installPkg(pId, data.name, text);
                         }, this);
                     }
                 }, {
                     icon: 'images/find.png',
                     tooltip: '详情',
-                    handler: function(view, recIndex, cellIndex, item, e, record) {
+                    handler: function (view, recIndex, cellIndex, item, e, record) {
                         require("open")(record.data.links.npm);
                     }
                 }]
             }
         ];
         this.callParent(arguments);
+    },
+    installPkg(pId, name, version) {
+        if (version != undefined) {
+            name = name + '@' + version;
+        }
+        if (Ext.getCmp('terminal').hidden) {
+            document.getElementById('terminal-btn').click();
+            const folder = jsCode.getFolder(pId);
+            command.cdTargetFolder(folder);
+            command.write('npm install ' + name);
+        } else {
+            command.write('npm install ' + name);
+        }
     }
 });

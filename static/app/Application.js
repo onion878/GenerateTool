@@ -10,13 +10,14 @@ const fileData = require('../service/dao/file');
 const geFileData = require('../service/dao/gefile');
 const swig = require('swig');
 const utils = require('../service/utils/utils');
+const command = require('../service/utils/commands');
 
 ipcRenderer.send('loading-msg', '服务加载中...');
 Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'MyAppNamespace',
     appFolder: 'app',
-    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate'],
+    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate', 'Statusbar'],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
         let pId = history.getMode();
@@ -312,7 +313,7 @@ Ext.application({
                             const title = event.data.text;
                             const type = event.data.type;
                             if (type == 'file' && event.childNodes.length == 0) {
-                                addbutton(item, 'generate', './images/tag.png', title, {
+                                addbutton(item, 'generate', './images/mode.png', title, {
                                     updateType: event.get('updateType'),
                                     path: event.get('folder') + '\\' + title,
                                     folder: event.get('folder'),
@@ -343,7 +344,7 @@ Ext.application({
                                 minWidth: 60,
                                 items: [{
                                     text: '添加模板文件',
-                                    icon: 'images/add.png',
+                                    icon: 'images/add-file.png',
                                     hidden: type != 'file' ? false : true,
                                     handler: function () {
                                         Ext.create('Ext.window.Window', {
@@ -441,7 +442,7 @@ Ext.application({
                                     {
                                         text: '设置生成路径',
                                         hidden: type == 'file' ? false : true,
-                                        icon: 'images/cog_add.png',
+                                        icon: 'images/set-file.png',
                                         handler: function () {
                                             const {file} = geFileData.getOneData(record.get('id'));
                                             const fileTpl = swig.compile(file);

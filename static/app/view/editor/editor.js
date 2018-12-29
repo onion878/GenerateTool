@@ -6,10 +6,11 @@ Ext.define('MyAppNamespace.view.editor.editor', {
     listeners: {
         render: function (c) {
             const tPanel = this.down('tabpanel');
-            history.getCode().forEach(c=> {
+            history.getCode().forEach(c => {
                 tPanel.add(c);
             });
             tPanel.setActiveTab(history.getShowCodeTab());
+            jsCode.initFile(this.pId);
         }
     },
     initComponent: function () {
@@ -32,10 +33,18 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                 listeners: {
                     drop: function (node, data, overModel, dropPosition) {
                         const fileName = data.records[0].data.text;
+                        if (data.records[0].data.parentId == 'root' && (fileName == 'data.js' || fileName == 'package.json')) return;
                         const oldFolder = data.records[0].data.parentFolder;
                         const newFolder = data.records[0].parentNode.data.parentFolder;
                         jsCode.moveFile(pId, oldFolder, newFolder, fileName);
                         data.records[0].set('parentFolder', newFolder + '/' + fileName);
+                    }
+                },
+                getRowClass: function (record, rowIndex, rowParams, store) {
+                    if (record.data.parentId == 'root' && (record.data.text == 'data.js' || record.data.text == 'package.json')) {
+                        return 'color-display';
+                    } else {
+                        return '';
                     }
                 }
             },
@@ -58,6 +67,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                 },
                 itemclick: function (node, record) {
                     if (record.data.type == 'file') {
+                        if (record.data.parentId == 'root' && (record.data.text == 'data.js' || record.data.text == 'package.json')) return;
                         const {file, content} = jsCode.readFile(pId, record.data.parentFolder);
                         const tPanel = this.up('editor').down('tabpanel');
                         const id = record.data.parentFolder;
@@ -83,6 +93,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                 },
                 itemcontextmenu: function (node, record, item, index, event, eOpts) {
                     const that = this;
+                    if (record.data.parentId == 'root' && (record.data.text == 'data.js' || record.data.text == 'package.json')) return;
                     if (record.id == 'root') {
                         new Ext.menu.Menu({
                             minWidth: 60,
@@ -202,11 +213,11 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                         title: '名称',
                                         width: 300,
                                         prompt: true,
-                                        value:  record.data.text,
+                                        value: record.data.text,
                                         buttons: Ext.MessageBox.OKCANCEL,
                                         scope: this,
-                                        fn:  function (btn, text) {
-                                            if (btn === 'ok'){
+                                        fn: function (btn, text) {
+                                            if (btn === 'ok') {
                                                 jsCode.reName(pId, record.data.text, text, record.parentNode.data.parentFolder);
                                                 record.set('text', text);
                                                 let parentFolder = record.parentNode.data.parentFolder;
@@ -244,7 +255,6 @@ Ext.define('MyAppNamespace.view.editor.editor', {
             xtype: 'tabpanel',
             fullscreen: true,
             plugins: new Ext.ux.TabCloseMenu(),
-            fullscreen: true,
             listeners: {
                 tabchange: function (tabPanel, tab) {
                     history.setShowCodeTab(tab.id);
@@ -253,7 +263,77 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                     history.removeCodeTab(tab.config.id);
                 }
             }
+        }, {
+            region: 'south',
+            split: true,
+            height: 100,
+            minSize: 100,
+            maxSize: 200,
+            id: 'terminal',
+            collapsible: false,
+            collapsed: false,
+            hidden: true,
+            html: `<div style="background: white;overflow: hidden;" id="term"></div>`,
+            margins: '0 0 0 0',
+            listeners: {
+                resize: function (el) {
+                    document.getElementById('term').style.height = document.getElementById('terminal-body').style.height;
+                    command.fitTerm();
+                }
+            },
+            tbar: {
+                xtype: 'statusbar',
+                pId: pId,
+                float: 'right',
+                list: [
+                    {img: './images/stop.png', name: 'Stop'},
+                    {img: './images/delete.png', name: 'Clear'}
+                ],
+                click: function (s, d, n) {
+                    if (n == 'Clear') {
+                        command.clearTerm();
+                    } else {
+                        command.cancelPty();
+                    }
+                }
+            }
         }];
+
+        this.bbar = {
+            xtype: 'statusbar',
+            pId: pId,
+            list: [{id: 'terminal-btn', img: './images/terminal.png', name: 'Terminal'}],
+            float: 'left',
+            status: false,
+            flagShow: false,
+            flagInit: false,
+            click: function (that, dom) {
+                if (!that.status && !that.flagInit) {
+                    that.status = true;
+                    Ext.getCmp('terminal').show();
+                    that.flagShow = true;
+                    that.flagInit = true;
+                    command.init(document.getElementById('term')).then((pty, xterm) => {
+                        that.status = false;
+                        const folder = jsCode.getFolder(that.pId);
+                        command.cdTargetFolder(folder);
+                    });
+                } else {
+                    if (that.flagShow) {
+                        Ext.getCmp('terminal').hide();
+                        that.flagShow = false;
+                    } else {
+                        Ext.getCmp('terminal').show();
+                        that.flagShow = true;
+                    }
+                }
+                if (that.flagShow) {
+                    dom.className = "active";
+                } else {
+                    dom.className = "";
+                }
+            }
+        };
         this.callParent(arguments);
     }
 });

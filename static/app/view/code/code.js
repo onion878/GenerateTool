@@ -40,7 +40,26 @@ Ext.define('MyAppNamespace.view.code.code', {
         this.codeEditor.layout();
     },
     initComponent: function () {
-        const pId = this.pId;
+        const pId = this.pId, that = this;
+        this.tbar = {
+            xtype: 'statusbar',
+            pId: pId,
+            list: [{img: './images/play_arrow.png', name: 'Run'}],
+            float: 'left',
+            click: function (tbar, d) {
+                that.runTest(pId, that.title);
+            }
+        };
         this.callParent(arguments);
+    },
+    runTest(pId, file) {
+        if (Ext.getCmp('terminal').hidden) {
+            document.getElementById('terminal-btn').click();
+            const folder = jsCode.getFolder(pId);
+            command.cdTargetFolder(folder);
+            command.write('node ' + file);
+        } else {
+            command.write('node ' + file);
+        }
     }
 });

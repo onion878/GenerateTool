@@ -6,10 +6,12 @@ body {
 ::-webkit-scrollbar {
     width: 10px;
 }
+
 /* 定义那个轨道的样式 */
 ::-webkit-scrollbar-track {
     background: transparent;
 }
+
 /* 定义滚动按钮的样式，就是那个bar */
 ::-webkit-scrollbar-thumb {
     background: rgba(166, 166, 168, 0.49);
@@ -51,6 +53,11 @@ body {
     background-color: #e0ebf3;
 }
 
+.x-panel-header-default .x-tool-img-mode {
+    background-image: url(../images/mode.png);
+    background-color: #e0ebf3;
+}
+
 .x-panel-header-default .x-tool-img-save {
     background-image: url(../images/database_save.png);
     background-color: #e0ebf3;
@@ -67,12 +74,17 @@ body {
 }
 
 .x-panel-header-default .x-tool-img-add-file {
-    background-image: url(../images/add.png);
+    background-image: url(../images/add-file.png);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-cog-add {
     background-image: url(../images/cog_add.png);
+    background-color: #e0ebf3;
+}
+
+.x-panel-header-default .x-tool-img-osx-terminal {
+    background-image: url(../images/application_osx_terminal.png);
     background-color: #e0ebf3;
 }
 
@@ -82,4 +94,48 @@ body {
 
 .color-blue span {
     color: blue;
+}
+
+.states-toolbar {
+    overflow: hidden;
+    background-color: #F2F2F2;
+    border-top: 1px solid #3892d4;
+    border-bottom: 1px solid #3892d4;
+    width: 100%;
+    height: 22px;
+}
+
+.states-toolbar a {
+    float: left;
+    height: 19.5px;
+    display: block;
+    color: #000030;
+    text-align: center;
+    padding: 0px 12px;
+    line-height: 20px;
+    text-decoration: none;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.states-toolbar a:hover {
+    background: #D9D9D9;
+}
+
+.states-toolbar a.active {
+    background-color: #BDBDBD;
+    color: #000000;
+}
+
+.states-toolbar a img {
+    margin-bottom: -4px;
+}
+
+.states-toolbar .states-content {
+    display: table;
+    margin: 0 auto;
+}
+
+.color-display {
+    color: lightgrey;
 }

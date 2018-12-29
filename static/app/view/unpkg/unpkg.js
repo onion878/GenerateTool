@@ -13,13 +13,13 @@ Ext.define('MyAppNamespace.view.unpkg.unpkg', {
         action: 'refresh'
     }, {
         xtype: 'button',
-        text: '安装',
+        text: '安装所有',
         icon: 'images/coins_add.png',
         action: 'installAll'
     }],
     selType: 'checkboxmodel',
     initComponent: function () {
-        const pId = this.pId;
+        const pId = this.pId, that = this;
         this.store = Ext.create('Ext.data.Store', {
             storeId: 'id',
             fields: ['pId', 'name', 'version', 'date', 'id'],
@@ -40,37 +40,37 @@ Ext.define('MyAppNamespace.view.unpkg.unpkg', {
                     icon: 'images/delete.png',
                     tooltip: '删除',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
-                        const el = this.up('unpkg').getEl(), that = this;
                         showConfirm(`是否删除包[${data.name}@${data.version}]?`, function (text) {
-                            el.mask('删除中...');
-                            jsCode.unInstallPkg(pId, data.name).then( name => {
-                                el.unmask();
-                                showToast(`${name},删除成功!`);
-                                const grid = that.up('unpkg');
-                                grid.getStore().setData(packageConfig.getAll(pId));
-                            }).catch( e => {
-                                el.unmask();
-                                showError(`删除失败-> ${e}`);
+                            jsCode.deletePkg(pId, data.name).then(f => {
+                                const grid = view.up('unpkg');
+                                grid.getStore().setData(packageConfig.getAll(grid.pId));
                             });
+                            that.runCommand('uninstall', pId, data.name);
                         }, this, Ext.MessageBox.ERROR);
                     }
                 }, {
                     icon: 'images/coins_add.png',
                     tooltip: '安装最新版',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
-                        const el = this.up('unpkg').getEl();
-                        el.mask('安装中...');
-                        jsCode.downloadPkg(pId, data.name).then(fileName => {
-                            el.unmask();
-                            showToast(`${fileName},安装成功!`);
-                        }).catch(e => {
-                            el.unmask();
-                            showError(`安装失败-> ${e}`);
-                        });
+                        showToast(`安装中...,安装成功后使用需要重新启动!`);
+                        that.runCommand('install', pId, data.name);
                     }
                 }]
             }
         ];
         this.callParent(arguments);
+    },
+    runCommand(type, pId, name, version) {
+        if (version != undefined) {
+            name = name + '@' + version;
+        }
+        if (Ext.getCmp('terminal').hidden) {
+            document.getElementById('terminal-btn').click();
+            const folder = jsCode.getFolder(pId);
+            command.cdTargetFolder(folder);
+            command.write('npm ' + type + ' ' + name);
+        } else {
+            command.write('npm ' + type + ' ' + name);
+        }
     }
 });

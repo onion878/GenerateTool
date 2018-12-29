@@ -32,9 +32,9 @@ class Package {
         }
     }
 
-    remove(name) {
+    remove(pId, name) {
         db.get('data')
-            .remove({name: name})
+            .remove({pId: pId, name: name})
             .write();
     }
 
@@ -46,7 +46,7 @@ class Package {
 
     removeAll(pId) {
         db.get('data')
-            .remove({ pId: pId })
+            .remove({pId: pId})
             .write();
     }
 }

@@ -79,7 +79,6 @@ Ext.define('MyAppNamespace.view.generate.generate', {
         }
     },
     initComponent: function () {
-        const pId = this.pId;
         const {updateType} = this.params;
         this.tbar = {
             dock: 'top',

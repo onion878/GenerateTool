@@ -1,10 +1,10 @@
 const fs = require('fs');
 const utils = require('./utils');
 const pack = require('../dao/package');
+const controls = require('../dao/controls');
 const appRoot = require('app-root-path');
 const npmi = require('npmi');
 const del = require('del');
-const npmu = require('./npmu');
 const archiver = require('archiver');
 
 class JscodeUtil {
@@ -72,19 +72,21 @@ class JscodeUtil {
         } else {
             parentFolder = '';
         }
-        const lists = fs.readdirSync(path);
         const data = [];
-        lists.forEach(item => {
-            const d = {text: item, parentFolder: parentFolder + item};
-            if (fs.statSync(path + '/' + item).isDirectory()) {
-                d.type = 'folder';
-                d.folder = true;
-            } else {
-                d.type = 'file';
-                d.leaf = true;
-            }
-            data.push(d);
-        });
+        try {
+            const lists = fs.readdirSync(path);
+            lists.forEach(item => {
+                const d = {text: item, parentFolder: parentFolder + item};
+                if (fs.statSync(path + '/' + item).isDirectory()) {
+                    d.type = 'folder';
+                    d.folder = true;
+                } else {
+                    d.type = 'file';
+                    d.leaf = true;
+                }
+                data.push(d);
+            });
+        } catch (e) {}
         return data;
     }
 
@@ -111,31 +113,16 @@ class JscodeUtil {
         return utils.writeFile({path: file, content: content});
     }
 
-    downloadPkg(id, fileName, version) {
-        const that = this, path = that.getFolder(id);
+    //downloadPkg
+    savePkg(id, fileName, version) {
+        const that = this;
         return new Promise((resolve, reject) => {
             try {
                 if (utils.isEmpty(version)) {
                     version = 'latest';
                 }
-                const options = {
-                    name: fileName,	// your module name
-                    version: version,		// expected version [default: 'latest']
-                    path: path,				// installation path [default: '.']
-                    forceInstall: false,	// force install if set to true (even if already installed, it will do a reinstall) [default: false]
-                    npmLoad: {				// npm.load(options, callback): this is the "options" given to npm.load()
-                        loglevel: 'silent'	// [default: {loglevel: 'silent'}]
-                    }
-                };
-                npmi(options, function (err, result) {
-                    if (err) {
-                        if (err.code === npmi.LOAD_ERR) reject('npm load error');
-                        else if (err.code === npmi.INSTALL_ERR) reject('npm install error');
-                        else reject(err.message);
-                    }
-                    pack.add({pId: id, name: fileName, version: version, date: utils.getNowTime()});
-                    resolve(options.name + '@' + version);
-                });
+                pack.add({pId: id, name: fileName, version: version, date: utils.getNowTime()});
+                resolve(fileName + '@' + version);
             } catch (e) {
                 console.log(e);
                 reject(e);
@@ -143,27 +130,12 @@ class JscodeUtil {
         });
     }
 
-    unInstallPkg(id, fileName) {
-        const that = this, path = that.getFolder(id);
+    deletePkg(id, fileName) {
+        const that = this;
         return new Promise((resolve, reject) => {
             try {
-                const options = {
-                    name: fileName,	// your module name
-                    path: path,				// installation path [default: '.']
-                    forceInstall: false,	// force install if set to true (even if already installed, it will do a reinstall) [default: false]
-                    npmLoad: {				// npm.load(options, callback): this is the "options" given to npm.load()
-                        loglevel: 'silent'	// [default: {loglevel: 'silent'}]
-                    }
-                };
-                npmu(options, function (err, result) {
-                    if (err) {
-                        if (err.code === npmu.LOAD_ERR) reject('npm load error');
-                        else if (err.code === npmu.INSTALL_ERR) reject('npm uninstall error');
-                        else reject(err.message);
-                    }
-                    pack.remove(fileName);
-                    resolve(options.name);
-                });
+                pack.remove(id, fileName);
+                resolve(fileName);
             } catch (e) {
                 console.log(e);
                 reject(e);
@@ -171,25 +143,14 @@ class JscodeUtil {
         });
     }
 
-    unInstallAll(id, names) {
-        const that = this, path = that.getFolder(id);
+    deleteAllPkg(id, names) {
+        const that = this;
         return new Promise((resolve, reject) => {
             try {
-                const options = {
-                    names: names,
-                    multiple: true,
-                    path: path,				// installation path [default: '.']
-                    forceInstall: false,	// force install if set to true (even if already installed, it will do a reinstall) [default: false]
-                    npmLoad: {				// npm.load(options, callback): this is the "options" given to npm.load()
-                        loglevel: 'silent'	// [default: {loglevel: 'silent'}]
-                    }
-                };
-                npmu(options, function (err, result) {
-                    names.forEach(fileName => {
-                        pack.remove(fileName);
-                    });
-                    resolve(options.names.join(','));
+                names.forEach(fileName => {
+                    pack.remove(id, fileName);
                 });
+                resolve(names.join(','));
             } catch (e) {
                 console.log(e);
                 reject(e);
@@ -276,23 +237,24 @@ class JscodeUtil {
 
     importModule(file) {
         const unZip = require('decompress');
-        const path = appRoot.path.replace(/\\/g,'/').replace('/resources/app.asar', ''), that = this;
+        const path = appRoot.path.replace(/\\/g, '/').replace('/resources/app.asar', ''), that = this;
         return new Promise((resolve, reject) => {
             const dir = `${path}/data/cache`;
             try {
                 unZip(file, dir).then(files => {
                     const data = JSON.parse(utils.readFile(`${dir}/data.json`));
-                    const controls = data['controls'], file = data['file'], gefile = data['gefile'], mode = data['mode'], modeData = data['modeData'], pack= data['package'];
+                    const controls = data['controls'], file = data['file'], gefile = data['gefile'],
+                        mode = data['mode'], modeData = data['modeData'], pack = data['package'];
                     const oldPid = mode.data[0].id;
                     let pId = that.getNewPid(oldPid);
                     const modeFolder = dir + '/' + mode.data[0].id;
-                    if (!fs.existsSync(modeFolder)) { 
-                        controls['ext'].forEach( e => e.pId = pId);
-                        file['data'].forEach( e => e.pId = pId);
-                        gefile['data'].forEach( e => e.pId = pId);
-                        mode['data'].forEach( e => e.id = pId);
-                        modeData['data'].forEach( e => e.pId = pId);
-                        pack['data'].forEach( e => e.pId = pId);
+                    if (!fs.existsSync(modeFolder)) {
+                        controls['ext'].forEach(e => e.pId = pId);
+                        file['data'].forEach(e => e.pId = pId);
+                        gefile['data'].forEach(e => e.pId = pId);
+                        mode['data'].forEach(e => e.id = pId);
+                        modeData['data'].forEach(e => e.pId = pId);
+                        pack['data'].forEach(e => e.pId = pId);
                         require('../dao/controls.js').addAllData(controls);
                         require('../dao/file.js').addAllData(file);
                         require('../dao/gefile.js').addAllData(gefile);
@@ -304,12 +266,12 @@ class JscodeUtil {
                     } else {
                         fs.rename(modeFolder, `${path}/jscode/${pId}`, (err) => {
                             if (err) throw err;
-                            controls['ext'].forEach( e => e.pId = pId);
-                            file['data'].forEach( e => e.pId = pId);
-                            gefile['data'].forEach( e => e.pId = pId);
-                            mode['data'].forEach( e => e.id = pId);
-                            modeData['data'].forEach( e => e.pId = pId);
-                            pack['data'].forEach( e => e.pId = pId);
+                            controls['ext'].forEach(e => e.pId = pId);
+                            file['data'].forEach(e => e.pId = pId);
+                            gefile['data'].forEach(e => e.pId = pId);
+                            mode['data'].forEach(e => e.id = pId);
+                            modeData['data'].forEach(e => e.pId = pId);
+                            pack['data'].forEach(e => e.pId = pId);
                             require('../dao/controls.js').addAllData(controls);
                             require('../dao/file.js').addAllData(file);
                             require('../dao/gefile.js').addAllData(gefile);
@@ -321,7 +283,7 @@ class JscodeUtil {
                         });
                     }
                 });
-            }catch (e) {
+            } catch (e) {
                 reject(e);
             }
         });
@@ -329,8 +291,8 @@ class JscodeUtil {
 
     getNewPid(pId) {
         const modules = require('../dao/mode.js').getAll(), that = this;
-        modules.some( ({id}) => {
-            if(id == pId) {
+        modules.some(({id}) => {
+            if (id == pId) {
                 pId = utils.getUUID();
                 that.getNewPid(pId);
                 return true;
@@ -348,6 +310,14 @@ class JscodeUtil {
         require('../dao/package.js').removeAll(pId);
         const path = appRoot.path.replace(/\\/g, '/').replace('/resources/app.asar', ''), that = this;
         del([`${path}/jscode/${pId}`]);
+    }
+
+    initFile(pId) {
+        const path = this.getFolder(pId);
+        fs.writeFileSync(path + '/data.js', 'let data=' + JSON.stringify(controls.getModuleData(pId)) + ';try {data = getAllData();}catch (e) {}module.exports = data;', 'utf8');
+        if (!fs.existsSync(path + '/package.json')) {
+            fs.writeFileSync(path + '/package.json', `{}`, 'utf8');
+        }
     }
 }
 

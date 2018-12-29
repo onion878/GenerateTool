@@ -9,7 +9,7 @@ app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow, loading;
+let mainWindow, loading, loadFlag = false;
 
 function createWindow() {
     // 预加载
@@ -27,6 +27,16 @@ function createWindow() {
     loading.webContents.once('dom-ready', () => {
         // 加载正式窗口
         createMainWindow();
+        setTimeout(() => {
+            if (!loadFlag) {
+                mainWindow.show();
+                if (loading && loading != null) {
+                    loading.hide();
+                    loading.close();
+                    loading = null;
+                }
+            }
+        }, 10000);
     });
     loading.show();
     loading.setResizable(false);
@@ -82,12 +92,6 @@ function createMainWindow() {
                 click() {
                     mainWindow.webContents.executeJavaScript(`resetZoom()`);
                 }
-            },
-            {
-                label: '重载界面',
-                click() {
-                    mainWindow.reload();
-                }
             }
         ]
     },
@@ -124,6 +128,7 @@ function createMainWindow() {
     });
 
     ipcMain.on('loading-success', (event, arg) => {
+        loadFlag = true;
         mainWindow.show();
         if (loading && loading != null) {
             loading.hide();
