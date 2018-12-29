@@ -8,6 +8,8 @@ const {
 app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
+const appPath = require('app-root-path');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false;
 
@@ -43,6 +45,13 @@ function createWindow() {
 }
 
 function createMainWindow() {
+    const rootPath = getPath();
+    if (!fs.existsSync(rootPath + '/data')) {
+        fs.mkdirSync(rootPath + '/data');
+    }
+    if (!fs.existsSync(rootPath + '/jscode')) {
+        fs.mkdirSync(rootPath + '/jscode');
+    }
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 800,
@@ -173,6 +182,15 @@ if (!gotTheLock) {
         mainWindow.focus();
     }
 }
+
+function getPath() {
+    let p = appPath.path.replace(/\\/g, '/');
+    if (p.indexOf('app.asar') > -1) {
+        p = p.replace('app.asar', '').replace('resources/', '');
+    }
+    return p;
+}
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.

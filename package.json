@@ -6,9 +6,8 @@
   "scripts": {
     "install": "node copy.js",
     "start": "electron .",
-    "postinstall": "install-app-deps",
-    "package-win": "electron-packager . --overwrite --asar --platform=win32 --arch=x64 --electron-version 4.0.0 --icon=static/images/icon.ico --out=dist --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\" && node renderer.js",
-    "package-linux": "electron-packager . --overwrite --asar --platform=linux --arch=x64 --electron-version 4.0.0 --icon=static/images/icon.ico --out=dist --version-string.CompanyName=OnionTool --version-string.FileDescription=GenaretorTool --version-string.ProductName=\"GenaretorTool\""
+    "dist": "electron-builder --win --x64",
+    "postinstall": "install-app-deps"
   },
   "keywords": [
     "Electron",
@@ -18,6 +17,24 @@
   ],
   "author": "Onion",
   "license": "CC0-1.0",
+  "build": {
+    "appId": "onion.app.GenaretorTool",
+    "asar": true,
+    "mac": {
+      "icon": "static/images/icon.ico",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "static/images/icon.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    }
+  },
   "devDependencies": {
     "electron": "^4.0.0",
     "electron-builder": "^20.38.2"
