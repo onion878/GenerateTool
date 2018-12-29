@@ -31,7 +31,6 @@
     "lowdb": "^1.0.0",
     "monaco-editor": "^0.15.6",
     "node-pty": "^0.7.8",
-    "npmi": "^4.0.0",
     "open": "0.0.5",
     "require-uncached": "^1.0.3",
     "shelljs": "^0.8.2",

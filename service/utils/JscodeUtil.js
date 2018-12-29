@@ -3,7 +3,6 @@ const utils = require('./utils');
 const pack = require('../dao/package');
 const controls = require('../dao/controls');
 const appRoot = require('app-root-path');
-const npmi = require('npmi');
 const del = require('del');
 const archiver = require('archiver');
 
