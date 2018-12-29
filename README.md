@@ -23,6 +23,8 @@ https://blog.csdn.net/qq_36224522/article/details/81268630
 git clone https://github.com/onion878/GenaretorTool.git
 # 安装打包工具
 npm install -g electron-packager
+# 安装build工具
+npm install --global windows-build-tools
 # 进入项目
 cd GenaretorTool 
 # 安装依赖
