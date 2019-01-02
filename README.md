@@ -14,7 +14,6 @@ https://blog.csdn.net/qq_36224522/article/details/81268630
 - 自定义模板
 - 自动生成文件
 
-使用无需安装node，无需node相关知识。
 ## 构建项目
 
 
@@ -35,8 +34,8 @@ npm run package-win
 
 ## 相关文档
 
-- [electron.atom.io/docs](http://electron.atom.io/docs) - electron官方文档(有中文)
-- [extjs-gpl](https://docs.sencha.com/extjs/6.5.0/classic/Ext.html) - extjs官方文档
+- [electron.atom.io/docs](http://electron.atom.io/docs) - electron官方文档
+- [extjs-gpl](https://docs.sencha.com/extjs/6.5.0/classic/Ext.html) - ExtJS官方文档
 - [monaco-editor](https://microsoft.github.io/monaco-editor/) - 编辑器
 - [swig](https://github.com/paularmstrong/swig) - 模板创建
 ## License
