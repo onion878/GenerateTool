@@ -14,8 +14,12 @@ body {
 
 /* 定义滚动按钮的样式，就是那个bar */
 ::-webkit-scrollbar-thumb {
-    background: rgba(166, 166, 168, 0.49);
+    background: rgba(166, 166, 168, 0.38);
     transition: opacity .8s linear;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #CFCFCF;
 }
 
 .code-content {

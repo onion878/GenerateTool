@@ -69,41 +69,50 @@ function createMainWindow() {
     // mainWindow.reload();
     // Open the DevTools. debug
     //mainWindow.webContents.openDevTools();
-    const menu = Menu.buildFromTemplate([{
-        label: '系统',
-        submenu: [{
-            label: '帮助',
-            click() {
-                let code = `openSome({id:'welcome',title:'帮助',type:'welcome'})`;
-                mainWindow.webContents.executeJavaScript(code);
-            }
+    const menu = Menu.buildFromTemplate([
+        {
+            label: '系统',
+            submenu: [
+                // {
+                //     label: '设置',
+                //     click() {
+                //         let code = `openSome({id:'setting',title:'设置',type:'setting'})`;
+                //         mainWindow.webContents.executeJavaScript(code);
+                //     }
+                // },
+                {
+                    label: '帮助',
+                    click() {
+                        let code = `openSome({id:'welcome',title:'帮助',type:'welcome'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                },
+                {
+                    label: '停止loading',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`Ext.getBody().unmask()`);
+                    }
+                },
+                {
+                    label: '放大',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`setZoom('+')`);
+                    }
+                },
+                {
+                    label: '缩小',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`setZoom('-')`);
+                    }
+                },
+                {
+                    label: '重置',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`resetZoom()`);
+                    }
+                }
+            ]
         },
-            {
-                label: '停止loading',
-                click() {
-                    mainWindow.webContents.executeJavaScript(`Ext.getBody().unmask()`);
-                }
-            },
-            {
-                label: '放大',
-                click() {
-                    mainWindow.webContents.executeJavaScript(`setZoom('+')`);
-                }
-            },
-            {
-                label: '缩小',
-                click() {
-                    mainWindow.webContents.executeJavaScript(`setZoom('-')`);
-                }
-            },
-            {
-                label: '重置',
-                click() {
-                    mainWindow.webContents.executeJavaScript(`resetZoom()`);
-                }
-            }
-        ]
-    },
         {
             label: '模板管理',
             click() {

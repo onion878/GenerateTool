@@ -17,7 +17,7 @@ Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'MyAppNamespace',
     appFolder: 'app',
-    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate', 'Statusbar'],
+    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate', 'Statusbar', 'Setting'],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
         let pId = history.getMode();
