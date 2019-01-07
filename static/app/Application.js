@@ -171,6 +171,7 @@ Ext.application({
                                                 console.error(e);
                                             }
                                             getFilesData();
+                                            registerAllSuggestion();
                                         }
                                     },
                                         {
