@@ -136,6 +136,18 @@ let registerAllSuggestion = () => {
         }
         registerSingleData(suggestions);
     }
+    monaco.languages.registerCompletionItemProvider('javascript', {
+        provideCompletionItems: function (model, position) {
+            return {
+                suggestions: [{
+                    label: 'require',
+                    kind: monaco.languages.CompletionItemKind.Field,
+                    detail: 'require module',
+                    insertText: `require('')`
+                }]
+            };
+        }
+    });
 };
 
 let registerSingleData = (suggestions) => {
@@ -153,7 +165,7 @@ let registerSingleData = (suggestions) => {
                 AllSuggestion[k].push([suggestions[k]]);
                 s.push({
                     label: k,
-                    kind: monaco.languages.CompletionItemKind.Variable,
+                    kind: monaco.languages.CompletionItemKind.Enum,
                     detail: suggestions[k],
                     insertText: k
                 });
@@ -162,7 +174,7 @@ let registerSingleData = (suggestions) => {
             AllSuggestion[k] = [suggestions[k]];
             s.push({
                 label: k,
-                kind: monaco.languages.CompletionItemKind.Variable,
+                kind: monaco.languages.CompletionItemKind.Field,
                 detail: suggestions[k],
                 insertText: k
             });
