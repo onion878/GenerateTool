@@ -148,8 +148,13 @@ let registerAllSuggestion = () => {
                     }, {
                         label: 'getAllData',
                         kind: monaco.languages.CompletionItemKind.Function,
-                        detail: 'require module',
+                        detail: 'get set data',
                         insertText: `getAllData()`
+                    }, {
+                        label: 'content',
+                        kind: monaco.languages.CompletionItemKind.Variable,
+                        detail: 'origin content',
+                        insertText: `content`
                     }
                 ]
             };
