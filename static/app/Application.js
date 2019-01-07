@@ -871,6 +871,7 @@ Ext.application({
         for (let i = 0; i < tabData.length; i++) {
             openSome(tabData[i]);
         }
+        registerAllSuggestion();
         Ext.getCmp('mainmenutab').setActiveTab(Ext.getCmp(showTab));
         ipcRenderer.send('loading-success', '加载完成!');
     }

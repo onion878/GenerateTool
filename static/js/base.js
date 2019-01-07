@@ -111,6 +111,74 @@ const languageType = [
     {id: "yaml", text: "yaml"}
 ];
 
+const AllSuggestion = {};
+
+let registerAllSuggestion = () => {
+    const d = getAllData();
+    for (let key in d) {
+        const v = d[key], suggestions = {};
+        if (typeof v == "object") {
+            if (v instanceof Array) {
+                suggestions[key] = `ArrayJSON: ${key}`;
+                if (v.length > 0) {
+                    for (let k in v[0]) {
+                        suggestions[k] = `ArrayJSON: ${key} -> ${k}`;
+                    }
+                }
+            } else {
+                suggestions[key] = `JSON: ${key}`;
+                for (let k in v) {
+                    suggestions[k] = `JSON: ${key} -> ${k}`;
+                }
+            }
+        } else {
+            suggestions[key] = `String: ${key}`;
+        }
+        registerSingleData(suggestions);
+    }
+};
+
+let registerSingleData = (suggestions) => {
+    const s = [];
+    for (let k in suggestions) {
+        let flag = false;
+        if (AllSuggestion[k]) {
+            AllSuggestion[k].some(a => {
+                if (a == suggestions[k]) {
+                    flag = true;
+                    return flag;
+                }
+            });
+            if (!flag) {
+                AllSuggestion[k].push([suggestions[k]]);
+                s.push({
+                    label: k,
+                    kind: monaco.languages.CompletionItemKind.Variable,
+                    detail: suggestions[k],
+                    insertText: k
+                });
+            }
+        } else {
+            AllSuggestion[k] = [suggestions[k]];
+            s.push({
+                label: k,
+                kind: monaco.languages.CompletionItemKind.Variable,
+                detail: suggestions[k],
+                insertText: k
+            });
+        }
+    }
+    languageType.forEach(lan => {
+        monaco.languages.registerCompletionItemProvider(lan.id, {
+            provideCompletionItems: function (model, position) {
+                return {
+                    suggestions: s
+                };
+            }
+        });
+    });
+};
+
 let setZoom = (type) => {
     const old = webFrame.getZoomFactor();
     if (type == '+') {

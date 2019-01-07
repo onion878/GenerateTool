@@ -34,6 +34,10 @@ class Controls {
         return con.get('ext').filter({cId: id}).value();
     }
 
+    getExtById(id) {
+        return con.get('ext').filter({id: id}).value();
+    }
+
     setDataValue(id, value) {
         if (value == undefined || value == null) value = '';
         con.get('ext')

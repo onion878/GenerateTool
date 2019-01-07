@@ -145,6 +145,15 @@ Ext.define('MyAppNamespace.controller.Mode', {
                             showToast(`已存在[${name}]!`);
                         } else {
                             btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
+                            const d = {};
+                            if (type == 'json') {
+                                d[name] = `JSON: ${name}`;
+                            } else if (type == 'datagrid') {
+                                d[name] = `ArrayJSON: ${name}`;
+                            } else {
+                                d[name] = `String: ${name}`;
+                            }
+                            registerSingleData(d);
                             this.up('window').close();
                         }
                     }
@@ -451,7 +460,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 handler: function () {
                     const valStr = this.up('window').down('minicode').codeEditor.getValue();
                     this.up('window').close();
-                    that.getCodeData(valStr, btn.bId, cId)
+                    that.getCodeData(valStr, btn.bId, cId);
                 }
             }, {
                 text: '取消',
@@ -674,6 +683,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
             store.setFields(fields);
             store.setData(v);
             grid.reconfigure(store, columns);
+            if (v.length > 0) {
+                const d = {}, label = controlData.getExtById(bId)[0].label;
+                for (let k in v[0]) {
+                    d[k] = `ArrayJSON: ${label} -> ${k}`;
+                }
+                registerSingleData(d);
+            }
         } else if (type == 'file') {
             btn.up('container').down('filefield').setRawValue(v);
         } else if (type == 'folder') {
@@ -681,7 +697,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
         } else if (type == 'json') {
             const g = btn.up('container').down('propertygrid');
             g.setSource(v);
-            controlData.setDataValue(bId, this.getGridJsonData(g.getStore()));
+            const d = this.getGridJsonData(g.getStore());
+            controlData.setDataValue(bId, d);
+            const d1 = {}, label = controlData.getExtById(bId)[0].label;
+            for (let k in d) {
+                d1[k] = `JSON: ${label} -> ${k}`;
+            }
+            registerSingleData(d1);
         } else {
 
         }
