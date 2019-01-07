@@ -107,9 +107,13 @@ class GeFile {
         const oldData = gdb.get('data').value();
         const newData = oldData.concat(data);
         gdb.set('data', newData).write();
-        swig.forEach(s => {
-            gdb.get('swig').push(s).write();
-        });
+        try {
+            swig.forEach(s => {
+                gdb.get('swig').push(s).write();
+            });
+        } catch (e) {
+        }
+
     }
 
     removeAll(pId) {

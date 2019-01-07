@@ -116,7 +116,7 @@ function createMainWindow() {
         {
             label: '模板管理',
             click() {
-                let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
+                let code = `openSome({id:'templet',title:'模板管理',type:'templet'})`;
                 mainWindow.webContents.executeJavaScript(code);
             }
         },
