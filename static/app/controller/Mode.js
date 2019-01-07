@@ -585,7 +585,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 values.forEach((v, i) => {
                     const btn = Ext.getCmp(conData[i].id),
                         type = btn.bType;
-                    that.setComponentValue(type, btn, v);
+                    that.setComponentValue(type, btn, v, id);
                 });
                 Ext.getBody().unmask();
             }).catch(e => {
@@ -621,17 +621,17 @@ Ext.define('MyAppNamespace.controller.Mode', {
         }
         if (d instanceof Promise) {
             d.then(v => {
-                this.setComponentValue(type, btn, v);
+                this.setComponentValue(type, btn, v, bId);
                 Ext.getBody().unmask();
             }).catch(e => {
                 Ext.getBody().unmask();
             });
         } else {
-            this.setComponentValue(type, btn, d);
+            this.setComponentValue(type, btn, d, bId);
             Ext.getBody().unmask();
         }
     },
-    setComponentValue(type, btn, v) {
+    setComponentValue(type, btn, v, bId) {
         if (type == 'text') {
             btn.up('container').down('textfield').setValue(v);
         } else if (type == 'textarea') {
@@ -681,7 +681,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
         } else if (type == 'json') {
             const g = btn.up('container').down('propertygrid');
             g.setSource(v);
-            controlData.setDataValue(bId, that.getGridJsonData(g.getStore()));
+            controlData.setDataValue(bId, this.getGridJsonData(g.getStore()));
         } else {
 
         }
