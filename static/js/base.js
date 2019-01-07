@@ -139,12 +139,19 @@ let registerAllSuggestion = () => {
     monaco.languages.registerCompletionItemProvider('javascript', {
         provideCompletionItems: function (model, position) {
             return {
-                suggestions: [{
-                    label: 'require',
-                    kind: monaco.languages.CompletionItemKind.Field,
-                    detail: 'require module',
-                    insertText: `require('')`
-                }]
+                suggestions: [
+                    {
+                        label: 'require',
+                        kind: monaco.languages.CompletionItemKind.Field,
+                        detail: 'require module',
+                        insertText: `require('')`
+                    }, {
+                        label: 'getAllData',
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        detail: 'require module',
+                        insertText: `getAllData()`
+                    }
+                ]
             };
         }
     });
