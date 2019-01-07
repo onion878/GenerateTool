@@ -35,7 +35,7 @@ const labelEditor = new Ext.Editor({
                     showToast(`已存在[${value}]!`);
                     return false;
                 }
-                if(value.trim().length == 0) {
+                if (value.trim().length == 0) {
                     showToast(`值不能为空!`);
                     return false;
                 }
@@ -49,7 +49,7 @@ let req = (module) => {
 };
 
 //获取已经定义的数据
-let getAllData = ()=> {
+let getAllData = () => {
     return controlData.getModuleData(moduleId);
 };
 
@@ -63,7 +63,8 @@ const getUUID = () => {
     return uuid;
 };
 
-const languageType = [{id: "bat", text: "bat"},
+const languageType = [
+    {id: "bat", text: "bat"},
     {id: "c", text: "c"},
     {id: "coffeescript", text: "coffeescript"},
     {id: "cpp", text: "cpp"},
@@ -107,10 +108,12 @@ const languageType = [{id: "bat", text: "bat"},
     {id: "typescript", text: "typescript"},
     {id: "vb", text: "vb"},
     {id: "xml", text: "xml"},
-    {id: "yaml", text: "yaml"}];
+    {id: "yaml", text: "yaml"}
+];
+
 let setZoom = (type) => {
     const old = webFrame.getZoomFactor();
-    if(type == '+') {
+    if (type == '+') {
         const val = old + 0.1;
         systemConfig.setZoom(val);
         webFrame.setZoomFactor(val);
