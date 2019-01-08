@@ -611,6 +611,7 @@ Ext.application({
                                                     f.preview = tplPre(allModuleData);
                                                 } catch (e) {
                                                     showError(f.file + ':模板错误');
+                                                    throw e;
                                                 }
                                             } else {
                                                 const filePath = f.name.replace(/\\/g, '\/');
