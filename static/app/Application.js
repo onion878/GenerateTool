@@ -606,8 +606,12 @@ Ext.application({
                                             const tpl = swig.compile(f.file);
                                             f.name = tpl(allModuleData);
                                             if (type == 'add') {
-                                                const tplPre = swig.compile(f.content);
-                                                f.preview = tplPre(allModuleData);
+                                                try {
+                                                    const tplPre = swig.compile(f.content);
+                                                    f.preview = tplPre(allModuleData);
+                                                } catch (e) {
+                                                    showError(f.file + ':模板错误');
+                                                }
                                             } else {
                                                 const filePath = f.name.replace(/\\/g, '\/');
                                                 try {
