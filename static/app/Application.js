@@ -946,9 +946,7 @@ function showToast(s) {
 
 function showError(s) {
     Ext.toast({
-        html: ` < span style = "color: red;" > $ {
-                                                                                                                s
-                                                                                                            } < /span>`,
+        html: `<span style = "color: red;" >${s}</span>`,
         closable: true,
         autoClose: false,
         align: 't',
