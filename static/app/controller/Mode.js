@@ -684,9 +684,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
             store.setData(v);
             grid.reconfigure(store, columns);
             if (v.length > 0) {
-                const d = {}, label = controlData.getExtById(bId)[0].label;
+                const d = {};
                 for (let k in v[0]) {
-                    d[k] = `ArrayJSON: ${label} -> ${k}`;
+                    d[k] = `ArrayJSON: ... -> ${k}`;
                 }
                 registerSingleData(d);
             }
@@ -699,9 +699,9 @@ Ext.define('MyAppNamespace.controller.Mode', {
             g.setSource(v);
             const d = this.getGridJsonData(g.getStore());
             controlData.setDataValue(bId, d);
-            const d1 = {}, label = controlData.getExtById(bId)[0].label;
+            const d1 = {};
             for (let k in d) {
-                d1[k] = `JSON: ${label} -> ${k}`;
+                d1[k] = `JSON: ... -> ${k}`;
             }
             registerSingleData(d1);
         } else {
