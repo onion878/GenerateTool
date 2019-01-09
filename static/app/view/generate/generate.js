@@ -9,10 +9,13 @@ Ext.define('MyAppNamespace.view.generate.generate', {
         render: function (c) {
             const that = this;
             that.fileName = that.title;
-            let language = systemConfig.getCode(that.fileName);
+            let language = getFileLanguage(that.fileName);
+            if (language == undefined) {
+                language = systemConfig.getCode(that.fileName);
+            }
             let val = geFileData.getOneData(that.params.fileId);
             let content = '';
-            if( val != undefined) {
+            if (val != undefined) {
                 content = val.content;
             }
             if (language == undefined) {
@@ -91,11 +94,11 @@ Ext.define('MyAppNamespace.view.generate.generate', {
                     text: '编辑',
                     pressed: true,
                     action: 'edit',
-                    cls: updateType == 'update'? 'color-blue': ''
+                    cls: updateType == 'update' ? 'color-blue' : ''
                 }, {
                     text: '预览',
                     action: 'preview',
-                    cls: updateType == 'update'? 'color-blue': ''
+                    cls: updateType == 'update' ? 'color-blue' : ''
                 }]
             }]
         };

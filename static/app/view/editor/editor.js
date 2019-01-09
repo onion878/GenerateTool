@@ -15,6 +15,14 @@ Ext.define('MyAppNamespace.view.editor.editor', {
     },
     initComponent: function () {
         const pId = this.pId;
+        const rootData = jsCode.getFileAndFolder(pId);
+        rootData.forEach(r => {
+            if (r.type == 'file') {
+                r.icon = getFileIcon(r.text);
+            } else {
+                r.icon = './icons/folder-core.svg';
+            }
+        });
         this.items = [{
             region: 'west',
             split: true,
@@ -54,15 +62,29 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                     expanded: true,
                     text: 'root',
                     parentFolder: '',
-                    children: jsCode.getFileAndFolder(this.pId)
+                    icon: './icons/folder-core-open.svg',
+                    children: rootData
                 }
             }),
             listeners: {
+                beforeitemexpand: function (node, index, item, eOpts) {
+                    node.data.icon = './icons/folder-core-open.svg';
+                },
+                beforeitemcollapse: function (node, index, item, eOpts) {
+                    node.data.icon = './icons/folder-core.svg';
+                },
                 afteritemexpand: function (node, index, item, eOpts) {
                     while (node.firstChild) {
                         node.removeChild(node.firstChild);
                     }
                     const child = jsCode.getFileAndFolder(this.up('editor').pId, node.data.parentFolder);
+                    child.forEach(r => {
+                        if (r.type == 'file') {
+                            r.icon = getFileIcon(r.text);
+                        } else {
+                            r.icon = './icons/folder-core.svg';
+                        }
+                    });
                     node.appendChild(child);
                 },
                 itemclick: function (node, record) {
@@ -82,7 +104,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                 filePath: file,
                                 fileContent: content,
                                 closable: true,
-                                icon: './images/script_code.png',
+                                icon: getFileIcon(file),
                                 xtype: 'code'
                             };
                             const jTab = tPanel.add(data);
@@ -104,6 +126,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                     handler: function () {
                                         showPrompt('文件名', '', function (text) {
                                             const child = jsCode.createFile(that.up('editor').pId, text);
+                                            child.icon = getFileIcon(text);
                                             const root = that.getRootNode();
                                             root.appendChild(child);
                                         });
@@ -115,6 +138,7 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                     handler: function () {
                                         showPrompt('文件夹', '', function (text) {
                                             const child = jsCode.createFolder(that.up('editor').pId, text);
+                                            child.icon = './icons/folder-core.svg';
                                             const root = that.getRootNode();
                                             root.appendChild(child);
                                         });
@@ -180,10 +204,12 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                     showPrompt('文件名', '', function (text) {
                                         if (record.data.type == 'folder') {
                                             const child = jsCode.createFile(pId, text, record.data.parentFolder);
+                                            child.icon = getFileIcon(text);
                                             record.appendChild(child)
                                         } else {
                                             const r = record.parentNode;
                                             const child = jsCode.createFile(pId, text, r.data.parentFolder);
+                                            child.icon = getFileIcon(text);
                                             r.appendChild(child);
                                         }
                                     });
@@ -196,10 +222,12 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                     showPrompt('文件夹', '', function (text) {
                                         if (record.data.type == 'folder') {
                                             const child = jsCode.createFolder(pId, text, record.data.parentFolder);
+                                            child.icon = './icons/folder-core.svg';
                                             record.appendChild(child)
                                         } else {
                                             const r = record.parentNode;
                                             const child = jsCode.createFolder(pId, text, r.data.parentFolder);
+                                            child.icon = './icons/folder-core.svg';
                                             r.appendChild(child);
                                         }
                                     });

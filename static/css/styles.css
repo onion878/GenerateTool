@@ -31,8 +31,8 @@ body {
     box-shadow: -1px 0px 1px 1px #d6d6d6;
 }
 
-.x-tree-no-icon .x-tree-icon {
-    display: none;
+.x-tree-icon {
+    background-position: center;
 }
 
 .x-tree-no-icon .x-tree-elbow-img {
@@ -63,7 +63,7 @@ body {
 }
 
 .x-panel-header-default .x-tool-img-save {
-    background-image: url(../images/database_save.png);
+    background-image: url(../images/new-module.png);
     background-color: #e0ebf3;
 }
 
