@@ -8,7 +8,6 @@ Ext.define('MyAppNamespace.view.code.code', {
     listeners: {
         render: function (c) {
             const {dom} = this.getEl().down('.code-editor-content'), that = this;
-            that.language = that.language != undefined ? that.language : 'javascript';
             that.fileContent = that.fileContent != undefined ? that.fileContent : '';
             that.codeEditor = monaco.editor.create(dom, {
                 value: that.fileContent,
@@ -41,15 +40,18 @@ Ext.define('MyAppNamespace.view.code.code', {
     },
     initComponent: function () {
         const pId = this.pId, that = this;
-        this.tbar = {
-            xtype: 'statusbar',
-            pId: pId,
-            list: [{img: './images/play_arrow.png', name: 'Run'}],
-            float: 'left',
-            click: function (tbar, d) {
-                that.runTest(pId, that.title);
-            }
-        };
+        that.language = that.language != undefined ? that.language : getFileLanguage(that.filePath);
+        if (that.language == 'javascript') {
+            this.tbar = {
+                xtype: 'statusbar',
+                pId: pId,
+                list: [{img: './images/play_arrow.png', name: 'Run'}],
+                float: 'left',
+                click: function (tbar, d) {
+                    that.runTest(pId, that.title);
+                }
+            };
+        }
         this.callParent(arguments);
     },
     runTest(pId, file) {
