@@ -19,11 +19,11 @@ https://blog.csdn.net/qq_36224522/article/details/81268630
 
 ```bash
 # 下载源码
-git clone https://github.com/onion878/GenaretorTool.git
+git clone https://github.com/onion878/GenerateTool.git
 # 安装build工具
 npm install --global windows-build-tools
 # 进入项目
-cd GenaretorTool 
+cd GenerateTool 
 # 安装依赖
 npm install
 # 启动项目

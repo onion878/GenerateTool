@@ -129,7 +129,7 @@ function createMainWindow() {
         {
             label: 'Github',
             click() {
-                require("open")('https://github.com/onion878/GenaretorTool');
+                require("open")('https://github.com/onion878/GenerateTool');
             }
         }
     ]);
