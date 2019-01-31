@@ -1,7 +1,7 @@
 {
-  "name": "GenaretorTool",
+  "name": "GenerateTool",
   "version": "1.0.0",
-  "description": "A genaretor Electron application",
+  "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {
     "install": "node copy.js",
@@ -36,22 +36,22 @@
     }
   },
   "devDependencies": {
-    "electron": "^4.0.0",
-    "electron-builder": "^20.38.2"
+    "electron": "^4.0.3",
+    "electron-builder": "^20.38.5"
   },
   "dependencies": {
-    "app-root-path": "^2.0.1",
-    "archiver": "^2.1.1",
+    "app-root-path": "^2.1.0",
+    "archiver": "^3.0.0",
     "axios": "^0.18.0",
     "decompress": "^4.2.0",
     "del": "^3.0.0",
     "lowdb": "^1.0.0",
     "monaco-editor": "^0.15.6",
-    "node-pty": "^0.7.8",
+    "node-pty": "^0.8.1",
     "open": "0.0.5",
-    "require-uncached": "^1.0.3",
-    "shelljs": "^0.8.2",
+    "require-uncached": "^2.0.0",
+    "shelljs": "^0.8.3",
     "swig": "^1.4.2",
-    "xterm": "^3.8.0"
+    "xterm": "^3.10.1"
   }
 }
