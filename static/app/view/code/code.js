@@ -2,7 +2,7 @@ Ext.define('MyAppNamespace.view.code.code', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.code',
     viewModel: true,
-    html: `<div class="code-editor-content" style="width: 400px;height: 400px;"></div>`,
+    html: `<div class="code-editor-content" style="width: 100%;height: 100%;"></div>`,
     layout: 'fit',
     codeEditor: null,
     listeners: {
@@ -11,16 +11,13 @@ Ext.define('MyAppNamespace.view.code.code', {
             that.fileContent = that.fileContent != undefined ? that.fileContent : '';
             that.codeEditor = monaco.editor.create(dom, {
                 value: that.fileContent,
-                language: that.language
+                language: that.language,
+                automaticLayout: true
             });
             that.codeEditor.onDidChangeModelContent(function (e) {
                 that.writeValue();
             });
-            that.editorLayout();
         }
-    },
-    onResize: function () {
-        this.editorLayout();
     },
     writeValue: function () {
         if (this.filePath != undefined && this.filePath != null && this.filePath != '') {
@@ -28,15 +25,6 @@ Ext.define('MyAppNamespace.view.code.code', {
             jsC.writeFile(this.filePath, val);
             history.setCode({id: this.id, fileContent: val});
         }
-    },
-    editorLayout: function () {
-        const code = this.getEl().down('.code-editor-content');
-        const parent = code.getParent();
-        const height = parent.getHeight();
-        const width = parent.getWidth();
-        code.dom.style.height = height + 'px';
-        code.dom.style.width = width + 'px';
-        this.codeEditor.layout();
     },
     initComponent: function () {
         const pId = this.pId, that = this;

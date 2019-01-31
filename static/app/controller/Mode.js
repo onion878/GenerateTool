@@ -244,6 +244,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 xtype: 'panel',
                 flex: 1,
                 height: 100,
+                layout: 'fit',
                 style: {
                     border: '1px solid #c2c2c2'
                 },

@@ -2,7 +2,7 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.minicode',
     viewModel: true,
-    html: `<div class="code-editor-content" style="width: 400px;height: 400px;"></div>`,
+    html: `<div class="code-editor-content" style="width: 100%;height: 100%;"></div>`,
     layout: 'fit',
     value: null,
     codeEditor: null,
@@ -15,25 +15,16 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
             that.fileContent = that.fileContent != undefined ? that.fileContent : '';
             that.codeEditor = monaco.editor.create(dom, {
                 language: that.language,
-                value: that.value
+                value: that.value,
+                minimap: {
+                    enabled: false
+                },
+                automaticLayout: true
             });
             that.codeEditor.onDidChangeModelContent(function (e) {
                 that.changeValue();
             });
-            that.editorLayout();
         }
-    },
-    onResize: function () {
-        this.editorLayout();
-    },
-    editorLayout: function () {
-        const code = this.getEl().down('.code-editor-content');
-        const parent = code.getParent();
-        const height = parent.getHeight();
-        const width = parent.getWidth();
-        code.dom.style.height = height + 'px';
-        code.dom.style.width = width + 'px';
-        this.codeEditor.layout();
     },
     initComponent: function () {
         this.callParent(arguments);
