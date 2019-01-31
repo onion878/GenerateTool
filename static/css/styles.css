@@ -100,44 +100,54 @@ body {
     color: blue;
 }
 
+
 .states-toolbar {
     overflow: hidden;
+    width: 100%;
+    height: 21px;
     background-color: #F2F2F2;
     border-top: 1px solid #3892d4;
     border-bottom: 1px solid #3892d4;
-    width: 100%;
-    height: 22px;
+    box-sizing: initial;
 }
 
 .states-toolbar a {
     float: left;
-    height: 19.5px;
     display: block;
+    height: 100%;
     color: #000030;
     text-align: center;
-    padding: 0px 12px;
-    line-height: 20px;
+    padding: 0px 6px;
     text-decoration: none;
     font-size: 12px;
     cursor: pointer;
-}
-
-.states-toolbar a:hover {
-    background: #D9D9D9;
-}
-
-.states-toolbar a.active {
-    background-color: #BDBDBD;
-    color: #000000;
-}
-
-.states-toolbar a img {
-    margin-bottom: -4px;
+    user-select: none;
+    line-height: 22px;
 }
 
 .states-toolbar .states-content {
     display: table;
     margin: 0 auto;
+}
+
+.states-toolbar .material-icons {
+    margin-top: 0.5px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.states-toolbar a:hover {
+    background: #3892d4;
+}
+
+.states-toolbar a.active {
+    background-color: #3892d4;
+    color: #000000;
+}
+
+.states-toolbar a img {
+    margin-bottom: -4px;
 }
 
 .color-display {
