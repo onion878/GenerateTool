@@ -76,6 +76,7 @@ Ext.define('MyAppNamespace.view.generate.generate', {
             that.codeEditor = Ext.create({
                 language: language,
                 value: content,
+                minimap: true,
                 xtype: 'minicode'
             });
             that.add(that.codeEditor);

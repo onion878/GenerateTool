@@ -13,11 +13,15 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
             } = this.getEl().down('.code-editor-content'), that = this;
             that.language = that.language != undefined ? that.language : 'javascript';
             that.fileContent = that.fileContent != undefined ? that.fileContent : '';
+            let mini = false;
+            if (this.minimap) {
+                mini = true;
+            }
             that.codeEditor = monaco.editor.create(dom, {
                 language: that.language,
                 value: that.value,
                 minimap: {
-                    enabled: false
+                    enabled: mini
                 },
                 automaticLayout: true
             });
