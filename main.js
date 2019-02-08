@@ -76,21 +76,10 @@ function createMainWindow() {
             label: '系统',
             submenu: [
                 {
-                    label: '放大',
+                    label: '设置',
                     click() {
-                        mainWindow.webContents.executeJavaScript(`setZoom('+')`);
-                    }
-                },
-                {
-                    label: '缩小',
-                    click() {
-                        mainWindow.webContents.executeJavaScript(`setZoom('-')`);
-                    }
-                },
-                {
-                    label: '重置',
-                    click() {
-                        mainWindow.webContents.executeJavaScript(`resetZoom()`);
+                        let code = `openSome({id:'setting',title:'设置',type:'setting'})`;
+                        mainWindow.webContents.executeJavaScript(code);
                     }
                 },
                 {

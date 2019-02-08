@@ -8,17 +8,23 @@ class Commands {
     constructor() {
         this.term = null;
         this.nowPty = null;
-        this.systemCmd = true;
+        this.systemCmd = false;
         this.workFlag = false;
+        this.config = require('../dao/system');
     }
 
     init(element) {
         const that = this;
         return new Promise((resolve, reject) => {
+            let terminal = this.config.getConfig('terminal');
+            if (terminal.trim().length == 0) {
+                terminal = process.env[os.platform() === 'win32' ? 'COMSPEC' : 'SHELL'];
+                this.systemCmd = true;
+            }
             if (this.nowPty == null) {
-                that.initNodePty(process.env[os.platform() === 'win32' ? 'COMSPEC' : 'SHELL'], resolve, element);
+                that.initNodePty(terminal, resolve, element);
             } else {
-                that.initXterm(process.env[os.platform() === 'win32' ? 'COMSPEC' : 'SHELL'], resolve, element);
+                that.initXterm(terminal, resolve, element);
                 resolve(that.nowPty, that.term);
             }
         });

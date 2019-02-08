@@ -12,6 +12,8 @@ class System {
         sdb.defaults({theme: 'neptune'}).write();
         sdb.defaults({user: {}}).write();
         sdb.defaults({auth: ''}).write();
+        sdb.defaults({terminal: ''}).write();
+        sdb.defaults({editor: ''}).write();
     }
 
     setCode(name, language) {
@@ -61,6 +63,14 @@ class System {
         return sdb.get('auth').value();
     }
 
+    setConfig(id, value) {
+        sdb.set(id, value)
+            .write();
+    }
+
+    getConfig(id) {
+        return sdb.get(id).value();
+    }
 }
 
 module.exports = new System();

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const shell = require('shelljs');
+const child = require('child_process').execFile;
 
 class Utils {
 
@@ -117,6 +118,15 @@ class Utils {
 
     readFile(path) {
         return fs.readFileSync(path, 'utf8');
+    }
+
+    openCodeFolder(file, folder) {
+        child(file, [folder], function (err, data) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+        });
     }
 }
 

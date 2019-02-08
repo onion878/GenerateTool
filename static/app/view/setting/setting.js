@@ -21,7 +21,45 @@ Ext.define('MyAppNamespace.view.setting.setting', {
         items: [{
             xtype: 'filefield',
             name: 'terminal',
-            fieldLabel: 'Terminal'
+            fieldLabel: '终端',
+            listeners: {
+                render: function (dom) {
+                    dom.setRawValue(systemConfig.getConfig('terminal'));
+                },
+                change: function (dom, val) {
+                    systemConfig.setConfig('terminal', val);
+                }
+            }
+        }, {
+            xtype: 'filefield',
+            name: 'editor',
+            fieldLabel: '编辑器',
+            listeners: {
+                render: function (dom) {
+                    dom.setRawValue(systemConfig.getConfig('editor'));
+                },
+                change: function (dom, val) {
+                    systemConfig.setConfig('editor', val);
+                }
+            }
+        }, {
+            xtype: 'slider',
+            name: 'editor',
+            fieldLabel: '编辑器',
+            increment: 10,
+            minValue: 0,
+            maxValue: 200,
+            tipText: function (thumb) {
+                return Ext.String.format('<b>{0}% 缩放</b>', thumb.value);
+            },
+            value: systemConfig.getZoom() * 100,
+            listeners: {
+                dragend: function (dom) {
+                    const v = dom.getValue();
+                    systemConfig.setZoom(v / 100);
+                    webFrame.setZoomFactor(v / 100);
+                }
+            }
         }]
     }],
     initComponent: function () {

@@ -189,6 +189,13 @@ Ext.define('MyAppNamespace.view.editor.editor', {
                                             history.setCode(data);
                                         }
                                     }
+                                },
+                                {
+                                    text: '编辑器打开',
+                                    icon: 'images/script_code.png',
+                                    handler: function () {
+                                        utils.openCodeFolder(systemConfig.getConfig('editor'), jsCode.getFolder(pId));
+                                    }
                                 }
                             ]
                         }).showAt(event.getPoint());
