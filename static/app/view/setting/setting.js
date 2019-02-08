@@ -45,7 +45,7 @@ Ext.define('MyAppNamespace.view.setting.setting', {
         }, {
             xtype: 'slider',
             name: 'editor',
-            fieldLabel: '编辑器',
+            fieldLabel: '界面缩放',
             increment: 10,
             minValue: 0,
             maxValue: 200,
