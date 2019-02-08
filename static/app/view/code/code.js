@@ -11,6 +11,7 @@ Ext.define('MyAppNamespace.view.code.code', {
             that.fileContent = that.fileContent != undefined ? that.fileContent : '';
             that.codeEditor = monaco.editor.create(dom, {
                 value: that.fileContent,
+                theme: 'consoleTheme',
                 language: that.language,
                 automaticLayout: true
             });

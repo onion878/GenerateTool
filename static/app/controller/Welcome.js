@@ -13,6 +13,5 @@ Ext.define('MyAppNamespace.controller.Welcome', {
 		});
 	},
 	onPanelRendered : function() {
-		//console.debug('userpanel被渲染了');
 	}
 });

@@ -141,6 +141,17 @@ body {
     background: #3892d4;
 }
 
+.states-toolbar .status-msg {
+    line-height: 20px;
+    color: teal;
+    float: right;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 90px);
+}
+
 .states-toolbar a.active {
     background-color: #3892d4;
     color: #000000;

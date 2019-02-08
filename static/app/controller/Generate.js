@@ -51,14 +51,13 @@ Ext.define('MyAppNamespace.controller.Generate', {
                 code.setValue(output);
             } catch (e) {
                 that.editFile(btn);
-                console.log(e);
-                showError('模板错误无法预览!');
+                showError(e);
             }
         } else {
             const {file} = geFileData.getOneData(params.fileId);
             if (file.trim().length == 0) {
                 that.editFile(btn);
-                showError('未设置修改文件,无法预览!');
+                showError('Error 未设置修改文件,无法预览!');
                 return;
             }
             try {
@@ -76,8 +75,7 @@ Ext.define('MyAppNamespace.controller.Generate', {
                 }
             } catch (e) {
                 that.editFile(btn);
-                console.log(e);
-                showError('模板错误无法预览!');
+                showError(e);
             }
         }
     },

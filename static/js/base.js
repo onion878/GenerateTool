@@ -19,6 +19,34 @@ amdRequire.config({
 });
 amdRequire(['vs/editor/editor.main'], function () {
     console.log('code init success');
+    // Register a new language
+    monaco.languages.register({id: 'consoleLanguage'});
+
+    // Register a tokens provider for the language
+    monaco.languages.setMonarchTokensProvider('consoleLanguage', {
+        tokenizer: {
+            root: [
+                [/\[error.*/, "custom-error"],
+                [/Error.*/, "custom-error"],
+                [/\[warn.*/, "custom-warn"],
+                [/\[info.*/, "custom-info"],
+                [/\[[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) (0[1-9]|[0-9]\d|3[01]):(0[1-9]|[0-9]\d|3[01]):(0[1-9]|[0-9]\d|3[01])+\]/, "custom-date"]
+            ]
+        }
+    });
+
+    // Define a new theme that contains only rules that match this language
+    monaco.editor.defineTheme('consoleTheme', {
+        base: 'vs',
+        inherit: true,
+        rules: [
+            { token: 'custom-info', foreground: '26c6da' },
+            { token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
+            { token: 'custom-warn', foreground: 'FFA500' },
+            { token: 'custom-date', foreground: '008800' }
+        ]
+    });
+
 });
 
 const labelEditor = new Ext.Editor({

@@ -35,7 +35,6 @@ Ext.define('MyAppNamespace.controller.Templet', {
 
                 }).catch(e => {
                     el.unmask();
-                    console.log(e);
                     showError(e);
                 });
             }

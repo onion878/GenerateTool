@@ -17,7 +17,7 @@ Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'MyAppNamespace',
     appFolder: 'app',
-    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate', 'Statusbar', 'Setting'],
+    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate', 'Statusbar', 'Setting', 'Message'],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
         let pId = history.getMode();
@@ -41,10 +41,54 @@ Ext.application({
         }
 
         ipcRenderer.send('loading-msg', '界面加载中...');
-        const viewport = Ext.create('Ext.Viewport', {
+        const viewport = Ext.create('Ext.panel.Panel', {
             id: 'border-example',
             layout: 'border',
+            bbar: {
+                id: 'msg-bar',
+                xtype: 'statusbar',
+                float: 'left',
+                msg: true,
+                flagShow: false,
+                list: [
+                    {img: './images/log.png', name: 'Console'}
+                ],
+                click: function (t, dom, n) {
+                    if (!t.flagShow) {
+                        t.flagShow = true;
+                        dom.className = "active";
+                        Ext.getCmp('console').show();
+                    } else {
+                        t.flagShow = false;
+                        dom.className = "";
+                        Ext.getCmp('console').hide();
+                    }
+                }
+            },
             items: [{
+                region: 'south',
+                split: true,
+                height: 100,
+                minSize: 100,
+                maxSize: 200,
+                collapsible: false,
+                collapsed: false,
+                id: 'console',
+                hidden: true,
+                margins: '0 0 0 0',
+                xtype: 'message',
+                tbar: {
+                    xtype: 'statusbar',
+                    pId: pId,
+                    float: 'right',
+                    list: [
+                        {img: './images/delete.png', name: 'Clear'}
+                    ],
+                    click: function (s, d, n) {
+                        Ext.getCmp('console').clear();
+                    }
+                }
+            }, {
                 region: 'west',
                 title: '系统菜单',
                 split: true,
@@ -168,7 +212,7 @@ Ext.application({
                                             try {
                                                 eval(geFileData.getSwig(pId));
                                             } catch (e) {
-                                                console.error(e);
+                                                showError(e);
                                             }
                                             getFilesData();
                                             registerAllSuggestion();
@@ -207,7 +251,7 @@ Ext.application({
                                         try {
                                             eval(geFileData.getSwig(pId));
                                         } catch (e) {
-                                            console.error(e);
+                                            showError(e);
                                         }
                                         getFilesData();
                                     }, this);
@@ -707,9 +751,10 @@ Ext.application({
                                                     selected.map(row => {
                                                         const f = row.data;
                                                         utils.createFile(f.name, f.preview);
+                                                        showToast('info: ' + f.name + ' 生成成功!');
                                                     });
                                                     Ext.getBody().unmask();
-                                                    showToast('执行完成');
+                                                    showToast('info: 执行完成');
                                                 }
                                             },
                                             {
@@ -752,6 +797,12 @@ Ext.application({
                 }
             }]
         });
+
+        Ext.create('Ext.Viewport', {
+            layout: 'fit',
+            items: viewport
+        });
+
         ipcRenderer.send('loading-msg', '缓存加载中...');
 
         function getFilesData() {
@@ -901,7 +952,7 @@ Ext.application({
         try {
             eval(geFileData.getSwig(pId));
         } catch (e) {
-            console.error(e);
+            showError(e);
         }
         ipcRenderer.send('loading-msg', '历史加载中...');
         const tabData = history.getTab();
@@ -936,23 +987,11 @@ function openSome({id, title, type, params, icon}) {
 }
 
 function showToast(s) {
-    Ext.toast({
-        html: s,
-        closable: false,
-        align: 't',
-        slideInDuration: 400
-    });
+    Ext.getCmp('console').setValue(s);
 }
 
 function showError(s) {
-    Ext.toast({
-        html: `<span style="color: red;">${s}</span>`,
-        closable: true,
-        autoClose: false,
-        align: 't',
-        slideDUration: 400,
-        maxWidth: 400
-    });
+    Ext.getCmp('console').setValue(s);
 }
 
 function showPrompt(title, msg, fn, dom, value) {

@@ -58,7 +58,10 @@ function createMainWindow() {
         height: 600,
         show: false,
         title: '代码构建工具',
-        icon: path.join(__dirname, 'static/images/icon.ico')
+        icon: path.join(__dirname, 'static/images/icon.ico'),
+        webPreferences: {
+            nodeIntegrationInWorker: true
+        }
     });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
@@ -66,33 +69,12 @@ function createMainWindow() {
         protocol: 'file:',
         slashes: true
     }));
-    // mainWindow.reload();
     // Open the DevTools. debug
     //mainWindow.webContents.openDevTools();
     const menu = Menu.buildFromTemplate([
         {
             label: '系统',
             submenu: [
-                // {
-                //     label: '设置',
-                //     click() {
-                //         let code = `openSome({id:'setting',title:'设置',type:'setting'})`;
-                //         mainWindow.webContents.executeJavaScript(code);
-                //     }
-                // },
-                {
-                    label: '帮助',
-                    click() {
-                        let code = `openSome({id:'welcome',title:'帮助',type:'welcome'})`;
-                        mainWindow.webContents.executeJavaScript(code);
-                    }
-                },
-                {
-                    label: '停止loading',
-                    click() {
-                        mainWindow.webContents.executeJavaScript(`Ext.getBody().unmask()`);
-                    }
-                },
                 {
                     label: '放大',
                     click() {
@@ -110,6 +92,25 @@ function createMainWindow() {
                     click() {
                         mainWindow.webContents.executeJavaScript(`resetZoom()`);
                     }
+                },
+                {
+                    label: '控制台',
+                    click() {
+                        mainWindow.webContents.openDevTools();
+                    }
+                },
+                {
+                    label: '重新启动',
+                    click() {
+                        app.relaunch();
+                        app.exit(0);
+                    }
+                },
+                {
+                    label: '停止loading',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`Ext.getBody().unmask()`);
+                    }
                 }
             ]
         },
@@ -121,9 +122,10 @@ function createMainWindow() {
             }
         },
         {
-            label: '控制台',
+            label: '帮助',
             click() {
-                mainWindow.webContents.openDevTools();
+                let code = `openSome({id:'welcome',title:'帮助',type:'welcome'})`;
+                mainWindow.webContents.executeJavaScript(code);
             }
         },
         {

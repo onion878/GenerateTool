@@ -30,7 +30,12 @@ Ext.define('MyAppNamespace.view.statusbar.statusbar', {
                     child = child + `>${l.name}</a>`;
                 }
             });
-            c.el.dom.querySelector('.states-toolbar').innerHTML = child + '</div>';
+            child = child + '</div>';
+            if(that.msg) {
+                child = child + '<div class="status-msg"></div>';
+            }
+            c.el.dom.querySelector('.states-toolbar').innerHTML = child;
+            that.infoPanel = Ext.get(c.el.dom).query('.status-msg')[0];
             const btn = Ext.get(c.el.dom).query('a');
             that.list.forEach((l, i) => {
                 btn[i].addEventListener("click", function (dom) {

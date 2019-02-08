@@ -19,6 +19,7 @@ Ext.define('MyAppNamespace.view.minicode.minicode', {
             }
             that.codeEditor = monaco.editor.create(dom, {
                 language: that.language,
+                theme: 'consoleTheme',
                 value: that.value,
                 minimap: {
                     enabled: mini

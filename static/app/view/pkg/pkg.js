@@ -34,7 +34,12 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
                     icon: 'images/coins_add.png',
                     tooltip: '安装最新版',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
-                        showToast(`安装中...,安装成功后使用需要重新启动!`);
+                        Ext.toast({
+                            html: '安装中...',
+                            closable: false,
+                            align: 't',
+                            slideInDuration: 400
+                        });
                         jsCode.savePkg(pId, data.name);
                         that.installPkg(pId, data.name);
                     }
@@ -44,7 +49,12 @@ Ext.define('MyAppNamespace.view.pkg.pkg', {
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         const el = this.up('pkg').getEl();
                         showPrompt('输入版本号', '', function (text) {
-                            showToast(`安装中...,安装成功后使用需要重新启动!`);
+                            Ext.toast({
+                                html: '安装中...',
+                                closable: false,
+                                align: 't',
+                                slideInDuration: 400
+                            });
                             jsCode.savePkg(pId, data.name, text);
                             that.installPkg(pId, data.name, text);
                         }, this);

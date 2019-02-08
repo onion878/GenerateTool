@@ -25,7 +25,14 @@ Ext.define('MyAppNamespace.controller.Unpkg', {
         const grid = dom.up('unpkg'), that = this;
         const sm = grid.getSelectionModel().getSelection();
         if (sm.length == 0) {
-            showError('请选择至少一条数据!');
+            Ext.toast({
+                html: `<span style="color: red;">请选择至少一条数据!</span>`,
+                closable: true,
+                autoClose: false,
+                align: 't',
+                slideDUration: 400,
+                maxWidth: 400
+            });
             return;
         }
         const names = [];
@@ -43,7 +50,12 @@ Ext.define('MyAppNamespace.controller.Unpkg', {
     },
     installAll: function (dom) {
         const grid = dom.up('unpkg');
-        showToast(`安装中...,安装成功后使用需要重新启动!`);
+        Ext.toast({
+            html: '安装中...',
+            closable: false,
+            align: 't',
+            slideInDuration: 400
+        });
         const d = grid.getStore().getData();
         d.items.forEach(({data}) => {
             this.installPkg(grid.pId, data.name, data.version);

@@ -52,7 +52,12 @@ Ext.define('MyAppNamespace.view.unpkg.unpkg', {
                     icon: 'images/coins_add.png',
                     tooltip: '安装最新版',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
-                        showToast(`安装中...,安装成功后使用需要重新启动!`);
+                        Ext.toast({
+                            html: '安装中...',
+                            closable: false,
+                            align: 't',
+                            slideInDuration: 400
+                        });
                         that.runCommand('install', pId, data.name);
                     }
                 }]
