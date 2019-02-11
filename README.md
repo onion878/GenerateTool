@@ -29,7 +29,7 @@ npm install
 # 启动项目
 npm start
 # 构建win平台exe运行程序
-npm run package-win
+npm run dist
 ```
 
 ## 相关文档
