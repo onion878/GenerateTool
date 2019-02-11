@@ -1,5 +1,8 @@
 # 代码构建工具
 
+## 下载
+- [安装包](https://drive.google.com/open?id=1A_usF07_FZaVXG-9qTQ_6ExXxvoGPPZ-)
+
 ##用处
 
 一个用来自定义模板并生成代码的工具。<br>
