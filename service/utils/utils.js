@@ -43,7 +43,7 @@ class Utils {
         return (selectDate);
     }
 
-    getNowTime(){
+    getNowTime() {
         let date = new Date();
         let month = date.getMonth() + 1;
         let day = date.getDate();
@@ -61,6 +61,7 @@ class Utils {
             }
             return num + "";
         }
+
         return code;
     }
 
@@ -104,7 +105,7 @@ class Utils {
     createFile(path, content) {
         try {
             path = path.replace(/\\/g, '/');
-            const filePath = path.substring(0,path.lastIndexOf(`/`));
+            const filePath = path.substring(0, path.lastIndexOf(`/`));
             if (!fs.existsSync(filePath)) {
                 shell.mkdir('-p', filePath);
             }
@@ -127,6 +128,10 @@ class Utils {
                 return;
             }
         });
+    }
+
+    fileExists(path) {
+        return fs.existsSync(path);
     }
 }
 

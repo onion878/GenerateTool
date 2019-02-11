@@ -103,6 +103,10 @@ Ext.application({
                     qtip: '定义js脚本',
                     listeners: {
                         click: function () {
+                            if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                showToast('[warn] 请先选择或创建一个模板!');
+                                return;
+                            }
                             jsCode.createFolder(pId);
                             Ext.create('Ext.window.Window', {
                                 title: '编辑脚本',
@@ -265,12 +269,8 @@ Ext.application({
                             ],
                             listeners: {
                                 click: function () {
-                                    if (pId === null) {
-                                        showToast('请先设置模板名称');
-                                        showPrompt('模板名称', '', function (text) {
-                                            pId = parentData.setData(text);
-                                            moduleId = pId;
-                                        }, this);
+                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                        showToast('[warn] 请先选择或创建一个模板!');
                                         return;
                                     }
                                     const modes = data.getData(pId);
@@ -633,6 +633,10 @@ Ext.application({
                             qtip: '配置swig',
                             listeners: {
                                 click: function () {
+                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        return;
+                                    }
                                     addbutton('swig-template', 'swig-template', './images/cog_add.png', 'Swig配置', {});
                                 }
                             }
@@ -644,6 +648,10 @@ Ext.application({
                             qtip: '添加模板文件',
                             listeners: {
                                 click: function () {
+                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        return;
+                                    }
                                     setGeFile(this);
                                 }
                             }
@@ -655,6 +663,10 @@ Ext.application({
                             qtip: '添加模板文件夹',
                             listeners: {
                                 click: function () {
+                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        return;
+                                    }
                                     setGeFolder(this);
                                 }
                             }
@@ -666,6 +678,10 @@ Ext.application({
                             qtip: '开始创建',
                             listeners: {
                                 click: function () {
+                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        return;
+                                    }
                                     const files = [],
                                         generatorData = geFileData.getFileData(pId);
                                     generatorData.forEach(f => {
@@ -690,6 +706,12 @@ Ext.application({
                                                     showError(e);
                                                     throw e;
                                                 }
+                                            }
+                                            const flag = utils.fileExists(f.name);
+                                            if (flag) {
+                                                f.flag = '是';
+                                            } else {
+                                                f.flag = '否';
                                             }
                                             f.type = type;
                                             files.push(f);
@@ -721,6 +743,18 @@ Ext.application({
                                             columns: [
                                                 new Ext.grid.RowNumberer(),
                                                 {text: '名称', align: 'center', dataIndex: 'name', flex: 1},
+                                                {
+                                                    text: '是否存在',
+                                                    align: 'center',
+                                                    dataIndex: 'flag',
+                                                    width: 80,
+                                                    locked: true,
+                                                    renderer: function (value, metaData) {
+                                                        if (value == '是')
+                                                            metaData.style = "color:red";
+                                                        return value;
+                                                    }
+                                                },
                                                 {
                                                     text: '类型',
                                                     align: 'center',
