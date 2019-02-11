@@ -30,7 +30,7 @@ Ext.define('MyAppNamespace.controller.Templet', {
                 el.mask('导入中...');
                 jsCode.importModule(file[0]).then( msg => {
                     el.unmask();
-                    showToast(msg);
+                    showToast('[info] ' + msg);
                     dom.up('templet').getStore().setData(parentData.getAll());
 
                 }).catch(e => {
