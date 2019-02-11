@@ -1,7 +1,5 @@
 # 代码构建工具
 
-## 下载
-- [安装包](https://drive.google.com/open?id=1A_usF07_FZaVXG-9qTQ_6ExXxvoGPPZ-)
 
 ##用处
 
@@ -34,6 +32,10 @@ npm start
 # 构建win平台exe运行程序
 npm run dist
 ```
+
+## 下载
+- [安装包](https://drive.google.com/open?id=1A_usF07_FZaVXG-9qTQ_6ExXxvoGPPZ-)
+
 
 ## 相关文档
 
