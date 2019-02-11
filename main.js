@@ -113,8 +113,7 @@ function createMainWindow() {
         {
             label: '帮助',
             click() {
-                let code = `openSome({id:'welcome',title:'帮助',type:'welcome'})`;
-                mainWindow.webContents.executeJavaScript(code);
+                require("open")('https://generate-docs.netlify.com/');
             }
         },
         {
