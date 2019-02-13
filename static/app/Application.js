@@ -785,10 +785,10 @@ Ext.application({
                                                     selected.map(row => {
                                                         const f = row.data;
                                                         utils.createFile(f.name, f.preview);
-                                                        showToast('info: ' + f.name + ' 生成成功!');
+                                                        showToast('[info] ' + f.name + ' 生成成功!');
                                                     });
                                                     Ext.getBody().unmask();
-                                                    showToast('info: 执行完成');
+                                                    showToast('[info] 执行完成');
                                                 }
                                             },
                                             {

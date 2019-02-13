@@ -36,8 +36,10 @@
     }
   },
   "devDependencies": {
+    "add": "^2.0.6",
     "electron": "^4.0.4",
-    "electron-builder": "^20.38.5"
+    "electron-builder": "^20.38.5",
+    "yarn": "^1.13.0"
   },
   "dependencies": {
     "app-root-path": "^2.1.0",
