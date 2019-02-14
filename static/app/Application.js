@@ -374,6 +374,7 @@ Ext.application({
                             }
                         },
                         afteritemexpand: function (node, index, item, eOpts) {
+                            // x-tree-expander
                             while (node.firstChild) {
                                 node.removeChild(node.firstChild);
                             }
@@ -389,6 +390,7 @@ Ext.application({
                                 }
                             });
                             node.appendChild(child);
+                            Ext.get(item).select('.x-tree-elbow-img').last().addCls('x-tree-expander')
                         },
                         itemcontextmenu: function (node, record, item, index, event, eOpts) {
                             const {
@@ -594,7 +596,7 @@ Ext.application({
                                                     record.set('text', val);
                                                     node.refresh();
                                                 }
-                                            }, item);
+                                            }, item, text);
                                         }
                                     },
                                     {

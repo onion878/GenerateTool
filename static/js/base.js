@@ -82,6 +82,10 @@ let req = (module) => {
     return need(`${jsC.getFolder(moduleId)}/${module}`);
 };
 
+let reqPath = (module) => {
+    return `${jsC.getFolder(moduleId)}/${module}`;
+};
+
 //获取已经定义的数据
 let getAllData = () => {
     return controlData.getModuleData(moduleId);

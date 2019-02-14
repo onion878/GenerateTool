@@ -45,14 +45,15 @@ Ext.define('MyAppNamespace.controller.Mode', {
                     pack: 'start',
                     align: 'stretch'
                 },
-                items: [{
-                    xtype: 'textfield',
-                    margin: '10',
-                    labelWidth: 45,
-                    name: 'name',
-                    allowBlank: false,
-                    fieldLabel: '变量名'
-                },
+                items: [
+                    {
+                        xtype: 'textfield',
+                        margin: '10',
+                        labelWidth: 45,
+                        name: 'name',
+                        allowBlank: false,
+                        fieldLabel: '变量名'
+                    },
                     {
                         xtype: 'combobox',
                         fieldLabel: '名称',
@@ -60,13 +61,18 @@ Ext.define('MyAppNamespace.controller.Mode', {
                         labelWidth: 45,
                         store: {
                             fields: ['id', 'text'],
-                            data: [{
-                                id: 'text',
-                                text: '文本框'
-                            },
+                            data: [
+                                {
+                                    id: 'text',
+                                    text: '文本框'
+                                },
                                 {
                                     id: 'textarea',
                                     text: '多行文本框'
+                                },
+                                {
+                                    id: 'combobox',
+                                    text: '单选框'
                                 },
                                 {
                                     id: 'datalist',
@@ -180,6 +186,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 xtype: 'textareafield',
                 flex: 1
             };
+        } else if (type == 'combobox') {
+            content = {
+                xtype: 'combobox',
+                valueField: 'id',
+                displayField: 'text',
+                flex: 1
+            };
         } else if (type == 'datalist') {
             content = {
                 xtype: 'treepanel',
@@ -282,6 +295,19 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 }
             };
             content.value = value;
+        } else if (type == 'combobox') {
+            content.listeners = {
+                change: function (dom, val) {
+                    controlData.setDataValue(id, {value: val, data: that.getStoreData(dom.getStore())});
+                }
+            };
+            if (value && value != null && value != '') {
+                content.store = Ext.create('Ext.data.Store', {
+                    fields: ['id', 'text'],
+                    data: value.data
+                });
+                content.value = value.value;
+            }
         } else if (type == 'datalist') {
             const data = [];
             if (value instanceof Array) {
@@ -478,6 +504,14 @@ Ext.define('MyAppNamespace.controller.Mode', {
             controlData.removeCode(btn.bId);
         }, btn, Ext.MessageBox.ERROR);
     },
+    getStoreData(store) {
+        const data = store.getData(),
+            list = [];
+        data.items.forEach(d => {
+            list.push(d.data);
+        });
+        return list;
+    },
     getListData(store) {
         const data = store.getData(),
             list = [];
@@ -669,6 +703,13 @@ Ext.define('MyAppNamespace.controller.Mode', {
                 root.removeChild(root.firstChild);
             }
             root.appendChild(child);
+        } else if (type == 'combobox') {
+            const combo = btn.up('container').down('combobox');
+            combo.setStore(Ext.create('Ext.data.Store', {
+                fields: ['id', 'text'],
+                data: v.data
+            }));
+            combo.setValue(v.value);
         } else if (type == 'datagrid') {
             const grid = btn.up('container').down('grid');
             const columns = [new Ext.grid.RowNumberer()],
