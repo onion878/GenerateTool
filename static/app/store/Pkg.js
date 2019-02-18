@@ -1,7 +1,7 @@
 /**
  * http://usejsdoc.org/
  */
-Ext.define('MyAppNamespace.store.Pkg', {
+Ext.define('OnionSpace.store.Pkg', {
 	extend : 'Ext.data.Store',
     proxy: {
         type: 'ajax',

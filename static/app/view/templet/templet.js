@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.templet.templet', {
+Ext.define('OnionSpace.view.templet.templet', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.templet',
     tbar: [{

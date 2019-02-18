@@ -92,6 +92,11 @@ body {
     background-color: #e0ebf3;
 }
 
+.x-panel-header-default .x-tool-img-shell {
+    background-image: url(../images/shell.png);
+    background-color: #e0ebf3;
+}
+
 .color-blue {
     color: blue;
 }

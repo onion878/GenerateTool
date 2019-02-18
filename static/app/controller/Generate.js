@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Generate', {
+Ext.define('OnionSpace.controller.Generate', {
     extend: 'Ext.app.Controller',
     views: ['generate.generate'],
     type: 'edit',

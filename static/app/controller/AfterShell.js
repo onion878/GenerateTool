@@ -1,6 +1,6 @@
-Ext.define('OnionSpace.controller.SwigTemplate', {
+Ext.define('OnionSpace.controller.AfterShell', {
     extend: 'Ext.app.Controller',
-    views: ['swig-template.swig-template'],
+    views: ['after-shell.after-shell'],
     init: function () {
         this.control({
             'generate': {

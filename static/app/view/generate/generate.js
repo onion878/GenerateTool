@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.generate.generate', {
+Ext.define('OnionSpace.view.generate.generate', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.generate',
     viewModel: true,

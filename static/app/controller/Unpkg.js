@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Unpkg', {
+Ext.define('OnionSpace.controller.Unpkg', {
     extend: 'Ext.app.Controller',
     views: ['unpkg.unpkg'],
     init: function () {

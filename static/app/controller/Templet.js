@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Templet', {
+Ext.define('OnionSpace.controller.Templet', {
     extend: 'Ext.app.Controller',
     views: ['templet.templet'],
     init: function () {

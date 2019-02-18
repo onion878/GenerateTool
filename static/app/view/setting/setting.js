@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.setting.setting', {
+Ext.define('OnionSpace.view.setting.setting', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.setting',
     viewModel: true,

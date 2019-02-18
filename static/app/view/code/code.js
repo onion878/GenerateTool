@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.code.code', {
+Ext.define('OnionSpace.view.code.code', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.code',
     viewModel: true,

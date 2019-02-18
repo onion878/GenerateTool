@@ -15,9 +15,24 @@ const command = require('../service/utils/commands');
 ipcRenderer.send('loading-msg', '服务加载中...');
 Ext.application({
     requires: ['Ext.container.Viewport'],
-    name: 'MyAppNamespace',
+    name: 'OnionSpace',
     appFolder: 'app',
-    controllers: ['Mode', 'Editor', 'Code', 'Pkg', 'Unpkg', 'Minicode', 'Welcome', 'Generate', 'Templet', 'SwigTemplate', 'Statusbar', 'Setting', 'Message'],
+    controllers: [
+        'Mode',
+        'Editor',
+        'Code',
+        'Pkg',
+        'Unpkg',
+        'Minicode',
+        'Welcome',
+        'Generate',
+        'Templet',
+        'SwigTemplate',
+        'Statusbar',
+        'Setting',
+        'Message',
+        'AfterShell'
+    ],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
         let pId = history.getMode();
@@ -684,6 +699,7 @@ Ext.application({
                                         showToast('[warn] 请先选择或创建一个模板!');
                                         return;
                                     }
+                                    Ext.getBody().mask('执行中...');
                                     const files = [],
                                         generatorData = geFileData.getFileData(pId);
                                     generatorData.forEach(f => {
@@ -697,7 +713,9 @@ Ext.application({
                                                     const tplPre = swig.compile(f.content);
                                                     f.preview = tplPre(allModuleData);
                                                 } catch (e) {
+                                                    showErrorFlag();
                                                     showError(f.file + ':模板错误');
+                                                    Ext.getBody().unmask();
                                                     throw e;
                                                 }
                                             } else {
@@ -706,6 +724,8 @@ Ext.application({
                                                     f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').replace(/\$/g, '\\\$').replace(/\`/g, '\\\`')}\`;` + f.content);
                                                 } catch (e) {
                                                     showError(e);
+                                                    showErrorFlag();
+                                                    Ext.getBody().unmask();
                                                     throw e;
                                                 }
                                             }
@@ -719,6 +739,7 @@ Ext.application({
                                             files.push(f);
                                         }
                                     });
+                                    Ext.getBody().unmask();
                                     Ext.create('Ext.window.Window', {
                                         title: '生成文件',
                                         fixed: true,
@@ -789,8 +810,22 @@ Ext.application({
                                                         utils.createFile(f.name, f.preview);
                                                         showToast('[info] ' + f.name + ' 生成成功!');
                                                     });
-                                                    Ext.getBody().unmask();
-                                                    showToast('[info] 执行完成');
+                                                    showToast('[info] 文件创建完成');
+                                                    try {
+                                                        closeNodeWin();
+                                                        nodeRun(geFileData.getShell(pId)).then(d => {
+                                                            showToast('[info] 创建后JS脚本执行成功');
+                                                            Ext.getBody().unmask();
+                                                        }).catch(e => {
+                                                            showError(e);
+                                                            showErrorFlag();
+                                                            Ext.getBody().unmask();
+                                                        });
+                                                    } catch (e) {
+                                                        showError(e);
+                                                        showErrorFlag();
+                                                        Ext.getBody().unmask();
+                                                    }
                                                 }
                                             },
                                             {
@@ -800,6 +835,21 @@ Ext.application({
                                             }
                                         ]
                                     }).show().focus();
+                                }
+                            }
+                        },
+                        {
+                            renderTpl: [
+                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-shell" role="presentation"></div>'
+                            ],
+                            qtip: '创建后执行脚本',
+                            listeners: {
+                                click: function () {
+                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        return;
+                                    }
+                                    addbutton('after-shell', 'after-shell', './images/shell.png', 'JS脚本', {pId: pId});
                                 }
                             }
                         }
@@ -1028,6 +1078,15 @@ function showToast(s) {
 
 function showError(s) {
     Ext.getCmp('console').setValue(s);
+}
+
+function showErrorFlag() {
+    Ext.toast({
+        html: `<span style="color: red">出现错误, 请查看日志!</span>`,
+        closable: false,
+        align: 't',
+        slideInDuration: 400
+    });
 }
 
 function showPrompt(title, msg, fn, dom, value) {

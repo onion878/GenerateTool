@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Pkg', {
+Ext.define('OnionSpace.controller.Pkg', {
     extend: 'Ext.app.Controller',
     views: ['pkg.pkg'],
     models: ['Pkg'],

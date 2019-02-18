@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.editor.editor', {
+Ext.define('OnionSpace.view.editor.editor', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.editor',
     viewModel: true,

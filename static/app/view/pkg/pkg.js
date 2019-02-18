@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.pkg.pkg', {
+Ext.define('OnionSpace.view.pkg.pkg', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.pkg',
     viewModel: true,

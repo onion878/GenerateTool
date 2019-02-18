@@ -1,25 +1,19 @@
-Ext.define('OnionSpace.view.swig-template.swig-template', {
+Ext.define('OnionSpace.view.after-shell.after-shell', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.swig-template',
-    viewModel: true,
+    alias: 'widget.after-shell',
     layout: 'fit',
-    fileName: null,
     codeEditor: null,
     listeners: {
         render: function (c) {
             const that = this;
             that.codeEditor = Ext.create({
                 language: 'javascript',
-                value: geFileData.getSwig(that.pId),
+                value: geFileData.getShell(that.pId),
                 xtype: 'minicode'
             });
             that.codeEditor.changeValue = function () {
                 const val = that.codeEditor.codeEditor.getValue();
-                geFileData.setSwig(that.pId, val);
-                try {
-                    eval(val);
-                } catch (e) {
-                }
+                geFileData.setShell(that.pId, val);
             };
             that.add(that.codeEditor);
         }
@@ -27,5 +21,4 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
     initComponent: function () {
         this.callParent(arguments);
     }
-})
-;
+});

@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Mode', {
+Ext.define('OnionSpace.controller.Mode', {
     extend: 'Ext.app.Controller',
     views: ['mode.mode'],
     pId: null,
@@ -618,13 +618,15 @@ Ext.define('MyAppNamespace.controller.Mode', {
             Ext.getBody().mask('执行中...');
             const reData = [],
                 conData = controlData.getAllCode(id);
+            closeNodeWin();
             conData.forEach(d => {
                 try {
                     reData.push(that.getCodeValue(d.value, d.id, d.cId));
                     showToast('[info] 需要执行的脚本:' + d.value);
                 } catch (e) {
-                    showError('[error] ' + e.toString());
+                    showError('[error] ' + e);
                     reData.push(null);
+                    Ext.getBody().unmask();
                 }
             });
             Promise.all(reData).then(values => {
@@ -647,7 +649,7 @@ Ext.define('MyAppNamespace.controller.Mode', {
             return;
         }
         controlData.setCode(bId, valStr, cId);
-        return eval(valStr);
+        return nodeRun(valStr);
     },
     getCodeData(valStr, bId, cId) {
         if (valStr.trim().length == 0) {
@@ -661,7 +663,8 @@ Ext.define('MyAppNamespace.controller.Mode', {
             btn = Ext.getCmp(bId),
             type = btn.bType;
         try {
-            d = eval(valStr);
+            closeNodeWin();
+            d = nodeRun(valStr);
         } catch (e) {
             showError(e);
             Ext.getBody().unmask();

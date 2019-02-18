@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.mode.mode', {
+Ext.define('OnionSpace.view.mode.mode', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.mode',
     scrollable: true,

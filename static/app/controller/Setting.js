@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Setting', {
+Ext.define('OnionSpace.controller.Setting', {
     extend: 'Ext.app.Controller',
     views: ['setting.setting'],
     init: function () {

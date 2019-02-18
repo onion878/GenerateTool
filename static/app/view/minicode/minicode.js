@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.minicode.minicode', {
+Ext.define('OnionSpace.view.minicode.minicode', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.minicode',
     viewModel: true,

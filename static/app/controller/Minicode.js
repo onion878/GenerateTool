@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Minicode', {
+Ext.define('OnionSpace.controller.Minicode', {
     extend: 'Ext.app.Controller',
     views: ['minicode.minicode'],
     init: function () {

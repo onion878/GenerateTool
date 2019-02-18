@@ -8,7 +8,8 @@ class GeFile {
     constructor() {
         gdb.defaults({
             data: [],
-            swig: []
+            swig: [],
+            shell: []
         }).write();
     }
 
@@ -103,13 +104,26 @@ class GeFile {
             }).value();
     }
 
-    addAllData({data, swig}) {
+    getFileShell(pId) {
+        return gdb.get('shell')
+            .filter({
+                pId: pId
+            }).value();
+    }
+
+    addAllData({data, swig, shell}) {
         const oldData = gdb.get('data').value();
         const newData = oldData.concat(data);
         gdb.set('data', newData).write();
         try {
             swig.forEach(s => {
                 gdb.get('swig').push(s).write();
+            });
+        } catch (e) {
+        }
+        try {
+            shell.forEach(s => {
+                gdb.get('shell').push(s).write();
             });
         } catch (e) {
         }
@@ -136,6 +150,28 @@ class GeFile {
         const v = gdb.get('swig').find({pId: pId});
         if (v.value() === undefined) {
             gdb.get('swig').push({pId: pId, content: content}).write();
+        } else {
+            v.set('content', content).write();
+        }
+    }
+
+    getShell(pId) {
+        let v = gdb.get('shell').find({pId: pId}).value();
+        if (v != undefined) {
+            v = v.content;
+        } else {
+            v = '';
+        }
+        if (v == null || v.trim().length == 0) {
+            v = "const {execSync} = require('child_process');\r\n// 获取定义的data\r\nconst data = getAllData();";
+        }
+        return v;
+    }
+
+    setShell(pId, content) {
+        const v = gdb.get('shell').find({pId: pId});
+        if (v.value() === undefined) {
+            gdb.get('shell').push({pId: pId, content: content}).write();
         } else {
             v.set('content', content).write();
         }

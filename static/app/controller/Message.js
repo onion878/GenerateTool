@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Message', {
+Ext.define('OnionSpace.controller.Message', {
     extend: 'Ext.app.Controller',
     views: ['message.message'],
     init: function () {

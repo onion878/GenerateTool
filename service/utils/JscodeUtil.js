@@ -225,6 +225,7 @@ class JscodeUtil {
         const gefile = require('../dao/gefile.js');
         data.gefile['data'] = gefile.getFileData(id);
         data.gefile['swig'] = gefile.getFileSwig(id);
+        data.gefile['shell'] = gefile.getFileShell(id);
         const mode = require('../dao/mode.js');
         data.mode['data'] = [mode.getById(id)];
         const modeData = require('../dao/modeData.js');

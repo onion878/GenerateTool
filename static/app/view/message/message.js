@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.message.message', {
+Ext.define('OnionSpace.view.message.message', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.message',
     viewModel: true,

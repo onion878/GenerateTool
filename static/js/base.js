@@ -40,10 +40,10 @@ amdRequire(['vs/editor/editor.main'], function () {
         base: 'vs',
         inherit: true,
         rules: [
-            { token: 'custom-info', foreground: '26c6da' },
-            { token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
-            { token: 'custom-warn', foreground: 'FFA500' },
-            { token: 'custom-date', foreground: '008800' }
+            {token: 'custom-info', foreground: '26c6da'},
+            {token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold'},
+            {token: 'custom-warn', foreground: 'FFA500'},
+            {token: 'custom-date', foreground: '008800'}
         ]
     });
 
@@ -101,10 +101,11 @@ const getUUID = () => {
     return uuid;
 };
 
-const languageType = [{
-    id: "bat",
-    text: "bat"
-},
+const languageType = [
+    {
+        id: "bat",
+        text: "bat"
+    },
     {
         id: "c",
         text: "c"
@@ -869,4 +870,44 @@ const $icons = {
     "adoc": "asciidoc",
     "asciidoc": "asciidoc",
     "edge": "edge"
+};
+
+const ipc = require('electron').ipcRenderer;
+
+ipc.on('runNode', (event, message) => {
+    console.log(message);
+    showToast(message);
+});
+
+ipc.on('runNodeErr', (event, message) => {
+    closeNodeWin();
+    showError('[error] 出现了错误, 请检查您的脚本, 错误信息如下:');
+    showError('[error] ' + JSON.stringify(message));
+    Ext.getBody().unmask();
+    showErrorFlag();
+});
+
+let runWin = null;
+
+const nodeRun = (content) => {
+    if (runWin == null) {
+        const {BrowserWindow, getCurrentWindow} = require('electron').remote;
+        runWin = new BrowserWindow({
+            parent: getCurrentWindow(),
+            show: false,
+            width: 200,
+            height: 200
+        });
+        runWin.loadURL(`file://${__dirname}/render.html`);
+    }
+    return runWin.webContents.executeJavaScript(`eval(\`${content.replace(/\$/g, '\\\$').replace(/\`/g, '\\\`')}\`);`);
+};
+
+const closeNodeWin = () => {
+    try {
+        runWin.close();
+    } catch (e) {
+
+    }
+    runWin = null;
 };

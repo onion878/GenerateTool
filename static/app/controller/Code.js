@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.controller.Code', {
+Ext.define('OnionSpace.controller.Code', {
     extend: 'Ext.app.Controller',
     views: ['code.code'],
     init: function () {

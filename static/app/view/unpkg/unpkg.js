@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.unpkg.unpkg', {
+Ext.define('OnionSpace.view.unpkg.unpkg', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.unpkg',
     tbar: [{

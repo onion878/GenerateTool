@@ -1,4 +1,4 @@
-Ext.define('MyAppNamespace.view.statusbar.statusbar', {
+Ext.define('OnionSpace.view.statusbar.statusbar', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.statusbar',
     html: '<div class="states-toolbar"></div>',
