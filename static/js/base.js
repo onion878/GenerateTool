@@ -284,56 +284,6 @@ const languageType = [
     }
 ];
 
-const AllSuggestion = {};
-
-let registerAllSuggestion = () => {
-    const d = getAllData();
-    for (let key in d) {
-        const v = d[key],
-            suggestions = {};
-        if (typeof v == "object") {
-            if (v instanceof Array) {
-                suggestions[key] = `ArrayJSON: ${key}`;
-                if (v.length > 0) {
-                    for (let k in v[0]) {
-                        suggestions[k] = `ArrayJSON: ${key} -> ${k}`;
-                    }
-                }
-            } else {
-                suggestions[key] = `JSON: ${key}`;
-                for (let k in v) {
-                    suggestions[k] = `JSON: ${key} -> ${k}`;
-                }
-            }
-        } else {
-            suggestions[key] = `String: ${key}`;
-        }
-        registerSingleData(suggestions);
-    }
-    monaco.languages.registerCompletionItemProvider('javascript', {
-        provideCompletionItems: function (model, position) {
-            return {
-                suggestions: [{
-                    label: 'require',
-                    kind: monaco.languages.CompletionItemKind.Field,
-                    detail: 'require module',
-                    insertText: `require('')`
-                }, {
-                    label: 'getAllData',
-                    kind: monaco.languages.CompletionItemKind.Function,
-                    detail: 'get set data',
-                    insertText: `getAllData()`
-                }, {
-                    label: 'content',
-                    kind: monaco.languages.CompletionItemKind.Variable,
-                    detail: 'origin content',
-                    insertText: `content`
-                }]
-            };
-        }
-    });
-};
-
 let registerSingleData = (suggestions) => {
     const s = [];
     for (let k in suggestions) {

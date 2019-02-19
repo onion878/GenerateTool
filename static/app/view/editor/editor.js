@@ -74,9 +74,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                     node.data.icon = './icons/folder-core.svg';
                 },
                 afteritemexpand: function (node, index, item, eOpts) {
-                    while (node.firstChild) {
-                        node.removeChild(node.firstChild);
-                    }
+                    node.removeAll();
                     const child = jsCode.getFileAndFolder(this.up('editor').pId, node.data.parentFolder);
                     child.forEach(r => {
                         if (r.type == 'file') {

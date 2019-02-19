@@ -221,9 +221,7 @@ Ext.application({
                                             }
                                             this.up('window').close();
                                             const root = Ext.getCmp('panel-model').getRootNode();
-                                            while (root.firstChild) {
-                                                root.removeChild(root.firstChild);
-                                            }
+                                            root.removeAll();
                                             root.appendChild(data.getData(pId));
                                             history.removeAll();
                                             Ext.getCmp('panel-model').setTitle(row.data.text);
@@ -234,7 +232,6 @@ Ext.application({
                                                 showError(e);
                                             }
                                             getFilesData();
-                                            registerAllSuggestion();
                                         }
                                     },
                                         {
@@ -260,9 +257,7 @@ Ext.application({
                                         moduleId = pId;
                                         history.setMode(pId);
                                         const root = Ext.getCmp('panel-model').getRootNode();
-                                        while (root.firstChild) {
-                                            root.removeChild(root.firstChild);
-                                        }
+                                        root.removeAll();
                                         root.appendChild(data.getData(pId));
                                         history.removeAll();
                                         Ext.getCmp('panel-model').setTitle(text);
@@ -328,9 +323,7 @@ Ext.application({
                                                 }
                                                 this.up('window').close();
                                                 const root = Ext.getCmp('panel-model').getRootNode();
-                                                while (root.firstChild) {
-                                                    root.removeChild(root.firstChild);
-                                                }
+                                                root.removeAll();
                                                 root.appendChild(data.getData(pId));
                                             }
                                         },
@@ -389,10 +382,7 @@ Ext.application({
                             }
                         },
                         afteritemexpand: function (node, index, item, eOpts) {
-                            // x-tree-expander
-                            while (node.firstChild) {
-                                node.removeChild(node.firstChild);
-                            }
+                            node.removeAll();
                             const child = fileData.getFiles(pId, node.data.id);
                             child.forEach(d => {
                                 d.children = undefined;
@@ -904,9 +894,7 @@ Ext.application({
                 }
             });
             const root = Ext.getCmp('ge-tree').getRootNode();
-            while (root.firstChild) {
-                root.removeChild(root.firstChild);
-            }
+            root.removeAll();
             root.appendChild(GfData);
         }
 
@@ -1046,7 +1034,6 @@ Ext.application({
         for (let i = 0; i < tabData.length; i++) {
             openSome(tabData[i]);
         }
-        registerAllSuggestion();
         Ext.getCmp('mainmenutab').setActiveTab(Ext.getCmp(showTab));
         ipcRenderer.send('loading-success', '加载完成!');
     }
