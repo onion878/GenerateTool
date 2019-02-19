@@ -284,47 +284,6 @@ const languageType = [
     }
 ];
 
-let registerSingleData = (suggestions) => {
-    const s = [];
-    for (let k in suggestions) {
-        let flag = false;
-        if (AllSuggestion[k]) {
-            AllSuggestion[k].some(a => {
-                if (a == suggestions[k]) {
-                    flag = true;
-                    return flag;
-                }
-            });
-            if (!flag) {
-                AllSuggestion[k].push([suggestions[k]]);
-                s.push({
-                    label: k,
-                    kind: monaco.languages.CompletionItemKind.Enum,
-                    detail: suggestions[k],
-                    insertText: k
-                });
-            }
-        } else {
-            AllSuggestion[k] = [suggestions[k]];
-            s.push({
-                label: k,
-                kind: monaco.languages.CompletionItemKind.Field,
-                detail: suggestions[k],
-                insertText: k
-            });
-        }
-    }
-    languageType.forEach(lan => {
-        monaco.languages.registerCompletionItemProvider(lan.id, {
-            provideCompletionItems: function (model, position) {
-                return {
-                    suggestions: s
-                };
-            }
-        });
-    });
-};
-
 let setZoom = (type) => {
     const old = webFrame.getZoomFactor();
     if (type == '+') {
