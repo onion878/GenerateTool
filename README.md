@@ -34,8 +34,8 @@ npm run dist
 ```
 
 ## 下载
-- [安装包](https://pan.baidu.com/s/1pM-zP6FjSI1SQTXgaNeeLg)
-- [压缩包](https://pan.baidu.com/s/1JAeqCY7bOw3YPD2mXk34BQ)
+- [安装包](http://118.24.168.209:8080/share/6B0G-TwY)
+- [压缩包](http://118.24.168.209:8080/share/FUadAkVM)
 
 
 ## 相关文档
