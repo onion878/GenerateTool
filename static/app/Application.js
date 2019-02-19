@@ -219,6 +219,7 @@ Ext.application({
                                                 moduleId = pId;
                                                 history.setMode(pId);
                                             }
+                                            Ext.getBody().mask('切换中...');
                                             this.up('window').close();
                                             const root = Ext.getCmp('panel-model').getRootNode();
                                             root.removeAll();
@@ -232,14 +233,16 @@ Ext.application({
                                                 showError(e);
                                             }
                                             getFilesData();
+                                            registerAllSuggestion();
+                                            Ext.getBody().unmask();
+                                            showToast('[info] 切换模板为:' + row.data.text);
                                         }
-                                    },
-                                        {
-                                            text: '取消',
-                                            handler: function () {
-                                                this.up('window').close();
-                                            }
+                                    }, {
+                                        text: '取消',
+                                        handler: function () {
+                                            this.up('window').close();
                                         }
+                                    }
                                     ]
                                 }).show().focus();
                             }
@@ -1034,6 +1037,7 @@ Ext.application({
         for (let i = 0; i < tabData.length; i++) {
             openSome(tabData[i]);
         }
+        registerAllSuggestion();
         Ext.getCmp('mainmenutab').setActiveTab(Ext.getCmp(showTab));
         ipcRenderer.send('loading-success', '加载完成!');
     }

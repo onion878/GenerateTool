@@ -44,9 +44,5 @@ Ext.define('OnionSpace.view.minicode.minicode', {
         if (oldModel) {
             oldModel.dispose();
         }
-    },
-    updateTheme(theme) {
-        const newTheme = (theme === 1 ? 'vs-dark' : (theme === 0 ? 'vs' : 'hc-black'));
-        monaco.editor.setTheme(newTheme);
     }
 });

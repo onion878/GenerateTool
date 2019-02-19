@@ -151,6 +151,15 @@ Ext.define('OnionSpace.controller.Mode', {
                             showToast(`已存在[${name}]!`);
                         } else {
                             btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
+                            const d = {};
+                            if (type == 'json') {
+                                d[name] = `JSON: ${name}`;
+                            } else if (type == 'datagrid') {
+                                d[name] = `ArrayJSON: ${name}`;
+                            } else {
+                                d[name] = `String: ${name}`;
+                            }
+                            registerSingleData(d);
                             this.up('window').close();
                         }
                     }
@@ -725,6 +734,13 @@ Ext.define('OnionSpace.controller.Mode', {
             store.setFields(fields);
             store.setData(v);
             grid.reconfigure(store, columns);
+            if (v.length > 0) {
+                const d = {};
+                for (let k in v[0]) {
+                    d[k] = `ArrayJSON: ... -> ${k}`;
+                }
+                registerSingleData(d);
+            }
         } else if (type == 'file') {
             btn.up('container').down('filefield').setRawValue(v);
         } else if (type == 'folder') {
@@ -734,6 +750,11 @@ Ext.define('OnionSpace.controller.Mode', {
             g.setSource(v);
             const d = this.getGridJsonData(g.getStore());
             controlData.setDataValue(bId, d);
+            const d1 = {};
+            for (let k in d) {
+                d1[k] = `JSON: ... -> ${k}`;
+            }
+            registerSingleData(d1);
         } else {
 
         }

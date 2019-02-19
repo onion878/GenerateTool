@@ -284,6 +284,105 @@ const languageType = [
     }
 ];
 
+const AllSuggestion = {};
+
+let registerAllSuggestion = () => {
+    const d = getAllData();
+    for (let key in d) {
+        const v = d[key],
+            suggestions = {};
+        if (typeof v == "object") {
+            if (v instanceof Array) {
+                suggestions[key] = `ArrayJSON: ${key}`;
+                if (v.length > 0) {
+                    for (let k in v[0]) {
+                        suggestions[k] = `ArrayJSON: ${key} -> ${k}`;
+                    }
+                }
+            } else {
+                suggestions[key] = `JSON: ${key}`;
+                for (let k in v) {
+                    suggestions[k] = `JSON: ${key} -> ${k}`;
+                }
+            }
+        } else {
+            suggestions[key] = `String: ${key}`;
+        }
+        registerSingleData(suggestions);
+    }
+    monaco.languages.registerCompletionItemProvider('javascript', {
+        provideCompletionItems: function (model, position) {
+            return {
+                suggestions: [{
+                    label: 'require',
+                    kind: monaco.languages.CompletionItemKind.Field,
+                    detail: 'require module',
+                    insertText: `require('')`
+                }, {
+                    label: 'getAllData',
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    detail: 'get set data',
+                    insertText: `getAllData()`
+                }, {
+                    label: 'content',
+                    kind: monaco.languages.CompletionItemKind.Variable,
+                    detail: 'origin content',
+                    insertText: `content`
+                }, {
+                    label: 'for',
+                    kind: monaco.languages.CompletionItemKind.Constant,
+                    detail: 'js 基础循环',
+                    insertText: `for (let i = 0; i < rows.length; i++) {\n\tconst row = rows[i];\n}`
+                }, {
+                    label: 'forin',
+                    kind: monaco.languages.CompletionItemKind.Constant,
+                    detail: 'For-In',
+                    insertText: `for (const key in object) {\n\tif (object.hasOwnProperty(key)) {\n\t\tconst element = object[key];\n\t}\n}`
+                }]
+            };
+        }
+    });
+};
+
+let registerSingleData = (suggestions) => {
+    const s = [];
+    for (let k in suggestions) {
+        let flag = false;
+        if (AllSuggestion[k]) {
+            AllSuggestion[k].some(a => {
+                if (a == suggestions[k]) {
+                    flag = true;
+                    return flag;
+                }
+            });
+            if (!flag) {
+                AllSuggestion[k].push([suggestions[k]]);
+                s.push({
+                    label: k,
+                    kind: monaco.languages.CompletionItemKind.Enum,
+                    detail: suggestions[k],
+                    insertText: k
+                });
+            }
+        } else {
+            AllSuggestion[k] = [suggestions[k]];
+            s.push({
+                label: k,
+                kind: monaco.languages.CompletionItemKind.Field,
+                detail: suggestions[k],
+                insertText: k
+            });
+        }
+    }
+    monaco.languages.registerCompletionItemProvider('javascript', {
+        provideCompletionItems: function (model, position) {
+            return {
+                suggestions: s
+            };
+        }
+    });
+};
+
 let setZoom = (type) => {
     const old = webFrame.getZoomFactor();
     if (type == '+') {

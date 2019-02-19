@@ -61,10 +61,7 @@ function createMainWindow() {
         height: 600,
         show: false,
         title: '代码构建工具',
-        icon: path.join(__dirname, 'static/images/icon.ico'),
-        webPreferences: {
-            nodeIntegrationInWorker: true
-        }
+        icon: path.join(__dirname, 'static/images/icon.ico')
     });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
