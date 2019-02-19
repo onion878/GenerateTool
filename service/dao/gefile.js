@@ -1,6 +1,7 @@
+const help = require('../utils/help');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('data/gefile.json');
+const adapter = new FileSync(help.getDataPath() + 'data/gefile.json');
 const gdb = low(adapter);
 
 class GeFile {

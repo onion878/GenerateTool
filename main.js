@@ -9,9 +9,9 @@ app.showExitPrompt = true;
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
-const appPath = require('app-root-path');
+const shell = require('shelljs');
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow, loading, loadFlag = false;
+let mainWindow, loading, loadFlag = false, globalStoreDirPath;
 
 function createWindow() {
     // 预加载
@@ -45,12 +45,15 @@ function createWindow() {
 }
 
 function createMainWindow() {
-    const rootPath = getPath();
-    if (!fs.existsSync(rootPath + '/data')) {
-        fs.mkdirSync(rootPath + '/data');
+    globalStoreDirPath = path.join(process.env.ProgramData || 'C:/ProgramData', '/', app.getName());
+    if (!fs.existsSync(globalStoreDirPath)) {
+        shell.mkdir('-p', globalStoreDirPath);
     }
-    if (!fs.existsSync(rootPath + '/jscode')) {
-        fs.mkdirSync(rootPath + '/jscode');
+    if (!fs.existsSync(globalStoreDirPath + '/data')) {
+        fs.mkdirSync(globalStoreDirPath + '/data');
+    }
+    if (!fs.existsSync(globalStoreDirPath + '/jscode')) {
+        fs.mkdirSync(globalStoreDirPath + '/jscode');
     }
     // Create the browser window.
     mainWindow = new BrowserWindow({
@@ -180,14 +183,6 @@ if (!gotTheLock) {
         if (mainWindow.isMinimized()) mainWindow.restore();
         mainWindow.focus();
     }
-}
-
-function getPath() {
-    let p = appPath.path.replace(/\\/g, '/');
-    if (p.indexOf('app.asar') > -1) {
-        p = p.replace('app.asar', '').replace('resources/', '');
-    }
-    return p;
 }
 
 // This method will be called when Electron has finished

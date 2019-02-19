@@ -1,6 +1,7 @@
+const help = require('../utils/help');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('data/modeData.json');
+const adapter = new FileSync(help.getDataPath() + 'data/modeData.json');
 const mdb = low(adapter);
 const utils = require('../utils/utils');
 

@@ -1,19 +1,15 @@
 const fs = require('fs');
+const help = require('./help');
 const utils = require('./utils');
 const pack = require('../dao/package');
 const controls = require('../dao/controls');
-const appRoot = require('app-root-path');
 const del = require('del');
 const archiver = require('archiver');
 
 class JscodeUtil {
 
     getFolder(id) {
-        let path = appRoot.path.replace(/\\/g, '/');
-        if (path.indexOf('app.asar') > -1) {
-            path = path.replace('app.asar', '').replace('resources/', '');
-        }
-        return path + '/jscode/' + id;
+        return help.getDataPath() + 'jscode/' + id;
     }
 
     //创建脚本文件夹
@@ -91,14 +87,14 @@ class JscodeUtil {
 
     unLinkFile(id, folder) {
         let path = this.getFolder(id) + '/' + folder;
-        del([path]).then(paths => {
+        del([path], {force: true}).then(paths => {
             console.log('Deleted files and folders:\n', paths.join('\n'));
         });
     }
 
     unLinkFolder(id, file) {
         let path = this.getFolder(id) + '/' + file;
-        del([path]).then(paths => {
+        del([path], {force: true}).then(paths => {
             console.log('Deleted files and folders:\n', paths.join('\n'));
         });
     }
@@ -162,7 +158,7 @@ class JscodeUtil {
     }
 
     exportModule({id, text, folder}) {
-        const path = appRoot.path.replace(/\\/g, '/').replace('/resources/app.asar', ''), that = this;
+        const path = help.getDataPath(), that = this;
         return new Promise(function (resolve, reject) {
             const output = fs.createWriteStream(`${folder}/${text}.zip`);
             const archive = archiver('zip', {
@@ -195,7 +191,7 @@ class JscodeUtil {
                     archive.finalize();
                     fs.rename(`${dir}/node_modules`, `${path}/jscode/${id}/node_modules`, (err) => {
                         if (err) throw err;
-                        del([dir]);
+                        del([dir], {force: true});
                     });
                 });
             } else {
@@ -237,7 +233,7 @@ class JscodeUtil {
 
     importModule(file) {
         const unZip = require('decompress');
-        const path = appRoot.path.replace(/\\/g, '/').replace('/resources/app.asar', ''), that = this;
+        const path = help.getDataPath(), that = this;
         return new Promise((resolve, reject) => {
             const dir = `${path}/data/cache`;
             try {
@@ -261,7 +257,7 @@ class JscodeUtil {
                         require('../dao/mode.js').addAllData(mode);
                         require('../dao/modeData.js').addAllData(modeData);
                         require('../dao/package.js').addAllData(pack);
-                        del([dir]);
+                        del([dir], {force: true});
                         resolve(`[${mode.data[0].text}]导入成功!`);
                     } else {
                         fs.rename(modeFolder, `${path}/jscode/${pId}`, (err) => {
@@ -278,7 +274,7 @@ class JscodeUtil {
                             require('../dao/mode.js').addAllData(mode);
                             require('../dao/modeData.js').addAllData(modeData);
                             require('../dao/package.js').addAllData(pack);
-                            del([dir]);
+                            del([dir], {force: true});
                             resolve(`[${mode.data[0].text}]导入成功!`);
                         });
                     }
@@ -308,8 +304,8 @@ class JscodeUtil {
         require('../dao/mode.js').removeAll(pId);
         require('../dao/modeData.js').removeAll(pId);
         require('../dao/package.js').removeAll(pId);
-        const path = appRoot.path.replace(/\\/g, '/').replace('/resources/app.asar', ''), that = this;
-        del([`${path}/jscode/${pId}`]);
+        const path = help.getDataPath();
+        del([`${path}/jscode/${pId}`], {force: true});
     }
 
     initFile(pId) {

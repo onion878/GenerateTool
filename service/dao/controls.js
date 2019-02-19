@@ -1,6 +1,7 @@
+const help = require('../utils/help');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('data/controls.json');
+const adapter = new FileSync(help.getDataPath() + 'data/controls.json');
 const con = low(adapter);
 
 class Controls {
@@ -76,6 +77,7 @@ class Controls {
     getAllCode(cId) {
         return con.get('code').filter({cId: cId}).value();
     }
+
     //获取当前设置的控件数据集
     getModuleData(pId) {
         const data = con.get('ext').filter({pId: pId}).value();
@@ -90,7 +92,7 @@ class Controls {
         con.get('ext')
             .remove({pId: pId, cId: cId})
             .write();
-        data.forEach(v=> {
+        data.forEach(v => {
             con.get('ext')
                 .push(v)
                 .write();
@@ -118,13 +120,13 @@ class Controls {
 
     removeAll(pId) {
         const oldExt = con.get('ext').filter({pId: pId}).value();
-        oldExt.forEach( e => {
+        oldExt.forEach(e => {
             con.get('code')
-                .remove({ id: e.id })
+                .remove({id: e.id})
                 .write();
         });
         con.get('ext')
-            .remove({ pId: pId })
+            .remove({pId: pId})
             .write();
     }
 }
