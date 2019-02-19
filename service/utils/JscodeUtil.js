@@ -187,7 +187,7 @@ class JscodeUtil {
                     if (err) throw err;
                     archive.pipe(output);
                     archive.append(that.getAllExportData(id), {name: 'data.json'});
-                    archive.directory(`jscode/${id}/`, id);
+                    archive.directory(`${path}jscode/${id}/`, id);
                     archive.finalize();
                     fs.rename(`${dir}/node_modules`, `${path}/jscode/${id}/node_modules`, (err) => {
                         if (err) throw err;
@@ -197,7 +197,7 @@ class JscodeUtil {
             } else {
                 archive.pipe(output);
                 archive.append(that.getAllExportData(id), {name: 'data.json'});
-                archive.directory(`jscode/${id}/`, id);
+                archive.directory(`${path}jscode/${id}/`, id);
                 archive.finalize();
             }
         });
