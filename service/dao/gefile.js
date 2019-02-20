@@ -52,8 +52,7 @@ class GeFile {
         if (v != undefined) {
             gdb.get('data').find({
                 id: id
-            })
-                .set('preview', preview)
+            }).set('preview', preview)
                 .write();
         } else {
             gdb.get('data')
@@ -128,7 +127,6 @@ class GeFile {
             });
         } catch (e) {
         }
-
     }
 
     removeAll(pId) {
@@ -148,12 +146,12 @@ class GeFile {
     }
 
     setSwig(pId, content) {
-        const v = gdb.get('swig').find({pId: pId});
-        if (v.value() === undefined) {
-            gdb.get('swig').push({pId: pId, content: content}).write();
-        } else {
-            v.set('content', content).write();
-        }
+        gdb.get('swig')
+            .remove({
+                pId: pId
+            })
+            .write();
+        gdb.get('swig').push({pId: pId, content: content}).write();
     }
 
     getShell(pId) {
@@ -170,12 +168,12 @@ class GeFile {
     }
 
     setShell(pId, content) {
-        const v = gdb.get('shell').find({pId: pId});
-        if (v.value() === undefined) {
-            gdb.get('shell').push({pId: pId, content: content}).write();
-        } else {
-            v.set('content', content).write();
-        }
+        gdb.get('shell')
+            .remove({
+                pId: pId
+            })
+            .write();
+        gdb.get('shell').push({pId: pId, content: content}).write();
     }
 }
 
