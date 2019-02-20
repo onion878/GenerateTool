@@ -133,6 +133,12 @@ class GeFile {
         gdb.get('data')
             .remove({pId: pId})
             .write();
+        gdb.get('swig')
+            .remove({pId: pId})
+            .write();
+        gdb.get('shell')
+            .remove({pId: pId})
+            .write();
     }
 
     getSwig(pId) {

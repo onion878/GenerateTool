@@ -908,7 +908,7 @@ const nodeRun = (content) => {
         });
         runWin.loadURL(`file://${__dirname}/render.html`);
     }
-    return runWin.webContents.executeJavaScript(`eval(\`${content.replace(/\$/g, '\\\$').replace(/\\/g, '\/').replace(/\`/g, '\\\`')}\`);`);
+    return runWin.webContents.executeJavaScript(content.replace(/\$\{(\w[\w\d]*)\}/g, (_, v) => eval(v)));
 };
 
 const closeNodeWin = () => {
