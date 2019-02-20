@@ -47,6 +47,38 @@ amdRequire(['vs/editor/editor.main'], function () {
         ]
     });
 
+    monaco.languages.registerCompletionItemProvider('javascript', {
+        provideCompletionItems: function (model, position) {
+            return {
+                suggestions: [{
+                    label: 'require',
+                    kind: monaco.languages.CompletionItemKind.Field,
+                    detail: 'require module',
+                    insertText: `require('')`
+                }, {
+                    label: 'getAllData',
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    detail: 'get set data',
+                    insertText: `getAllData()`
+                }, {
+                    label: 'content',
+                    kind: monaco.languages.CompletionItemKind.Variable,
+                    detail: 'origin content',
+                    insertText: `content`
+                }, {
+                    label: 'for',
+                    kind: monaco.languages.CompletionItemKind.Constant,
+                    detail: 'js 基础循环',
+                    insertText: `for (let i = 0; i < rows.length; i++) {\n\tconst row = rows[i];\n}`
+                }, {
+                    label: 'forin',
+                    kind: monaco.languages.CompletionItemKind.Constant,
+                    detail: 'For-In',
+                    insertText: `for (const key in object) {\n\tif (object.hasOwnProperty(key)) {\n\t\tconst element = object[key];\n\t}\n}`
+                }]
+            };
+        }
+    });
 });
 
 const labelEditor = new Ext.Editor({
@@ -310,38 +342,6 @@ let registerAllSuggestion = () => {
         }
         registerSingleData(suggestions);
     }
-    monaco.languages.registerCompletionItemProvider('javascript', {
-        provideCompletionItems: function (model, position) {
-            return {
-                suggestions: [{
-                    label: 'require',
-                    kind: monaco.languages.CompletionItemKind.Field,
-                    detail: 'require module',
-                    insertText: `require('')`
-                }, {
-                    label: 'getAllData',
-                    kind: monaco.languages.CompletionItemKind.Function,
-                    detail: 'get set data',
-                    insertText: `getAllData()`
-                }, {
-                    label: 'content',
-                    kind: monaco.languages.CompletionItemKind.Variable,
-                    detail: 'origin content',
-                    insertText: `content`
-                }, {
-                    label: 'for',
-                    kind: monaco.languages.CompletionItemKind.Constant,
-                    detail: 'js 基础循环',
-                    insertText: `for (let i = 0; i < rows.length; i++) {\n\tconst row = rows[i];\n}`
-                }, {
-                    label: 'forin',
-                    kind: monaco.languages.CompletionItemKind.Constant,
-                    detail: 'For-In',
-                    insertText: `for (const key in object) {\n\tif (object.hasOwnProperty(key)) {\n\t\tconst element = object[key];\n\t}\n}`
-                }]
-            };
-        }
-    });
 };
 
 let registerSingleData = (suggestions) => {
@@ -908,7 +908,7 @@ const nodeRun = (content) => {
         });
         runWin.loadURL(`file://${__dirname}/render.html`);
     }
-    return runWin.webContents.executeJavaScript(`eval(\`${content.replace(/\$/g, '\\\$').replace(/\`/g, '\\\`')}\`);`);
+    return runWin.webContents.executeJavaScript(`eval(\`${content.replace(/\$/g, '\\\$').replace(/\\/g, '\/').replace(/\`/g, '\\\`')}\`);`);
 };
 
 const closeNodeWin = () => {
