@@ -624,6 +624,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     reData.push(that.getCodeValue(d.value, d.id, d.cId));
                     showToast('[info] 需要执行的脚本:' + d.value);
                 } catch (e) {
+                    console.error(e);
                     showError('[error] ' + e);
                     reData.push(null);
                     Ext.getBody().unmask();
@@ -638,6 +639,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 });
                 Ext.getBody().unmask();
             }).catch(e => {
+                console.error(e);
                 showError('[error] ' + e.toString());
                 Ext.getBody().unmask();
             });
@@ -666,6 +668,7 @@ Ext.define('OnionSpace.controller.Mode', {
             closeNodeWin();
             d = nodeRun(valStr);
         } catch (e) {
+            console.error(e);
             showError(e);
             Ext.getBody().unmask();
             throw e;
@@ -677,6 +680,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 this.setComponentValue(type, btn, v, bId);
                 Ext.getBody().unmask();
             }).catch(e => {
+                console.error(e);
                 Ext.getBody().unmask();
             });
         } else {

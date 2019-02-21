@@ -67,6 +67,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                             el.unmask();
                                             showToast(`导出为[${data.folder}\\${data.text}.zip]`);
                                         }).catch(err => {
+                                            console.error(err);
                                             showError(err);
                                             el.unmask();
                                         });

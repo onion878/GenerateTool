@@ -34,6 +34,7 @@ Ext.define('OnionSpace.controller.Templet', {
                     dom.up('templet').getStore().setData(parentData.getAll());
 
                 }).catch(e => {
+                    console.error(e);
                     el.unmask();
                     showError(e);
                 });

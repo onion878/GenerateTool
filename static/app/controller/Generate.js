@@ -50,6 +50,7 @@ Ext.define('OnionSpace.controller.Generate', {
                 const output = tpl(controlData.getModuleData(btn.up('generate').pId));
                 code.setValue(output);
             } catch (e) {
+                console.error(e);
                 that.editFile(btn);
                 showError(e);
             }
@@ -74,6 +75,7 @@ Ext.define('OnionSpace.controller.Generate', {
                     }
                 }
             } catch (e) {
+                console.error(e);
                 that.editFile(btn);
                 showError(e);
             }
