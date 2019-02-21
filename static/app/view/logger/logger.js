@@ -20,14 +20,14 @@ Ext.define('OnionSpace.view.logger.logger', {
                 minimap: {
                     enabled: false
                 },
-                automaticLayout: true,
-                value: logger.readValue()
+                automaticLayout: true
             });
+            that.setValue(logger.readValue());
         }
     },
     setValue: function (msg) {
-        this.codeEditor.setValue(this.value);
-        this.codeEditor.revealLine(this.value.split('\n').length);
+        this.codeEditor.setValue(msg);
+        this.codeEditor.revealLine(msg.split('\n').length);
     },
     clear: function () {
         this.codeEditor.setValue('');
