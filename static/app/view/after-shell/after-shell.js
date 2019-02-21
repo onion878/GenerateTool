@@ -9,7 +9,8 @@ Ext.define('OnionSpace.view.after-shell.after-shell', {
             that.codeEditor = Ext.create({
                 language: 'javascript',
                 value: geFileData.getShell(that.pId),
-                xtype: 'minicode'
+                xtype: 'minicode',
+                minimap: true
             });
             that.codeEditor.changeValue = function () {
                 const val = that.codeEditor.codeEditor.getValue();

@@ -11,7 +11,8 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
             that.codeEditor = Ext.create({
                 language: 'javascript',
                 value: geFileData.getSwig(that.pId),
-                xtype: 'minicode'
+                xtype: 'minicode',
+                minimap: true
             });
             that.codeEditor.changeValue = function () {
                 const val = that.codeEditor.codeEditor.getValue();
@@ -19,6 +20,7 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
                 try {
                     eval(val);
                 } catch (e) {
+                    console.log(e);
                 }
             };
             that.add(that.codeEditor);

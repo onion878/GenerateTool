@@ -47,6 +47,7 @@
     "axios": "^0.18.0",
     "decompress": "^4.2.0",
     "del": "^3.0.0",
+    "log4js": "^4.0.2",
     "lowdb": "^1.0.0",
     "monaco-editor": "^0.15.6",
     "node-pty": "^0.8.1",

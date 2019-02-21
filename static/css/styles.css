@@ -169,3 +169,7 @@ body {
 .color-display {
     color: lightgrey;
 }
+
+.mtku {
+    cursor: pointer;
+}

@@ -25,6 +25,16 @@ Ext.define('OnionSpace.view.message.message', {
             that.codeEditor.onDidChangeModelContent(function (e) {
                 that.changeValue();
             });
+        },
+        click: {
+            element: 'el',
+            preventDefault: true,
+            fn: function (e, target) {
+                if ((" " + target.className + " ").replace(/[\n\t]/g, " ").indexOf(" mtku ") > -1) {
+                    doSomeThing(target.innerText);
+                }
+
+            }
         }
     },
     setValue: function (msg) {

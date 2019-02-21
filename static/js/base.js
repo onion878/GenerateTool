@@ -2,10 +2,38 @@ const {
     webFrame
 } = require('electron');
 const jsC = require('../service/utils/JscodeUtil');
+const logger = require('../service/utils/logger');
 const need = require('require-uncached');
 let moduleId = null,
     editLabelId = null;
 webFrame.setZoomFactor(systemConfig.getZoom());
+
+(function () {
+    const _log = console.log;
+    const _error = console.error;
+    const _warning = console.warning;
+    const _debug = console.debug;
+
+    console.debug = function (msg) {
+        logger.debug(msg);
+        _debug.apply(console, arguments);
+    };
+
+    console.error = function (errMessage) {
+        logger.error(errMessage);
+        _error.apply(console, arguments);
+    };
+
+    console.log = function (logMessage) {
+        logger.info(logMessage);
+        _log.apply(console, arguments);
+    };
+
+    console.warning = function (warnMessage) {
+        logger.warning(warnMessage);
+        _warning.apply(console, arguments);
+    };
+})();
 
 amdRequire.config({
     paths: {
@@ -26,10 +54,16 @@ amdRequire(['vs/editor/editor.main'], function () {
     monaco.languages.setMonarchTokensProvider('consoleLanguage', {
         tokenizer: {
             root: [
+                [/\[选择模板]/, "custom-click"],
+                [/\[创建模板]/, "custom-click"],
+                [/\[查看详情]/, "custom-click"],
                 [/\[error.*/, "custom-error"],
+                [/\[ERROR.*/, "custom-error"],
                 [/Error.*/, "custom-error"],
                 [/\[warn.*/, "custom-warn"],
+                [/\[WARN.*/, "custom-warn"],
                 [/\[info.*/, "custom-info"],
+                [/\[INFO.*/, "custom-info"],
                 [/\[[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) (0[1-9]|[0-9]\d|3[01]):(0[1-9]|[0-9]\d|3[01]):(0[1-9]|[0-9]\d|3[01])+\]/, "custom-date"]
             ]
         }
@@ -40,6 +74,7 @@ amdRequire(['vs/editor/editor.main'], function () {
         base: 'vs',
         inherit: true,
         rules: [
+            {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},
             {token: 'custom-info', foreground: '26c6da'},
             {token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold'},
             {token: 'custom-warn', foreground: 'FFA500'},
@@ -47,6 +82,7 @@ amdRequire(['vs/editor/editor.main'], function () {
         ]
     });
 
+    // register suggestions
     monaco.languages.registerCompletionItemProvider('javascript', {
         provideCompletionItems: function (model, position) {
             return {
@@ -54,7 +90,8 @@ amdRequire(['vs/editor/editor.main'], function () {
                     label: 'require',
                     kind: monaco.languages.CompletionItemKind.Field,
                     detail: 'require module',
-                    insertText: `require('')`
+                    insertText: 'require(\'$0\');',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
                 }, {
                     label: 'getAllData',
                     kind: monaco.languages.CompletionItemKind.Function,
@@ -63,23 +100,44 @@ amdRequire(['vs/editor/editor.main'], function () {
                 }, {
                     label: 'content',
                     kind: monaco.languages.CompletionItemKind.Variable,
-                    detail: 'origin content',
+                    detail: '原来值 -- 生效模块: 修改模板',
                     insertText: `content`
                 }, {
                     label: 'for',
                     kind: monaco.languages.CompletionItemKind.Constant,
                     detail: 'js 基础循环',
-                    insertText: `for (let i = 0; i < rows.length; i++) {\n\tconst row = rows[i];\n}`
+                    insertText: 'for (let ${1:i} = 0; ${1:i} < ${2:rows}.length; ${1:i}++) {\n\tconst ${3:row} = ${2:rows}[${1:i}];\n}',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
                 }, {
                     label: 'forin',
                     kind: monaco.languages.CompletionItemKind.Constant,
                     detail: 'For-In',
-                    insertText: `for (const key in object) {\n\tif (object.hasOwnProperty(key)) {\n\t\tconst element = object[key];\n\t}\n}`
+                    insertText: 'for (const key in ${1:object}) {\n\tif (${1:object}.hasOwnProperty(key)) {\n\t\tconst element = ${1:object}[key];\n\t}\n}',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                }, {
+                    label: 'exports',
+                    kind: monaco.languages.CompletionItemKind.Constant,
+                    detail: 'module exports',
+                    insertText: 'module.exports = '
+                }, {
+                    label: 'req',
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    detail: '引入js脚本 -- 生效模块: JS脚本,从JS脚本取值',
+                    insertText: 'req(\'$0\');',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                }, {
+                    label: 'swig',
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    detail: '设置swig过滤器 -- 生效模块: swig配置',
+                    insertText: 'swig.setFilter(\'${1:name}\', function (oldVal) {\n\treturn oldVal.toLowerCase();\n});',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
                 }]
             };
         }
     });
+
 });
+
 
 const labelEditor = new Ext.Editor({
     updateEl: true,
@@ -888,9 +946,10 @@ ipc.on('runNode', (event, message) => {
 });
 
 ipc.on('runNodeErr', (event, message) => {
-    closeNodeWin();
+    // closeNodeWin();
     showError('[error] 出现了错误, 请检查您的脚本, 错误信息如下:');
     showError('[error] ' + JSON.stringify(message));
+    showToast('查看完整日志: [查看详情]');
     Ext.getBody().unmask();
     showErrorFlag();
 });

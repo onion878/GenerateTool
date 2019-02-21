@@ -31,7 +31,8 @@ Ext.application({
         'Statusbar',
         'Setting',
         'Message',
-        'AfterShell'
+        'AfterShell',
+        'Logger'
     ],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
@@ -119,7 +120,7 @@ Ext.application({
                     listeners: {
                         click: function () {
                             if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                showToast('[warn] 请先选择或创建一个模板!');
+                                showToast('请先[选择模板]或[创建模板]!');
                                 return;
                             }
                             jsCode.createFolder(pId);
@@ -180,6 +181,7 @@ Ext.application({
                     rootVisible: false,
                     hideCollapseTool: true,
                     tools: [{
+                        id: 'main-change-module',
                         qtip: '切换模板',
                         renderTpl: [
                             '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-tag" role="presentation"></div>'
@@ -230,6 +232,7 @@ Ext.application({
                                             try {
                                                 eval(geFileData.getSwig(pId));
                                             } catch (e) {
+                                                console.error(e);
                                                 showError(e);
                                             }
                                             getFilesData();
@@ -249,6 +252,7 @@ Ext.application({
                         }
                     },
                         {
+                            id: 'main-create-module',
                             qtip: '新建模板',
                             renderTpl: [
                                 '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-save" role="presentation"></div>'
@@ -268,6 +272,7 @@ Ext.application({
                                         try {
                                             eval(geFileData.getSwig(pId));
                                         } catch (e) {
+                                            console.error(e);
                                             showError(e);
                                         }
                                         getFilesData();
@@ -283,7 +288,7 @@ Ext.application({
                             listeners: {
                                 click: function () {
                                     if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        showToast('请先[选择模板]或[创建模板]!');
                                         return;
                                     }
                                     const modes = data.getData(pId);
@@ -557,6 +562,7 @@ Ext.application({
                                                                     const tpl = swig.compile(val);
                                                                     output = tpl(controlData.getModuleData(pId));
                                                                 } catch (e) {
+                                                                    console.error(e);
                                                                 }
                                                                 this.up('form').down('textareafield').setValue(output);
                                                             }
@@ -644,7 +650,7 @@ Ext.application({
                             listeners: {
                                 click: function () {
                                     if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        showToast('请先[选择模板]或[创建模板]!');
                                         return;
                                     }
                                     addbutton('swig-template', 'swig-template', './images/cog_add.png', 'Swig配置', {});
@@ -659,7 +665,7 @@ Ext.application({
                             listeners: {
                                 click: function () {
                                     if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        showToast('请先[选择模板]或[创建模板]!');
                                         return;
                                     }
                                     setGeFile(this);
@@ -674,7 +680,7 @@ Ext.application({
                             listeners: {
                                 click: function () {
                                     if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        showToast('请先[选择模板]或[创建模板]!');
                                         return;
                                     }
                                     setGeFolder(this);
@@ -689,7 +695,7 @@ Ext.application({
                             listeners: {
                                 click: function () {
                                     if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        showToast('请先[选择模板]或[创建模板]!');
                                         return;
                                     }
                                     Ext.getBody().mask('执行中...');
@@ -706,6 +712,7 @@ Ext.application({
                                                     const tplPre = swig.compile(f.content);
                                                     f.preview = tplPre(allModuleData);
                                                 } catch (e) {
+                                                    console.error(e);
                                                     showErrorFlag();
                                                     showError(f.file + ':模板错误');
                                                     Ext.getBody().unmask();
@@ -716,6 +723,7 @@ Ext.application({
                                                 try {
                                                     f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').replace(/\$/g, '\\\$').replace(/\`/g, '\\\`')}\`;` + f.content);
                                                 } catch (e) {
+                                                    console.error(e);
                                                     showError(e);
                                                     showErrorFlag();
                                                     Ext.getBody().unmask();
@@ -810,11 +818,13 @@ Ext.application({
                                                             showToast('[info] 创建后JS脚本执行成功');
                                                             Ext.getBody().unmask();
                                                         }).catch(e => {
+                                                            console.error(e);
                                                             showError(e);
                                                             showErrorFlag();
                                                             Ext.getBody().unmask();
                                                         });
                                                     } catch (e) {
+                                                        console.error(e);
                                                         showError(e);
                                                         showErrorFlag();
                                                         Ext.getBody().unmask();
@@ -839,7 +849,7 @@ Ext.application({
                             listeners: {
                                 click: function () {
                                     if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                        showToast('[warn] 请先选择或创建一个模板!');
+                                        showToast('请先[选择模板]或[创建模板]!');
                                         return;
                                     }
                                     addbutton('after-shell', 'after-shell', './images/shell.png', 'JS脚本', {pId: pId});
@@ -1029,6 +1039,7 @@ Ext.application({
         try {
             eval(geFileData.getSwig(pId));
         } catch (e) {
+            console.error(e);
             showError(e);
         }
         ipcRenderer.send('loading-msg', '历史加载中...');
@@ -1116,4 +1127,21 @@ function showConfirm(msg, fn, dom, icon) {
     };
     if (dom !== undefined) options.animateTarget = dom;
     Ext.MessageBox.show(options).focus();
+}
+
+function doSomeThing(text) {
+    switch (text) {
+        case '[选择模板]': {
+            Ext.getCmp('main-change-module').getEl().dom.click();
+            break;
+        }
+        case '[创建模板]': {
+            Ext.getCmp('main-create-module').getEl().dom.click();
+            break;
+        }
+        case '[查看详情]': {
+            openSome({id: 'logger', title: '系统日志', type: 'logger'});
+            break;
+        }
+    }
 }

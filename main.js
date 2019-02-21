@@ -89,6 +89,13 @@ function createMainWindow() {
                     }
                 },
                 {
+                    label: '系统日志',
+                    click() {
+                        let code = `openSome({id:'logger',title:'系统日志',type:'logger'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                },
+                {
                     label: '重新启动',
                     click() {
                         app.relaunch();
