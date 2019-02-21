@@ -25,5 +25,8 @@ module.exports = {
     },
     readValue() {
         return fs.readFileSync(help.getDataPath() + 'log.log', 'utf8');
+    },
+    clear() {
+        fs.writeFileSync(filePath, '');
     }
 };
