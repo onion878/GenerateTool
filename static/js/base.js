@@ -946,7 +946,7 @@ ipc.on('runNode', (event, message) => {
 });
 
 ipc.on('runNodeErr', (event, message) => {
-    // closeNodeWin();
+    closeNodeWin();
     showError('[error] 出现了错误, 请检查您的脚本, 错误信息如下:');
     showError('[error] ' + JSON.stringify(message));
     showToast('查看完整日志: [查看详情]');
