@@ -2,8 +2,12 @@ const help = require('./help');
 const fs = require('fs');
 const log4js = require('log4js');
 const filePath = help.getDataPath() + 'log.log';
-if (fs.statSync(filePath).size > 50000) {
-    fs.writeFileSync(filePath, '');
+try {
+    if (fs.statSync(filePath).size > 50000) {
+        fs.writeFileSync(filePath, '');
+    }
+} catch (e) {
+
 }
 log4js.configure({
     appenders: {cheese: {type: 'file', filename: filePath}, console: {type: 'console'}},
