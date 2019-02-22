@@ -49,7 +49,7 @@ Ext.define('OnionSpace.controller.Templet', {
     },
     copyModule: function (dom) {
         Ext.create('Ext.window.Window', {
-            title: '选择模板',
+            title: '复制模板',
             width: 400,
             layout: 'fit',
             fixed: true,
@@ -67,7 +67,7 @@ Ext.define('OnionSpace.controller.Templet', {
                 items: [
                     {
                         xtype: 'combobox',
-                        fieldLabel: '模板名称',
+                        fieldLabel: '选择模板',
                         margin: '10',
                         labelWidth: 60,
                         store: {
