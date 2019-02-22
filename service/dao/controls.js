@@ -124,12 +124,9 @@ class Controls {
     }
 
     removeAll(pId) {
-        const oldExt = con.get('ext').filter({pId: pId}).value();
-        oldExt.forEach(e => {
-            con.get('code')
-                .remove({id: e.id, pId: help.getPid()})
-                .write();
-        });
+        con.get('code')
+            .remove({pId: pId})
+            .write();
         con.get('ext')
             .remove({pId: pId})
             .write();
