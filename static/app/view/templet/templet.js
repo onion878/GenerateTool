@@ -8,9 +8,14 @@ Ext.define('OnionSpace.view.templet.templet', {
         action: 'refreshGrid'
     }, {
         xtype: 'button',
-        text: '导入',
-        icon: 'images/coins_add.png',
+        text: '导入模板',
+        icon: 'images/import.png',
         action: 'importModule'
+    }, {
+        xtype: 'button',
+        text: '复制模板',
+        icon: 'images/copy.png',
+        action: 'copyModule'
     }],
     initComponent: function () {
         const pId = this.pId;
@@ -80,13 +85,23 @@ Ext.define('OnionSpace.view.templet.templet', {
                             text: '删除',
                             handler: function (btn) {
                                 const data = btn.up().getWidgetRecord().getData();
-                                showConfirm(`是否删除模板[${data.text}]?`, function (text) {
+                                let msg = `是否删除模板[${data.text}]?`, flag = false;
+                                if (data.id == history.getMode()) {
+                                    flag = true;
+                                    msg = `删除当前模板[${data.text}]系统会重新启动,是否继续?`;
+                                }
+                                showConfirm(msg, function (text) {
                                     jsCode.removeModule(data.id);
                                     btn.up('templet').getStore().setData(parentData.getAll());
-                                    if(data.id == history.getMode()) {
+                                    if (flag) {
                                         history.setMode('');
+                                        history.removeAll();
+                                        const {app} = require('electron').remote;
+                                        app.relaunch();
+                                        app.exit(0);
+                                    } else {
+                                        showToast('[info] 删除成功!');
                                     }
-                                    showToast('删除成功请重载界面!');
                                 }, this, Ext.MessageBox.ERROR);
                             }
                         }

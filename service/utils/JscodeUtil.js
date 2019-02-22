@@ -81,8 +81,15 @@ class JscodeUtil {
                 }
                 data.push(d);
             });
-        } catch (e) {}
+        } catch (e) {
+        }
         return data;
+    }
+
+    deleteFile(file) {
+        del([file], {force: true}).then(paths => {
+            console.log('Deleted files and folders:\n', paths.join('\n'));
+        });
     }
 
     unLinkFile(id, folder) {
@@ -231,7 +238,7 @@ class JscodeUtil {
         return JSON.stringify(data);
     }
 
-    importModule(file) {
+    importModule(file, newName) {
         const unZip = require('decompress');
         const path = help.getDataPath(), that = this;
         return new Promise((resolve, reject) => {
@@ -242,14 +249,31 @@ class JscodeUtil {
                     const controls = data['controls'], file = data['file'], gefile = data['gefile'],
                         mode = data['mode'], modeData = data['modeData'], pack = data['package'];
                     const oldPid = mode.data[0].id;
-                    let pId = that.getNewPid(oldPid);
+                    let pId = that.getNewPid(oldPid), list = {};
+                    if (utils.isEmpty(newName)) {
+                        newName = that.getNewModuleName(mode['data'][0].text, 1);
+                    }
+                    mode['data'][0].text = newName;
                     const modeFolder = dir + '/' + mode.data[0].id;
                     if (!fs.existsSync(modeFolder)) {
-                        controls['ext'].forEach(e => e.pId = pId);
+                        modeData['data'].forEach(e => {
+                            e.pId = pId;
+                            const cId = this.getNewCid(e.id);
+                            list[e.id] = cId;
+                            e.id = cId;
+                        });
+                        controls['ext'].forEach(e => {
+                            e.pId = pId;
+                            e.cId = list[e.cId];
+                        });
+                        controls['code'].forEach(e => {
+                            e.cId = list[e.cId];
+                        });
                         file['data'].forEach(e => e.pId = pId);
                         gefile['data'].forEach(e => e.pId = pId);
+                        gefile['swig'].forEach(e => e.pId = pId);
+                        gefile['shell'].forEach(e => e.pId = pId);
                         mode['data'].forEach(e => e.id = pId);
-                        modeData['data'].forEach(e => e.pId = pId);
                         pack['data'].forEach(e => e.pId = pId);
                         require('../dao/controls.js').addAllData(controls);
                         require('../dao/file.js').addAllData(file);
@@ -262,11 +286,24 @@ class JscodeUtil {
                     } else {
                         fs.rename(modeFolder, `${path}/jscode/${pId}`, (err) => {
                             if (err) throw err;
-                            controls['ext'].forEach(e => e.pId = pId);
+                            modeData['data'].forEach(e => {
+                                e.pId = pId;
+                                const cId = this.getNewCid(e.id);
+                                list[e.id] = cId;
+                                e.id = cId;
+                            });
+                            controls['ext'].forEach(e => {
+                                e.pId = pId;
+                                e.cId = list[e.cId];
+                            });
+                            controls['code'].forEach(e => {
+                                e.cId = list[e.cId];
+                            });
                             file['data'].forEach(e => e.pId = pId);
                             gefile['data'].forEach(e => e.pId = pId);
+                            gefile['swig'].forEach(e => e.pId = pId);
+                            gefile['shell'].forEach(e => e.pId = pId);
                             mode['data'].forEach(e => e.id = pId);
-                            modeData['data'].forEach(e => e.pId = pId);
                             pack['data'].forEach(e => e.pId = pId);
                             require('../dao/controls.js').addAllData(controls);
                             require('../dao/file.js').addAllData(file);
@@ -285,6 +322,25 @@ class JscodeUtil {
         });
     }
 
+    getNewModuleName(name, total) {
+        const modules = require('../dao/mode.js').getAll(), that = this;
+        let flag = false;
+        modules.forEach(({text}) => {
+            if (name.trim() == text.trim()) {
+                flag = true;
+            }
+        });
+        if (flag) {
+            if (total > 1) {
+                name = name.replace('(' + (total - 1) + ')', '(' + total + ')');
+            } else {
+                name = name + '(' + total + ')';
+            }
+            return that.getNewModuleName(name, total + 1);
+        }
+        return name;
+    }
+
     getNewPid(pId) {
         const modules = require('../dao/mode.js').getAll(), that = this;
         modules.some(({id}) => {
@@ -297,6 +353,18 @@ class JscodeUtil {
         return pId;
     }
 
+    getNewCid(cId) {
+        const modules = require('../dao/modeData.js').getAll(), that = this;
+        modules.some(({id}) => {
+            if (id == cId) {
+                cId = utils.getUUID();
+                that.getNewCid(cId);
+                return true;
+            }
+        });
+        return cId;
+    }
+
     removeModule(pId) {
         require('../dao/controls.js').removeAll(pId);
         require('../dao/file.js').removeAll(pId);
@@ -305,7 +373,7 @@ class JscodeUtil {
         require('../dao/modeData.js').removeAll(pId);
         require('../dao/package.js').removeAll(pId);
         const path = help.getDataPath();
-        del([`${path}/jscode/${pId}`], {force: true});
+        del([`${path}jscode/${pId}`], {force: true});
     }
 
     initFile(pId) {

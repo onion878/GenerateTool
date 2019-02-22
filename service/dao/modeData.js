@@ -21,6 +21,10 @@ class ModeData {
         return mdb.get('data').filter({pId: pId}).value();
     }
 
+    getAll() {
+        return mdb.get('data').value();
+    }
+
     getById(id) {
         return mdb.get('data').find({id: id}).value();
     }
