@@ -285,7 +285,6 @@ class JscodeUtil {
                         resolve(`[${mode.data[0].text}]导入成功!`);
                     } else {
                         fs.rename(modeFolder, `${path}/jscode/${pId}`, (err) => {
-                            if (err) throw err;
                             modeData['data'].forEach(e => {
                                 e.pId = pId;
                                 const cId = this.getNewCid(e.id);
@@ -343,25 +342,33 @@ class JscodeUtil {
 
     getNewPid(pId) {
         const modules = require('../dao/mode.js').getAll(), that = this;
+        let flag = false;
         modules.some(({id}) => {
             if (id == pId) {
-                pId = utils.getUUID();
-                that.getNewPid(pId);
+                flag = true;
                 return true;
             }
         });
+        if (flag) {
+            pId = utils.getUUID();
+            return that.getNewPid(pId);
+        }
         return pId;
     }
 
     getNewCid(cId) {
         const modules = require('../dao/modeData.js').getAll(), that = this;
+        let flag = false;
         modules.some(({id}) => {
             if (id == cId) {
-                cId = utils.getUUID();
-                that.getNewCid(cId);
+                flag = true;
                 return true;
             }
         });
+        if (flag) {
+            cId = utils.getUUID();
+            return that.getNewCid(cId);
+        }
         return cId;
     }
 
