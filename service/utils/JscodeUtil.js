@@ -268,6 +268,7 @@ class JscodeUtil {
                         });
                         controls['code'].forEach(e => {
                             e.cId = list[e.cId];
+                            e.pId = pId;
                         });
                         file['data'].forEach(e => e.pId = pId);
                         gefile['data'].forEach(e => e.pId = pId);
@@ -297,6 +298,7 @@ class JscodeUtil {
                             });
                             controls['code'].forEach(e => {
                                 e.cId = list[e.cId];
+                                e.pId = pId;
                             });
                             file['data'].forEach(e => e.pId = pId);
                             gefile['data'].forEach(e => e.pId = pId);
@@ -380,7 +382,11 @@ class JscodeUtil {
         require('../dao/modeData.js').removeAll(pId);
         require('../dao/package.js').removeAll(pId);
         const path = help.getDataPath();
-        del([`${path}jscode/${pId}`], {force: true});
+        return new Promise((resolve, reject) => {
+            del([`${path}jscode/${pId}`], {force: true}).then((p) => {
+                resolve(p);
+            }).catch(e => reject(e));
+        });
     }
 
     initFile(pId) {

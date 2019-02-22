@@ -26,11 +26,11 @@ class ModeData {
     }
 
     getById(id) {
-        return mdb.get('data').find({id: id}).value();
+        return mdb.get('data').find({id: id, pId: help.getPid()}).value();
     }
 
     removeById(id) {
-        mdb.get('data').remove({id: id}).write();
+        mdb.get('data').remove({id: id, pId: help.getPid()}).write();
     }
 
     removeByPId(pId) {

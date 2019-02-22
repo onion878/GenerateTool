@@ -16,7 +16,7 @@ class Package {
     }
 
     add(data) {
-        const val = db.get('data').filter({name: data.name}).value();
+        const val = db.get('data').filter({name: data.name, pId: help.getPid()}).value();
         if (val.length == 0) {
             data.id = utils.getUUID();
             db.get('data')
@@ -25,7 +25,7 @@ class Package {
         } else {
             data.id = val[0].id;
             db.get('data')
-                .remove({id: data.id})
+                .remove({id: data.id, pId: help.getPid()})
                 .write();
             db.get('data')
                 .push(data)

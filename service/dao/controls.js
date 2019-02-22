@@ -20,62 +20,63 @@ class Controls {
 
     removeExt(id) {
         con.get('ext')
-            .remove({id: id})
+            .remove({id: id, pId: help.getPid()})
             .write();
     }
 
     setExtLabel(id, label) {
         con.get('ext')
-            .find({id: id})
+            .find({id: id, pId: help.getPid()})
             .set('label', label)
             .write();
     }
 
     getExt(id) {
-        return con.get('ext').filter({cId: id}).value();
+        return con.get('ext').filter({cId: id, pId: help.getPid()}).value();
     }
 
     getExtById(id) {
-        return con.get('ext').filter({id: id}).value();
+        return con.get('ext').filter({id: id, pId: help.getPid()}).value();
     }
 
     setDataValue(id, value) {
         if (value == undefined || value == null) value = '';
         con.get('ext')
-            .find({id: id})
+            .find({id: id, pId: help.getPid()})
             .set('data', value)
             .write();
     }
 
     setCode(id, val, cId) {
         const d = con.get('code')
-            .find({id: id})
+            .find({id: id, pId: help.getPid()})
             .value();
         if (d == undefined || d == null) {
             con.get('code')
-                .push({id: id, value: val, cId: cId})
+                .push({id: id, value: val, cId: cId, pId: help.getPid()})
                 .write();
         } else {
             con.get('code')
-                .find({id: id})
+                .find({id: id, pId: help.getPid()})
                 .set('value', val)
                 .set('cId', cId)
+                .set('pId', help.getPid())
                 .write();
         }
     }
 
     removeCode(id) {
         con.get('code')
-            .remove({id: id})
+            .remove({id: id, pId: help.getPid()})
             .write();
     }
 
     getCode(id) {
-        return con.get('code').find({id: id}).value();
+        return con.get('code').find({id: id, pId: help.getPid()}).value();
     }
 
     getAllCode(cId) {
-        return con.get('code').filter({cId: cId}).value();
+        return con.get('code').filter({cId: cId, pId: help.getPid()}).value();
     }
 
     //获取当前设置的控件数据集
@@ -105,7 +106,7 @@ class Controls {
     }
 
     getCodeById(id) {
-        return con.get('code').find({id: id}).value();
+        return con.get('code').find({id: id, pId: help.getPid()}).value();
     }
 
     addAllData({ext, code}) {
@@ -122,7 +123,7 @@ class Controls {
         const oldExt = con.get('ext').filter({pId: pId}).value();
         oldExt.forEach(e => {
             con.get('code')
-                .remove({id: e.id})
+                .remove({id: e.id, pId: help.getPid()})
                 .write();
         });
         con.get('ext')

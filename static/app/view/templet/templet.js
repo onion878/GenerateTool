@@ -91,17 +91,22 @@ Ext.define('OnionSpace.view.templet.templet', {
                                     msg = `删除当前模板[${data.text}]系统会重新启动,是否继续?`;
                                 }
                                 showConfirm(msg, function (text) {
-                                    jsCode.removeModule(data.id);
-                                    btn.up('templet').getStore().setData(parentData.getAll());
-                                    if (flag) {
-                                        history.setMode('');
-                                        history.removeAll();
-                                        const {app} = require('electron').remote;
-                                        app.relaunch();
-                                        app.exit(0);
-                                    } else {
-                                        showToast('[info] 删除成功!');
-                                    }
+                                    const el = btn.up('templet').getEl();
+                                    el.mask('处理中...');
+                                    jsCode.removeModule(data.id).then(() => {
+                                        btn.up('templet').getStore().setData(parentData.getAll());
+                                        if (flag) {
+                                            history.setMode('');
+                                            history.removeAll();
+                                            el.unmask();
+                                            const {app} = require('electron').remote;
+                                            app.relaunch();
+                                            app.exit(0);
+                                        } else {
+                                            el.unmask();
+                                            showToast('[info] 删除成功!');
+                                        }
+                                    });
                                 }, this, Ext.MessageBox.ERROR);
                             }
                         }

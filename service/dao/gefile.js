@@ -30,7 +30,7 @@ class GeFile {
         const v = this.getOneData(id);
         if (v != undefined) {
             gdb.get('data').find({
-                id: id
+                id: id, pId: help.getPid()
             })
                 .set('content', content)
                 .write();
@@ -51,7 +51,7 @@ class GeFile {
         const v = this.getOneData(id);
         if (v != undefined) {
             gdb.get('data').find({
-                id: id
+                id: id, pId: help.getPid()
             }).set('preview', preview)
                 .write();
         } else {
@@ -69,14 +69,14 @@ class GeFile {
 
     getOneData(id) {
         return gdb.get('data').find({
-            id: id
+            id: id, pId: help.getPid()
         }).value();
     }
 
     removeData(id) {
         gdb.get('data')
             .remove({
-                id: id
+                id: id, pId: help.getPid()
             })
             .write();
     }
@@ -84,7 +84,7 @@ class GeFile {
     updateDataFile(id, file) {
         gdb.get('data')
             .find({
-                id: id
+                id: id, pId: help.getPid()
             })
             .set('file', file)
             .write();

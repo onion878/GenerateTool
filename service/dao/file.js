@@ -26,7 +26,7 @@ class File {
     removeFile(id) {
         fdb.get('data')
             .remove({
-                id: id
+                id: id, pId: help.getPid()
             })
             .write();
     }
@@ -41,7 +41,7 @@ class File {
 
     getFile(id) {
         return fdb.get('data').find({
-            id: id
+            id: id, pId: help.getPid()
         }).value();
     }
 
@@ -61,14 +61,14 @@ class File {
 
     updateRootId(id, rootId) {
         fdb.get('data').find({
-            id: id
+            id: id, pId: help.getPid()
         }).set('rootId', rootId)
             .write()
     }
 
     updateName(id, name) {
         fdb.get('data').find({
-            id: id
+            id: id, pId: help.getPid()
         }).set('text', name)
             .write()
     }
