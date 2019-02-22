@@ -109,6 +109,10 @@ class Controls {
         return con.get('code').find({id: id, pId: help.getPid()}).value();
     }
 
+    getCodeByPid(pId) {
+        return con.get('code').filter({pId: pId}).value();
+    }
+
     addAllData({ext, code}) {
         const oldExt = con.get('ext').value();
         const oldCode = con.get('code').value();

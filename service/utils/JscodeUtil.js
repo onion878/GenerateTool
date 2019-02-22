@@ -215,14 +215,7 @@ class JscodeUtil {
         const controls = require('../dao/controls.js');
         const controlsData = controls.getExtByPid(id);
         data.controls['ext'] = controlsData;
-        const controlsDataCode = [];
-        controlsData.forEach(c => {
-            const code = controls.getCodeById(c.id);
-            if (code != undefined) {
-                controlsDataCode.push(code);
-            }
-        });
-        data.controls['code'] = controlsDataCode;
+        data.controls['code'] = controls.getCodeByPid(id);
         const file = require('../dao/file.js');
         data.file['data'] = file.getExportData(id);
         const gefile = require('../dao/gefile.js');
@@ -285,6 +278,7 @@ class JscodeUtil {
                         del([dir], {force: true});
                         resolve(`[${mode.data[0].text}]导入成功!`);
                     } else {
+                        console.log(controls['code']);
                         fs.rename(modeFolder, `${path}/jscode/${pId}`, (err) => {
                             modeData['data'].forEach(e => {
                                 e.pId = pId;
