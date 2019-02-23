@@ -140,7 +140,12 @@ Ext.application({
                                     xtype: 'editor',
                                     pId: pId
                                 },
-                                buttonAlign: 'center'
+                                buttonAlign: 'center',
+                                listeners: {
+                                    close: function () {
+                                        command.destroy();
+                                    }
+                                }
                             }).show().focus();
                         }
                     }

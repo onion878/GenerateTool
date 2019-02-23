@@ -118,6 +118,16 @@ class Commands {
     write(shell) {
         this.nowPty.write(shell + "\r");
     }
+
+    destroy() {
+        if (this.nowPty != null) {
+            this.nowPty.destroy();
+            this.nowPty = null;
+            this.term = null;
+            this.systemCmd = false;
+            this.workFlag = false;
+        }
+    }
 }
 
 module.exports = new Commands();

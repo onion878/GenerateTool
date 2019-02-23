@@ -349,6 +349,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                     command.init(document.getElementById('term')).then((pty, xterm) => {
                         that.status = false;
                         const folder = jsCode.getFolder(that.pId);
+                        console.log(folder);
                         command.cdTargetFolder(folder);
                     });
                 } else {
