@@ -1,6 +1,6 @@
 # 代码构建工具
 
-
+![截图](https://generate-docs.netlify.com/screen.png)
 ##用处
 
 一个用来自定义模板并生成代码的工具。<br>
