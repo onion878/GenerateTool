@@ -48,9 +48,9 @@ Ext.define('OnionSpace.view.code.code', {
             document.getElementById('terminal-btn').click();
             const folder = jsCode.getFolder(pId);
             command.cdTargetFolder(folder);
-            command.write('node ' + file);
+            command.write(`node -e "console.log(require('./${file}'))"`);
         } else {
-            command.write('node ' + file);
+            command.write(`node -e "console.log(require('./${file}'))"`);
         }
     }
 });
