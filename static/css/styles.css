@@ -154,7 +154,7 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: calc(100% - 90px);
+    width: calc(100% - 160px);
 }
 
 .states-toolbar a.active {

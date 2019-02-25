@@ -2,15 +2,14 @@ Ext.define('OnionSpace.view.editor.editor', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.editor',
     viewModel: true,
-    layout: 'border',
     listeners: {
         render: function (c) {
-            const tPanel = this.down('tabpanel');
-            history.getCode().forEach(c => {
-                tPanel.add(c);
-            });
-            tPanel.setActiveTab(history.getShowCodeTab());
-            jsCode.initFile(this.pId);
+            if (utils.isEmpty(this.pId)) {
+                showToast('请先[选择模板]或[创建模板]!');
+            } else {
+                jsCode.createFolder(this.pId);
+                jsCode.initFile(this.pId);
+            }
         }
     },
     initComponent: function () {
@@ -23,12 +22,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                 r.icon = './icons/folder-core.svg';
             }
         });
-        this.items = [{
-            region: 'west',
-            split: true,
-            width: 220,
-            minWidth: 160,
-            maxWidth: 400,
+        this.items = {
             margins: '0 0 0 0',
             xtype: 'treepanel',
             useArrows: true,
@@ -89,7 +83,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                     if (record.data.type == 'file') {
                         if (record.data.parentId == 'root' && (record.data.text == 'data.js' || record.data.text == 'package.json')) return;
                         const {file, content} = jsCode.readFile(pId, record.data.parentFolder);
-                        const tPanel = this.up('editor').down('tabpanel');
+                        const tPanel = Ext.getCmp('mainmenutab');
                         const id = record.data.parentFolder;
                         const nowItem = Ext.getCmp(id);
                         if (nowItem) {
@@ -103,6 +97,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                 fileContent: content,
                                 closable: true,
                                 icon: getFileIcon(file),
+                                useType: 'editor',
                                 xtype: 'code'
                             };
                             const jTab = tPanel.add(data);
@@ -127,7 +122,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                             child.icon = getFileIcon(text);
                                             const root = that.getRootNode();
                                             root.appendChild(child);
-                                        });
+                                        }, item);
                                     }
                                 },
                                 {
@@ -139,7 +134,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                             child.icon = './icons/folder-core.svg';
                                             const root = that.getRootNode();
                                             root.appendChild(child);
-                                        });
+                                        }, item);
                                     }
                                 },
                                 {
@@ -147,7 +142,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                     icon: 'images/npm.jpg',
                                     handler: function () {
                                         const nowItem = Ext.getCmp('pkg-main');
-                                        const tPanel = that.up('editor').down('tabpanel');
+                                        const tPanel = Ext.getCmp('mainmenutab');
                                         if (nowItem) {
                                             tPanel.setActiveTab(nowItem);
                                         } else {
@@ -157,6 +152,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                                 title: '安装包',
                                                 closable: true,
                                                 icon: './images/npm.jpg',
+                                                useType: 'editor',
                                                 xtype: 'pkg'
                                             };
                                             const jTab = tPanel.add(data);
@@ -170,7 +166,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                     icon: 'images/npm.jpg',
                                     handler: function () {
                                         const nowItem = Ext.getCmp('unpkg-main');
-                                        const tPanel = that.up('editor').down('tabpanel');
+                                        const tPanel = Ext.getCmp('mainmenutab');
                                         if (nowItem) {
                                             tPanel.setActiveTab(nowItem);
                                         } else {
@@ -179,6 +175,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                                 pId: pId,
                                                 title: '管理包',
                                                 closable: true,
+                                                useType: 'editor',
                                                 icon: './images/npm.jpg',
                                                 xtype: 'unpkg'
                                             };
@@ -217,7 +214,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                             child.icon = getFileIcon(text);
                                             r.appendChild(child);
                                         }
-                                    });
+                                    }, item);
                                 }
                             },
                             {
@@ -235,7 +232,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                             child.icon = './icons/folder-core.svg';
                                             r.appendChild(child);
                                         }
-                                    });
+                                    }, item);
                                 }
                             },
                             {
@@ -249,8 +246,10 @@ Ext.define('OnionSpace.view.editor.editor', {
                                         value: record.data.text,
                                         buttons: Ext.MessageBox.OKCANCEL,
                                         scope: this,
+                                        animateTarget: item,
                                         fn: function (btn, text) {
                                             if (btn === 'ok') {
+                                                Ext.getCmp('mainmenutab').remove(record.data.parentFolder);
                                                 jsCode.reName(pId, record.data.text, text, record.parentNode.data.parentFolder);
                                                 record.set('text', text);
                                                 let parentFolder = record.parentNode.data.parentFolder;
@@ -276,95 +275,12 @@ Ext.define('OnionSpace.view.editor.editor', {
                                             jsCode.unLinkFile(pId, record.data.parentFolder);
                                         }
                                         record.parentNode.removeChild(record);
-                                    });
+                                        Ext.getCmp('mainmenutab').remove(record.data.parentFolder);
+                                    }, item, Ext.MessageBox.ERROR);
                                 }
                             }
                         ]
                     }).showAt(event.getPoint());
-                }
-            }
-        }, {
-            region: 'center',
-            xtype: 'tabpanel',
-            fullscreen: true,
-            plugins: new Ext.ux.TabCloseMenu(),
-            listeners: {
-                tabchange: function (tabPanel, tab) {
-                    history.setShowCodeTab(tab.id);
-                },
-                remove: function (tabPanel, tab) {
-                    history.removeCodeTab(tab.config.id);
-                }
-            }
-        }, {
-            region: 'south',
-            split: true,
-            height: 100,
-            minSize: 100,
-            maxSize: 200,
-            id: 'terminal',
-            collapsible: false,
-            collapsed: false,
-            hidden: true,
-            html: `<div style="background: white;overflow: hidden;" id="term"></div>`,
-            margins: '0 0 0 0',
-            listeners: {
-                resize: function (el) {
-                    document.getElementById('term').style.height = document.getElementById('terminal-body').style.height;
-                    command.fitTerm();
-                }
-            },
-            tbar: {
-                xtype: 'statusbar',
-                pId: pId,
-                float: 'right',
-                list: [
-                    {img: './images/stop.png', name: 'Stop'},
-                    {img: './images/delete.png', name: 'Clear'}
-                ],
-                click: function (s, d, n) {
-                    if (n == 'Clear') {
-                        command.clearTerm();
-                    } else {
-                        command.cancelPty();
-                    }
-                }
-            }
-        }];
-
-        this.bbar = {
-            xtype: 'statusbar',
-            pId: pId,
-            list: [{id: 'terminal-btn', img: './images/terminal.png', name: 'Terminal'}],
-            float: 'left',
-            status: false,
-            flagShow: false,
-            flagInit: false,
-            click: function (that, dom) {
-                if (!that.status && !that.flagInit) {
-                    that.status = true;
-                    Ext.getCmp('terminal').show();
-                    that.flagShow = true;
-                    that.flagInit = true;
-                    command.init(document.getElementById('term')).then((pty, xterm) => {
-                        that.status = false;
-                        const folder = jsCode.getFolder(that.pId);
-                        console.log(folder);
-                        command.cdTargetFolder(folder);
-                    });
-                } else {
-                    if (that.flagShow) {
-                        Ext.getCmp('terminal').hide();
-                        that.flagShow = false;
-                    } else {
-                        Ext.getCmp('terminal').show();
-                        that.flagShow = true;
-                    }
-                }
-                if (that.flagShow) {
-                    dom.className = "active";
-                } else {
-                    dom.className = "";
                 }
             }
         };

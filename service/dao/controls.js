@@ -1,5 +1,6 @@
 const help = require('../utils/help');
 const low = require('lowdb');
+const fs = require('fs');
 const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync(help.getDataPath() + 'data/controls.json');
 const con = low(adapter);
@@ -16,12 +17,14 @@ class Controls {
         con.get('ext')
             .push(data)
             .write();
+        this.changeData();
     }
 
     removeExt(id) {
         con.get('ext')
             .remove({id: id, pId: help.getPid()})
             .write();
+        this.changeData();
     }
 
     setExtLabel(id, label) {
@@ -29,6 +32,7 @@ class Controls {
             .find({id: id, pId: help.getPid()})
             .set('label', label)
             .write();
+        this.changeData();
     }
 
     getExt(id) {
@@ -45,6 +49,7 @@ class Controls {
             .find({id: id, pId: help.getPid()})
             .set('data', value)
             .write();
+        this.changeData();
     }
 
     setCode(id, val, cId) {
@@ -63,12 +68,14 @@ class Controls {
                 .set('pId', help.getPid())
                 .write();
         }
+        this.changeData();
     }
 
     removeCode(id) {
         con.get('code')
             .remove({id: id, pId: help.getPid()})
             .write();
+        this.changeData();
     }
 
     getCode(id) {
@@ -130,6 +137,13 @@ class Controls {
         con.get('ext')
             .remove({pId: pId})
             .write();
+        this.changeData();
+    }
+
+    changeData() {
+        const pId = help.getPid();
+        const path = help.getDataPath() + 'jscode/' + pId;
+        fs.writeFileSync(path + '/data.js', 'let data=' + JSON.stringify(this.getModuleData(pId)) + ';try {data = getAllData();}catch (e) {}module.exports = data;', 'utf8');
     }
 }
 

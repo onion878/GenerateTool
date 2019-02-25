@@ -106,7 +106,7 @@ class Commands {
     }
 
     cdTargetFolder(folder) {
-        if (this.workFlag) return;
+        if (this.nowPty == null) return;
         if (this.systemCmd) {
             this.nowPty.write(`cd /d ${folder}\r`);
         } else {

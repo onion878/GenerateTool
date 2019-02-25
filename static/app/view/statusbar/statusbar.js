@@ -34,12 +34,16 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
             if(that.msg) {
                 child = child + '<div class="status-msg"></div>';
             }
-            c.el.dom.querySelector('.states-toolbar').innerHTML = child;
+            const main = c.el.dom.querySelector('.states-toolbar');
+            main.innerHTML = child;
+            if(that.dock == 'left') {
+                main.style.transform = 'rotate(90deg)';
+            }
             that.infoPanel = Ext.get(c.el.dom).query('.status-msg')[0];
             const btn = Ext.get(c.el.dom).query('a');
             that.list.forEach((l, i) => {
                 btn[i].addEventListener("click", function (dom) {
-                    if (changeFlag) {
+                    if (changeFlag || that.toggle) {
                         that.changeCls(btn, this);
                     }
                     that.click(that, this, l.name);

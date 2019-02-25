@@ -23,7 +23,7 @@ Ext.define('OnionSpace.controller.Mode', {
         const data = controlData.getExt(panel.id),
             that = this;
         data.forEach(d => {
-            panel.add(Ext.create(that.getDataModule(d.content, d.type, d.label, d.id, d.data)));
+            panel.add(that.getDataModule(d.content, d.type, d.label, d.id, d.data));
         });
     },
     add: function (btn) {
@@ -108,7 +108,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         listeners: {
                             select: function (combo, record) {
                                 if (record.id == 'minicode') {
-                                    this.up('form').add(Ext.create({
+                                    this.up('form').add({
                                         xtype: 'combobox',
                                         id: 'combo-language',
                                         fieldLabel: '语言',
@@ -123,7 +123,7 @@ Ext.define('OnionSpace.controller.Mode', {
                                         displayField: 'text',
                                         valueField: 'id',
                                         allowBlank: false
-                                    }));
+                                    });
                                 } else {
                                     const dom = Ext.getCmp('combo-language');
                                     if (dom != undefined) {
@@ -150,7 +150,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         if (moduleData[name] != undefined) {
                             showToast(`已存在[${name}]!`);
                         } else {
-                            btn.up('panel').add(Ext.create(that.getComponent(type, name, id, language)));
+                            btn.up('panel').add(that.getComponent(type, name, id, language));
                             const d = {};
                             if (type == 'json') {
                                 d[name] = `JSON: ${name}`;
@@ -598,7 +598,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         const panel = btn.up('mode');
                         panel.removeAll();
                         sortData.forEach(d => {
-                            panel.add(Ext.create(that.getDataModule(d.content, d.type, d.label, d.id, d.data)));
+                            panel.add(that.getDataModule(d.content, d.type, d.label, d.id, d.data));
                         });
                         this.up('window').close();
                     }
