@@ -644,27 +644,28 @@ Ext.application({
                                                             pack: 'start',
                                                             align: 'stretch'
                                                         },
-                                                        items: [{
-                                                            xtype: 'textfield',
-                                                            fieldLabel: '文件',
-                                                            margin: '10',
-                                                            emptyText: '如:{{folder}}/{{file.mapper}}',
-                                                            labelWidth: 45,
-                                                            name: 'file',
-                                                            value: file,
-                                                            listeners: {
-                                                                change: function (dom, val) {
-                                                                    let output = val;
-                                                                    try {
-                                                                        const tpl = swig.compile(val);
-                                                                        output = tpl(controlData.getModuleData(pId));
-                                                                    } catch (e) {
-                                                                        console.error(e);
+                                                        items: [
+                                                            {
+                                                                xtype: 'textfield',
+                                                                fieldLabel: '文件',
+                                                                margin: '10',
+                                                                emptyText: '如:{{folder}}/{{file.mapper}}',
+                                                                labelWidth: 45,
+                                                                name: 'file',
+                                                                value: file,
+                                                                listeners: {
+                                                                    change: function (dom, val) {
+                                                                        let output = val;
+                                                                        try {
+                                                                            const tpl = swig.compile(val);
+                                                                            output = tpl(controlData.getModuleData(pId));
+                                                                        } catch (e) {
+                                                                            console.error(e);
+                                                                        }
+                                                                        this.up('form').down('textareafield').setValue(output);
                                                                     }
-                                                                    this.up('form').down('textareafield').setValue(output);
                                                                 }
-                                                            }
-                                                        },
+                                                            },
                                                             {
                                                                 xtype: 'textareafield',
                                                                 fieldLabel: '预览',
@@ -698,7 +699,7 @@ Ext.application({
                                             }
                                         },
                                         {
-                                            text: '修改',
+                                            text: '重命名',
                                             icon: 'images/edit.svg',
                                             handler: function () {
                                                 showPrompt('名称', '', function (val) {
