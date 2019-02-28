@@ -274,7 +274,9 @@ Ext.application({
                                                 this.up('window').close();
                                                 const root = Ext.getCmp('panel-model').getRootNode();
                                                 root.removeAll();
-                                                root.appendChild(data.getData(pId));
+                                                const list = data.getData(pId);
+                                                list.forEach(d => d.icon = './images/database_save.svg');
+                                                root.appendChild(list);
                                                 history.removeAll();
                                                 Ext.getCmp('panel-model').setTitle(row.data.text);
                                                 Ext.getCmp('mainmenutab').removeAll();
