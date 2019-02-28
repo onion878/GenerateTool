@@ -201,7 +201,7 @@ Ext.application({
                                     minWidth: 60,
                                     items: [{
                                         text: '删除',
-                                        icon: 'images/cancel.svg',
+                                        icon: 'images/cross.svg',
                                         handler: function () {
                                             showConfirm(`是否删除模板[${record.data.text}]?`, function (text) {
                                                 data.removeById(record.data.id);
