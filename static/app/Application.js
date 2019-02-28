@@ -39,10 +39,12 @@ Ext.application({
         ipcRenderer.send('loading-msg', '模块加载中...');
         let pId = history.getMode();
         moduleId = pId;
+        const datas = data.getData(pId);
+        datas.forEach(d => d.icon = './images/database_save.svg');
         let store = Ext.create('Ext.data.TreeStore', {
             root: {
                 expanded: true,
-                children: data.getData(pId)
+                children: datas
             }
         });
         let fileStore = Ext.create('Ext.data.TreeStore', {
@@ -431,7 +433,9 @@ Ext.application({
                                                     this.up('window').close();
                                                     const root = Ext.getCmp('panel-model').getRootNode();
                                                     root.removeAll();
-                                                    root.appendChild(data.getData(pId));
+                                                    const list = data.getData(pId);
+                                                    list.forEach(d => d.icon = './images/database_save.svg');
+                                                    root.appendChild(list);
                                                 }
                                             }, {
                                                 text: '取消',
