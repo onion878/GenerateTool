@@ -4,17 +4,17 @@ Ext.define('OnionSpace.view.unpkg.unpkg', {
     tbar: [{
         xtype: 'button',
         text: '删除',
-        icon: 'images/delete.png',
+        icon: 'images/cross.svg',
         action: 'deletePkg'
     }, {
         xtype: 'button',
         text: '刷新',
-        icon: 'images/arrow_refresh_small.png',
+        icon: 'images/refresh.svg',
         action: 'refresh'
     }, {
         xtype: 'button',
         text: '安装所有',
-        icon: 'images/coins_add.png',
+        icon: 'images/data-add.svg',
         action: 'installAll'
     }],
     selType: 'checkboxmodel',
@@ -37,7 +37,7 @@ Ext.define('OnionSpace.view.unpkg.unpkg', {
                 sortable: false,
                 align: 'center',
                 items: [{
-                    icon: 'images/delete.png',
+                    icon: 'images/cross.svg',
                     tooltip: '删除',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         showConfirm(`是否删除包[${data.name}@${data.version}]?`, function (text) {
@@ -49,7 +49,7 @@ Ext.define('OnionSpace.view.unpkg.unpkg', {
                         }, this, Ext.MessageBox.ERROR);
                     }
                 }, {
-                    icon: 'images/coins_add.png',
+                    icon: 'images/data-add.svg',
                     tooltip: '安装最新版',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         Ext.toast({

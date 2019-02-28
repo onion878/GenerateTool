@@ -115,7 +115,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                             items: [
                                 {
                                     text: '新建文件',
-                                    icon: 'images/add.png',
+                                    icon: 'images/add.svg',
                                     handler: function () {
                                         showPrompt('文件名', '', function (text) {
                                             const child = jsCode.createFile(that.up('editor').pId, text);
@@ -127,7 +127,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                 },
                                 {
                                     text: '新建文件夹',
-                                    icon: 'images/folder_add.png',
+                                    icon: 'images/folder_add.svg',
                                     handler: function () {
                                         showPrompt('文件夹', '', function (text) {
                                             const child = jsCode.createFolder(that.up('editor').pId, text);
@@ -139,7 +139,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                 },
                                 {
                                     text: '安装包',
-                                    icon: 'images/npm.jpg',
+                                    icon: 'images/npm.svg',
                                     handler: function () {
                                         const nowItem = Ext.getCmp('pkg-main');
                                         const tPanel = Ext.getCmp('mainmenutab');
@@ -151,7 +151,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                                 pId: pId,
                                                 title: '安装包',
                                                 closable: true,
-                                                icon: './images/npm.jpg',
+                                                icon: './images/npm.svg',
                                                 useType: 'editor',
                                                 xtype: 'pkg'
                                             };
@@ -163,7 +163,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                 },
                                 {
                                     text: '管理包',
-                                    icon: 'images/npm.jpg',
+                                    icon: 'images/npm.svg',
                                     handler: function () {
                                         const nowItem = Ext.getCmp('unpkg-main');
                                         const tPanel = Ext.getCmp('mainmenutab');
@@ -176,7 +176,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                                 title: '管理包',
                                                 closable: true,
                                                 useType: 'editor',
-                                                icon: './images/npm.jpg',
+                                                icon: './images/npm.svg',
                                                 xtype: 'unpkg'
                                             };
                                             const jTab = tPanel.add(data);
@@ -187,7 +187,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                 },
                                 {
                                     text: '编辑器打开',
-                                    icon: 'images/script_code.png',
+                                    icon: 'images/javascript.svg',
                                     handler: function () {
                                         utils.openCodeFolder(systemConfig.getConfig('editor'), jsCode.getFolder(pId));
                                     }
@@ -201,7 +201,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                         items: [
                             {
                                 text: '新建文件',
-                                icon: 'images/add.png',
+                                icon: 'images/add.svg',
                                 handler: function () {
                                     showPrompt('文件名', '', function (text) {
                                         if (record.data.type == 'folder') {
@@ -219,7 +219,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                             },
                             {
                                 text: '新建文件夹',
-                                icon: 'images/folder_add.png',
+                                icon: 'images/folder_add.svg',
                                 handler: function () {
                                     showPrompt('文件夹', '', function (text) {
                                         if (record.data.type == 'folder') {
@@ -237,7 +237,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                             },
                             {
                                 text: '重命名',
-                                icon: 'images/arrow_refresh_small.png',
+                                icon: 'images/edit.svg',
                                 handler: function () {
                                     Ext.MessageBox.show({
                                         title: '名称',
@@ -266,7 +266,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                             },
                             {
                                 text: '删除',
-                                icon: 'images/cross.png',
+                                icon: 'images/cross.svg',
                                 handler: function () {
                                     showConfirm(`是否删除[${record.data.text}]?`, function (text) {
                                         if (record.data.type == 'folder') {

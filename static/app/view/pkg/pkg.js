@@ -31,7 +31,7 @@ Ext.define('OnionSpace.view.pkg.pkg', {
                 text: '操作',
                 align: 'center',
                 items: [{
-                    icon: 'images/coins_add.png',
+                    icon: 'images/data-add.svg',
                     tooltip: '安装最新版',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         Ext.toast({
@@ -44,7 +44,7 @@ Ext.define('OnionSpace.view.pkg.pkg', {
                         that.installPkg(pId, data.name);
                     }
                 }, {
-                    icon: 'images/cog_add.png',
+                    icon: 'images/other-database.svg',
                     tooltip: '安装其它版本',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         const el = this.up('pkg').getEl();
@@ -60,7 +60,7 @@ Ext.define('OnionSpace.view.pkg.pkg', {
                         }, this);
                     }
                 }, {
-                    icon: 'images/find.png',
+                    icon: 'images/find.svg',
                     tooltip: '详情',
                     handler: function (view, recIndex, cellIndex, item, e, record) {
                         require("open")(record.data.links.npm);

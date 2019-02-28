@@ -439,7 +439,7 @@ Ext.define('OnionSpace.controller.Mode', {
             },
                 {
                     xtype: 'button',
-                    icon: 'images/script_code.png',
+                    icon: 'images/javascript.svg',
                     tooltip: '从js脚本取值',
                     bId: id,
                     id: id,
@@ -450,7 +450,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 },
                 {
                     xtype: 'button',
-                    icon: 'images/cancel.png',
+                    icon: 'images/cancel.svg',
                     tooltip: '删除',
                     bId: id,
                     handler: function (btn) {

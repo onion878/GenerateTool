@@ -34,7 +34,7 @@ Ext.define('OnionSpace.view.code.code', {
             this.tbar = {
                 xtype: 'statusbar',
                 pId: pId,
-                list: [{img: './images/play_arrow.png', name: 'Run'}],
+                list: [{img: './images/play.svg', name: 'Run'}],
                 float: 'left',
                 click: function (tbar, d) {
                     that.runTest(pId, that.title);

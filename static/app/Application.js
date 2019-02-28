@@ -72,8 +72,8 @@ Ext.application({
                 flagShow: false,
                 flagInit: false,
                 list: [
-                    {img: './images/log.png', name: 'Console'},
-                    {id: 'terminal-btn', img: './images/terminal.png', name: 'Terminal'}
+                    {img: './images/log.svg', name: 'Console'},
+                    {id: 'terminal-btn', img: './images/terminal.svg', name: 'Terminal'}
                 ],
                 click: function (t, dom, name) {
                     if (name == 'Console') {
@@ -136,8 +136,8 @@ Ext.application({
                     pId: pId,
                     float: 'right',
                     list: [
-                        {img: './images/stop.png', name: 'Stop'},
-                        {img: './images/delete.png', name: 'Clear'}
+                        {img: './images/stop.svg', name: 'Stop'},
+                        {img: './images/delete.svg', name: 'Clear'}
                     ],
                     click: function (s, d, n) {
                         if (n == 'Clear') {
@@ -164,7 +164,7 @@ Ext.application({
                     pId: pId,
                     float: 'right',
                     list: [
-                        {img: './images/delete.png', name: 'Clear'}
+                        {img: './images/delete.svg', name: 'Clear'}
                     ],
                     click: function (s, d, n) {
                         Ext.getCmp('console').clear();
@@ -194,14 +194,14 @@ Ext.application({
                                 const item = event.data.id;
                                 const icon = event.data.icon;
                                 const title = event.data.text;
-                                addbutton(item, 'mode', './images/coins_add.png', title, {});
+                                addbutton(item, 'mode', './images/database_save.svg', title, {});
                             },
                             itemcontextmenu: function (node, record, item, index, event, eOpts) {
                                 new Ext.menu.Menu({
                                     minWidth: 60,
                                     items: [{
                                         text: '删除',
-                                        icon: 'images/cancel.png',
+                                        icon: 'images/cancel.svg',
                                         handler: function () {
                                             showConfirm(`是否删除模板[${record.data.text}]?`, function (text) {
                                                 data.removeById(record.data.id);
@@ -512,7 +512,7 @@ Ext.application({
                                     minWidth: 60,
                                     items: [{
                                         text: '添加模板文件',
-                                        icon: 'images/add-file.png',
+                                        icon: 'images/add-file.svg',
                                         hidden: type != 'file' ? false : true,
                                         handler: function () {
                                             Ext.create('Ext.window.Window', {
@@ -600,7 +600,7 @@ Ext.application({
                                     },
                                         {
                                             text: '添加模板文件夹',
-                                            icon: 'images/folder_add.png',
+                                            icon: 'images/folder_add.svg',
                                             hidden: type != 'file' ? false : true,
                                             handler: function () {
                                                 showPrompt('模板文件夹', '', function (val) {
@@ -621,7 +621,7 @@ Ext.application({
                                         {
                                             text: '设置生成路径',
                                             hidden: type == 'file' ? false : true,
-                                            icon: 'images/set-file.png',
+                                            icon: 'images/set-file.svg',
                                             handler: function () {
                                                 const {
                                                     file
@@ -699,7 +699,7 @@ Ext.application({
                                         },
                                         {
                                             text: '修改',
-                                            icon: 'images/table_edit.png',
+                                            icon: 'images/edit.svg',
                                             handler: function () {
                                                 showPrompt('名称', '', function (val) {
                                                     if (val.trim().length > 0) {
@@ -712,7 +712,7 @@ Ext.application({
                                         },
                                         {
                                             text: '删除',
-                                            icon: 'images/cross.png',
+                                            icon: 'images/cross.svg',
                                             handler: function () {
                                                 showConfirm(`是否删除[${record.data.text}]?`, function (text) {
                                                     record.parentNode.removeChild(record);
@@ -826,7 +826,6 @@ Ext.application({
                                         Ext.create('Ext.window.Window', {
                                             title: '生成文件',
                                             fixed: true,
-                                            maxHeight: 500,
                                             width: 500,
                                             layout: 'fit',
                                             resizable: true,
@@ -985,13 +984,13 @@ Ext.application({
                                             items: [
                                                 {
                                                     text: '配置swig',
-                                                    icon: 'images/cog_add.png',
+                                                    icon: 'images/set.svg',
                                                     handler: function () {
                                                         if (pId == undefined || pId == null || pId.trim().length == 0) {
                                                             showToast('请先[选择模板]或[创建模板]!');
                                                             return;
                                                         }
-                                                        addbutton('swig-template', 'swig-template', './images/cog_add.png', 'Swig配置', {});
+                                                        addbutton('swig-template', 'swig-template', './images/set.svg', 'Swig配置', {});
                                                     }
                                                 },
                                                 {

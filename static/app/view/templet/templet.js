@@ -4,17 +4,17 @@ Ext.define('OnionSpace.view.templet.templet', {
     tbar: [{
         xtype: 'button',
         text: '刷新',
-        icon: 'images/arrow_refresh_small.png',
+        icon: 'images/refresh.svg',
         action: 'refreshGrid'
     }, {
         xtype: 'button',
         text: '导入模板',
-        icon: 'images/import.png',
+        icon: 'images/import.svg',
         action: 'importModule'
     }, {
         xtype: 'button',
         text: '复制模板',
-        icon: 'images/copy.png',
+        icon: 'images/copy.svg',
         action: 'copyModule'
     }],
     initComponent: function () {

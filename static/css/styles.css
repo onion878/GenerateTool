@@ -48,52 +48,52 @@ body {
 }
 
 .x-panel-header-default .x-tool-img-add {
-    background-image: url(../images/coins_add.png);
+    background-image: url(../images/data-add.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-tag {
-    background-image: url(../images/tag.png);
+    background-image: url(../images/switch.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-mode {
-    background-image: url(../images/mode.png);
+    background-image: url(../images/mode.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-save {
-    background-image: url(../images/new-module.png);
+    background-image: url(../images/new-module.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-cd-go {
-    background-image: url(../images/cd_go.png);
+    background-image: url(../images/startup.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-add-folder {
-    background-image: url(../images/folder_add.png);
+    background-image: url(../images/folder_add.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-add-file {
-    background-image: url(../images/add-file.png);
+    background-image: url(../images/add-file.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-cog-add {
-    background-image: url(../images/cog_add.png);
+    background-image: url(../images/set.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-osx-terminal {
-    background-image: url(../images/application_osx_terminal.png);
+    background-image: url(../images/terminal.svg);
     background-color: #e0ebf3;
 }
 
 .x-panel-header-default .x-tool-img-more {
-    background-image: url(../images/more.png);
+    background-image: url(../images/more.svg);
     background-color: #e0ebf3;
 }
 
