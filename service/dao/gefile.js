@@ -10,7 +10,8 @@ class GeFile {
         gdb.defaults({
             data: [],
             swig: [],
-            shell: []
+            shell: [],
+            beforeShell: []
         }).write();
     }
 
@@ -111,7 +112,14 @@ class GeFile {
             }).value();
     }
 
-    addAllData({data, swig, shell}) {
+    getFilBeforeShell(pId) {
+        return gdb.get('beforeShell')
+            .filter({
+                pId: pId
+            }).value();
+    }
+
+    addAllData({data, swig, shell, beforeShell}) {
         const oldData = gdb.get('data').value();
         const newData = oldData.concat(data);
         gdb.set('data', newData).write();
@@ -127,6 +135,12 @@ class GeFile {
             });
         } catch (e) {
         }
+        try {
+            beforeShell.forEach(s => {
+                gdb.get('beforeShell').push(s).write();
+            });
+        } catch (e) {
+        }
     }
 
     removeAll(pId) {
@@ -137,6 +151,9 @@ class GeFile {
             .remove({pId: pId})
             .write();
         gdb.get('shell')
+            .remove({pId: pId})
+            .write();
+        gdb.get('beforeShell')
             .remove({pId: pId})
             .write();
     }
@@ -173,6 +190,19 @@ class GeFile {
         return v;
     }
 
+    getBeforeShell(pId) {
+        let v = gdb.get('beforeShell').find({pId: pId}).value();
+        if (v != undefined) {
+            v = v.content;
+        } else {
+            v = '';
+        }
+        if (v == null || v.trim().length == 0) {
+            v = "const {execSync} = require('child_process');\r\n// 获取定义的data\r\nconst data = getAllData();";
+        }
+        return v;
+    }
+
     setShell(pId, content) {
         gdb.get('shell')
             .remove({
@@ -180,6 +210,15 @@ class GeFile {
             })
             .write();
         gdb.get('shell').push({pId: pId, content: content}).write();
+    }
+
+    setBeforeShell(pId, content) {
+        gdb.get('beforeShell')
+            .remove({
+                pId: pId
+            })
+            .write();
+        gdb.get('beforeShell').push({pId: pId, content: content}).write();
     }
 }
 

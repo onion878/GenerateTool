@@ -222,6 +222,7 @@ class JscodeUtil {
         data.gefile['data'] = gefile.getFileData(id);
         data.gefile['swig'] = gefile.getFileSwig(id);
         data.gefile['shell'] = gefile.getFileShell(id);
+        data.gefile['beforeShell'] = gefile.getFilBeforeShell(id);
         const mode = require('../dao/mode.js');
         data.mode['data'] = [mode.getById(id)];
         const modeData = require('../dao/modeData.js');
@@ -266,7 +267,16 @@ class JscodeUtil {
                         file['data'].forEach(e => e.pId = pId);
                         gefile['data'].forEach(e => e.pId = pId);
                         gefile['swig'].forEach(e => e.pId = pId);
-                        gefile['shell'].forEach(e => e.pId = pId);
+                        try {
+                            gefile['shell'].forEach(e => e.pId = pId);
+                        } catch (e) {
+
+                        }
+                        try {
+                            gefile['beforeShell'].forEach(e => e.pId = pId);
+                        } catch (e) {
+
+                        }
                         mode['data'].forEach(e => e.id = pId);
                         pack['data'].forEach(e => e.pId = pId);
                         require('../dao/controls.js').addAllData(controls);
@@ -297,7 +307,16 @@ class JscodeUtil {
                             file['data'].forEach(e => e.pId = pId);
                             gefile['data'].forEach(e => e.pId = pId);
                             gefile['swig'].forEach(e => e.pId = pId);
-                            gefile['shell'].forEach(e => e.pId = pId);
+                            try {
+                                gefile['shell'].forEach(e => e.pId = pId);
+                            } catch (e) {
+
+                            }
+                            try {
+                                gefile['beforeShell'].forEach(e => e.pId = pId);
+                            } catch (e) {
+
+                            }
                             mode['data'].forEach(e => e.id = pId);
                             pack['data'].forEach(e => e.pId = pId);
                             require('../dao/controls.js').addAllData(controls);

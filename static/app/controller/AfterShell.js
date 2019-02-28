@@ -3,7 +3,7 @@ Ext.define('OnionSpace.controller.AfterShell', {
     views: ['after-shell.after-shell'],
     init: function () {
         this.control({
-            'generate': {
+            'after-shell': {
                 render: this.onPanelRendered
             }
         });

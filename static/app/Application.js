@@ -32,6 +32,7 @@ Ext.application({
         'Setting',
         'Message',
         'AfterShell',
+        'BeforeShell',
         'Logger'
     ],
     launch: function () {
@@ -740,21 +741,6 @@ Ext.application({
                         tools: [
                             {
                                 renderTpl: [
-                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-cog-add" role="presentation"></div>'
-                                ],
-                                qtip: '配置swig',
-                                listeners: {
-                                    click: function () {
-                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                            showToast('请先[选择模板]或[创建模板]!');
-                                            return;
-                                        }
-                                        addbutton('swig-template', 'swig-template', './images/cog_add.png', 'Swig配置', {});
-                                    }
-                                }
-                            },
-                            {
-                                renderTpl: [
                                     '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-file" role="presentation"></div>'
                                 ],
                                 qtip: '添加模板文件',
@@ -847,6 +833,28 @@ Ext.application({
                                             constrain: true,
                                             animateTarget: this,
                                             modal: true,
+                                            viewModel: {
+                                                data: {
+                                                    after: true,
+                                                    before: true,
+                                                }
+                                            },
+                                            tbar: [
+                                                {
+                                                    xtype: 'checkbox',
+                                                    bind: '{before}',
+                                                    fieldLabel: '执行创建前脚本',
+                                                    inputValue: 'before',
+                                                    boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`
+                                                }, '-',
+                                                {
+                                                    xtype: 'checkbox',
+                                                    bind: '{after}',
+                                                    fieldLabel: '执行创建后脚本',
+                                                    name: 'after',
+                                                    boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`
+                                                }
+                                            ],
                                             items: {
                                                 xtype: 'grid',
                                                 layout: 'fit',
@@ -898,32 +906,60 @@ Ext.application({
                                             buttons: [
                                                 {
                                                     text: '生成', handler: function () {
+                                                        const {before, after} = this.up('window').getViewModel().getData();
                                                         this.up('window').close();
                                                         Ext.getBody().mask('执行中...');
+                                                        closeNodeWin();
                                                         const grid = this.up('window').down('grid');
                                                         const selected = grid.getSelectionModel().getSelection();
-                                                        selected.map(row => {
-                                                            const f = row.data;
-                                                            utils.createFile(f.name, f.preview);
-                                                            showToast('[info] ' + f.name + ' 生成成功!');
-                                                        });
-                                                        showToast('[info] 文件创建完成');
-                                                        try {
-                                                            closeNodeWin();
-                                                            nodeRun(geFileData.getShell(pId)).then(d => {
-                                                                showToast('[info] 创建后JS脚本执行成功');
-                                                                Ext.getBody().unmask();
+                                                        if (before) {
+                                                            nodeRun('(function(){' + geFileData.getBeforeShell(pId) + '})();').then(d => {
+                                                                showToast('[info] 创建前JS脚本执行成功');
+                                                                selected.map(row => {
+                                                                    const f = row.data;
+                                                                    utils.createFile(f.name, f.preview);
+                                                                    showToast('[info] ' + f.name + ' 生成成功!');
+                                                                });
+                                                                showToast('[info] 文件创建完成');
+                                                                if (after) {
+                                                                    nodeRun('(function(){' + geFileData.getShell(pId) + '})();').then(d => {
+                                                                        showToast('[info] 创建后JS脚本执行成功');
+                                                                        Ext.getBody().unmask();
+                                                                    }).catch(e => {
+                                                                        console.error(e);
+                                                                        showError(e);
+                                                                        showErrorFlag();
+                                                                        Ext.getBody().unmask();
+                                                                    });
+                                                                } else {
+                                                                    Ext.getBody().unmask();
+                                                                }
                                                             }).catch(e => {
                                                                 console.error(e);
                                                                 showError(e);
                                                                 showErrorFlag();
                                                                 Ext.getBody().unmask();
                                                             });
-                                                        } catch (e) {
-                                                            console.error(e);
-                                                            showError(e);
-                                                            showErrorFlag();
-                                                            Ext.getBody().unmask();
+                                                        } else {
+                                                            selected.map(row => {
+                                                                const f = row.data;
+                                                                utils.createFile(f.name, f.preview);
+                                                                showToast('[info] ' + f.name + ' 生成成功!');
+                                                            });
+                                                            showToast('[info] 文件创建完成');
+                                                            if (after) {
+                                                                nodeRun('(function(){' + geFileData.getShell(pId) + '})();').then(d => {
+                                                                    showToast('[info] 创建后JS脚本执行成功');
+                                                                    Ext.getBody().unmask();
+                                                                }).catch(e => {
+                                                                    console.error(e);
+                                                                    showError(e);
+                                                                    showErrorFlag();
+                                                                    Ext.getBody().unmask();
+                                                                });
+                                                            } else {
+                                                                Ext.getBody().unmask();
+                                                            }
                                                         }
                                                     }
                                                 },
@@ -939,16 +975,49 @@ Ext.application({
                             },
                             {
                                 renderTpl: [
-                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-shell" role="presentation"></div>'
+                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-more" role="presentation"></div>'
                                 ],
-                                qtip: '创建后执行脚本',
+                                qtip: '其它配置',
                                 listeners: {
-                                    click: function () {
-                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                            showToast('请先[选择模板]或[创建模板]!');
-                                            return;
-                                        }
-                                        addbutton('after-shell', 'after-shell', './images/shell.png', 'JS脚本', {pId: pId});
+                                    click: function (btn, e) {
+                                        new Ext.menu.Menu({
+                                            minWidth: 60,
+                                            items: [
+                                                {
+                                                    text: '配置swig',
+                                                    icon: 'images/cog_add.png',
+                                                    handler: function () {
+                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                            return;
+                                                        }
+                                                        addbutton('swig-template', 'swig-template', './images/cog_add.png', 'Swig配置', {});
+                                                    }
+                                                },
+                                                {
+                                                    text: '生成前脚本',
+                                                    icon: 'images/before.svg',
+                                                    handler: function () {
+                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                            return;
+                                                        }
+                                                        addbutton('before-shell', 'before-shell', './images/before.svg', '生成前脚本', {pId: pId});
+                                                    }
+                                                },
+                                                {
+                                                    text: '生成后脚本',
+                                                    icon: 'images/after.svg',
+                                                    handler: function () {
+                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                            return;
+                                                        }
+                                                        addbutton('after-shell', 'after-shell', './images/after.svg', '生成后脚本', {pId: pId});
+                                                    }
+                                                }
+                                            ]
+                                        }).showAt(e.getPoint());
                                     }
                                 }
                             }
