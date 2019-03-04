@@ -12,6 +12,8 @@ const swig = require('swig');
 const utils = require('../service/utils/utils');
 const command = require('../service/utils/commands');
 
+let consoleShowFlag = false;
+
 ipcRenderer.send('loading-msg', '服务加载中...');
 Ext.application({
     requires: ['Ext.container.Viewport'],
@@ -74,11 +76,12 @@ Ext.application({
                 flagShow: false,
                 flagInit: false,
                 list: [
-                    {img: './images/log.svg', name: 'Console'},
+                    {id: 'console-btn', img: './images/log.svg', name: 'Console'},
                     {id: 'terminal-btn', img: './images/terminal.svg', name: 'Terminal'}
                 ],
                 click: function (t, dom, name) {
                     if (name == 'Console') {
+                        consoleShowFlag = true;
                         Ext.getCmp('terminal').hide();
                         t.flagShow = false;
                         if (!t.consoleFlagShow) {
@@ -991,13 +994,13 @@ Ext.application({
                                             items: [
                                                 {
                                                     text: '配置swig',
-                                                    icon: 'images/set.svg',
+                                                    icon: 'images/template.svg',
                                                     handler: function () {
                                                         if (pId == undefined || pId == null || pId.trim().length == 0) {
                                                             showToast('请先[选择模板]或[创建模板]!');
                                                             return;
                                                         }
-                                                        addbutton('swig-template', 'swig-template', './images/set.svg', 'Swig配置', {});
+                                                        addbutton('swig-template', 'swig-template', './images/template.svg', 'Swig配置', {});
                                                     }
                                                 },
                                                 {
@@ -1288,10 +1291,16 @@ function openCode(code) {
 }
 
 function showToast(s) {
+    if (!consoleShowFlag) {
+        document.getElementById('console-btn').click();
+    }
     Ext.getCmp('console').setValue(s);
 }
 
 function showError(s) {
+    if (!consoleShowFlag) {
+        document.getElementById('console-btn').click();
+    }
     Ext.getCmp('console').setValue(s);
 }
 

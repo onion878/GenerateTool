@@ -17,16 +17,26 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
             that.codeEditor.changeValue = function () {
                 const val = that.codeEditor.codeEditor.getValue();
                 geFileData.setSwig(that.pId, val);
-                try {
-                    eval(val);
-                } catch (e) {
-                    console.log(e);
-                }
             };
             that.add(that.codeEditor);
         }
     },
     initComponent: function () {
+        const that = this;
+        this.tbar = {
+            xtype: 'statusbar',
+            pId: this.pId,
+            list: [{img: './images/use.svg', name: '应用'}],
+            float: 'left',
+            click: function (tbar, d) {
+                const val = that.codeEditor.codeEditor.getValue();
+                try {
+                    eval(val);
+                } catch (e) {
+                    console.log(e);
+                }
+            }
+        };
         this.callParent(arguments);
     }
 })

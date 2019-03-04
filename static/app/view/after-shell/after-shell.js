@@ -20,6 +20,18 @@ Ext.define('OnionSpace.view.after-shell.after-shell', {
         }
     },
     initComponent: function () {
+        const that = this;
+        this.tbar = {
+            xtype: 'statusbar',
+            pId: this.pId,
+            list: [{img: './images/test.svg', name: 'Test'}],
+            float: 'left',
+            click: function (tbar, d) {
+                const val = that.codeEditor.codeEditor.getValue();
+                closeNodeWin();
+                nodeRun(val);
+            }
+        };
         this.callParent(arguments);
     }
 });

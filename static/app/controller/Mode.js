@@ -634,7 +634,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 values.forEach((v, i) => {
                     const btn = Ext.getCmp(conData[i].id),
                         type = btn.bType;
-                    showToast('[info] 执行结果:' + JSON.stringify(v, undefined, 4));
+                    showToast('[info] 执行结果:' + JSON.stringify(v));
                     that.setComponentValue(type, btn, v, id);
                 });
                 Ext.getBody().unmask();
@@ -676,7 +676,7 @@ Ext.define('OnionSpace.controller.Mode', {
         if (d instanceof Promise) {
             d.then(v => {
                 showToast('[info] 需要执行的脚本:' + valStr);
-                showToast('[info] 执行结果:' + JSON.stringify(v, undefined, 4));
+                showToast('[info] 执行结果:' + JSON.stringify(v));
                 this.setComponentValue(type, btn, v, bId);
                 Ext.getBody().unmask();
             }).catch(e => {
@@ -685,7 +685,7 @@ Ext.define('OnionSpace.controller.Mode', {
             });
         } else {
             showToast('[info] 需要执行的脚本:' + valStr);
-            showToast('[info] 执行结果:' + JSON.stringify(d, undefined, 4));
+            showToast('[info] 执行结果:' + JSON.stringify(d));
             this.setComponentValue(type, btn, d, bId);
             Ext.getBody().unmask();
         }
