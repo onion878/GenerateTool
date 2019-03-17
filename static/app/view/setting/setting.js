@@ -60,6 +60,46 @@ Ext.define('OnionSpace.view.setting.setting', {
                     webFrame.setZoomFactor(v / 100);
                 }
             }
+        }, {
+            xtype: 'radiogroup',
+            fieldLabel: '主题',
+            layout: {
+                autoFlex: false
+            },
+            defaults: {
+                margin: '0 15 0 0'
+            },
+            items: [{
+                boxLabel: 'neptune',
+                inputValue: 'neptune'
+            }, {
+                boxLabel: 'aria',
+                inputValue: 'aria'
+            }],
+            listeners: {
+                render: function (dom) {
+                    let index = 0;
+                    const t = systemConfig.getTheme();
+                    if (t == 'aria') {
+                        index = 1;
+                    }
+                    dom.items.items[index].setValue(true);
+                },
+                change: function (dom, val) {
+                    let t = '';
+                    for (let v in val) {
+                        t = val[v];
+                    }
+                    if(t != systemConfig.getTheme()) {
+                        systemConfig.setTheme(t);
+                        showConfirm(`是否重新启动?`, function (text) {
+                            const {app} = require('electron').remote;
+                            app.relaunch();
+                            app.exit(0);
+                        }, dom, Ext.MessageBox.ERROR);
+                    }
+                }
+            }
         }]
     }],
     initComponent: function () {

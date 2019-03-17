@@ -31,6 +31,10 @@ function createWindow() {
         createMainWindow();
         setTimeout(() => {
             if (!loadFlag) {
+                const systemConfig = require('./service/dao/system');
+                if (systemConfig.getWin().maximal) {
+                    mainWindow.maximize();
+                }
                 mainWindow.show();
                 if (loading && loading != null) {
                     loading.hide();
@@ -55,20 +59,29 @@ function createMainWindow() {
     if (!fs.existsSync(globalStoreDirPath + '/jscode')) {
         fs.mkdirSync(globalStoreDirPath + '/jscode');
     }
+    const systemConfig = require('./service/dao/system');
+    let data = systemConfig.getWin();
+    if (data.id == undefined) {
+        data = {id: '', width: 800, height: 600, maximal: false, x: 100, y: 100};
+    }
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: data.width,
+        height: data.height,
         show: false,
         title: '代码构建工具',
         icon: path.join(__dirname, 'static/images/icon.ico')
     });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, `static/index.html`),
+        pathname: path.join(__dirname, `static/${systemConfig.getTheme()}.html`),
         protocol: 'file:',
         slashes: true
     }));
+
+    if (data.id == 'system') {
+        mainWindow.setPosition(data.x, data.y);
+    }
     // Open the DevTools. debug
     //mainWindow.webContents.openDevTools();
     const menu = Menu.buildFromTemplate([
@@ -144,6 +157,9 @@ function createMainWindow() {
 
     ipcMain.on('loading-success', (event, arg) => {
         loadFlag = true;
+        if (data.maximal) {
+            mainWindow.maximize();
+        }
         mainWindow.show();
         if (loading && loading != null) {
             loading.hide();
@@ -172,6 +188,16 @@ function createMainWindow() {
                     if (loading && loading != null) {
                         loading.close();
                     }
+                    let [x, y] = mainWindow.getPosition();
+                    let [width, height] = mainWindow.getSize();
+                    const maximal = mainWindow.isMaximized();
+                    if (maximal) {
+                        width = data.width;
+                        height = data.height;
+                        x = data.x;
+                        y = data.y;
+                    }
+                    systemConfig.setWin({id: 'system', x: x, y: y, width: width, height: height, maximal: maximal});
                 }
             });
         }

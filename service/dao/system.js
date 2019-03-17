@@ -12,6 +12,7 @@ class System {
         sdb.defaults({zoom: 1}).write();
         sdb.defaults({theme: 'neptune'}).write();
         sdb.defaults({user: {}}).write();
+        sdb.defaults({win: {}}).write();
         sdb.defaults({auth: ''}).write();
         sdb.defaults({terminal: ''}).write();
         sdb.defaults({editor: ''}).write();
@@ -71,6 +72,15 @@ class System {
 
     getConfig(id) {
         return sdb.get(id).value();
+    }
+
+    setWin(config) {
+        sdb.set('win', config)
+            .write();
+    }
+
+    getWin() {
+        return sdb.get('win').value();
     }
 }
 

@@ -71,7 +71,7 @@ amdRequire(['vs/editor/editor.main'], function () {
 
     // Define a new theme that contains only rules that match this language
     monaco.editor.defineTheme('consoleTheme', {
-        base: 'vs',
+        base: systemConfig.getTheme() == 'aria' ? 'vs-dark' : 'vs',
         inherit: true,
         rules: [
             {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},

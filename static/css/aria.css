@@ -1,0 +1,175 @@
+body {
+    font-family: 微软雅黑;
+}
+
+/* 定义滚动条宽度 */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* 定义那个轨道的样式 */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 定义滚动按钮的样式，就是那个bar */
+::-webkit-scrollbar-thumb {
+    background: rgba(166, 166, 168, 0.38);
+    transition: opacity .8s linear;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #CFCFCF;
+}
+
+.code-content {
+    width: 100%;
+    height: 100%;
+}
+
+.slider-mouseover {
+    box-shadow: -1px 0px 1px 1px #d6d6d6;
+}
+
+.x-tree-icon {
+    background-position: center;
+}
+
+.x-tree-no-icon .x-tree-elbow-img {
+    width: 0px;
+}
+
+.mode-controls .x-form-text {
+    border-bottom: 0.5px inset #c2c2c2;
+}
+
+.mode-controls .x-form-text:focus {
+    border-bottom: 0.5px inset #3F4757;
+}
+
+.x-panel-header-default .x-tool-img-add {
+    background-image: url(../images/data-add.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-tag {
+    background-image: url(../images/switch.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-mode {
+    background-image: url(../images/mode.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-save {
+    background-image: url(../images/new-module.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-cd-go {
+    background-image: url(../images/startup.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-add-folder {
+    background-image: url(../images/folder_add.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-add-file {
+    background-image: url(../images/add-file.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-cog-add {
+    background-image: url(../images/set.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-osx-terminal {
+    background-image: url(../images/terminal.svg);
+    background-color: #5C6B82;
+}
+
+.x-panel-header-default .x-tool-img-more {
+    background-image: url(../images/more.svg);
+    background-color: #5C6B82;
+}
+
+.color-blue {
+    color: blue;
+}
+
+.color-blue span {
+    color: blue;
+}
+
+
+.states-toolbar {
+    overflow: hidden;
+    width: 100%;
+    height: 21px;
+    background-color: #5C6B82;
+    border-top: 1px solid #3F4757;
+    border-bottom: 1px solid #3F4757;
+    box-sizing: initial;
+}
+
+.states-toolbar a {
+    float: left;
+    display: block;
+    height: 100%;
+    color: #000030;
+    text-align: center;
+    padding: 0px 6px;
+    text-decoration: none;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    line-height: 22px;
+}
+
+.states-toolbar .states-content {
+    display: table;
+    margin: 0 auto;
+}
+
+.states-toolbar .material-icons {
+    margin-top: 0.5px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.states-toolbar a:hover {
+    background: #3F4757;
+}
+
+.states-toolbar .status-msg {
+    line-height: 20px;
+    color: teal;
+    float: right;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 160px);
+}
+
+.states-toolbar a.active {
+    background-color: #3F4757;
+    color: #000000;
+}
+
+.states-toolbar a img {
+    margin-bottom: -4px;
+}
+
+.color-display {
+    color: lightgrey;
+}
+
+.mtku {
+    cursor: pointer;
+}

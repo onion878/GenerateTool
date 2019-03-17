@@ -2,7 +2,7 @@ const os = require('os');
 const pty = require('node-pty');
 const Terminal = require('xterm').Terminal;
 const fit = require('xterm/lib/addons/fit/fit');
-const {remote} = require('electron');
+const { remote } = require('electron');
 
 class Commands {
     constructor() {
@@ -11,6 +11,13 @@ class Commands {
         this.systemCmd = false;
         this.workFlag = false;
         this.config = require('../dao/system');
+        if(this.config.getTheme() == 'aria') {
+            this.color1 = '#424242';
+            this.color2 = '#232D38';
+        } else {
+            this.color1 = '#FFFFFF';
+            this.color2 = '#FAFAFA';
+        }
     }
 
     init(element) {
@@ -61,11 +68,11 @@ class Commands {
         that.term = new Terminal({
             fontFamily: 'Consolas',
             theme: {
-                foreground: '#000',
-                background: '#ffffff',
-                cursor: '#000',
+                foreground: that.ColorReverse(that.color2),
+                background: that.color2,
+                cursor: that.ColorReverse(that.color2),
                 selection: 'rgba(255, 255, 255, 0.3)',
-                black: '#ffffff',
+                black: that.ColorReverse(that.color2),
                 red: '#e06c75',
                 brightRed: '#e06c75',
                 green: '#A4EFA1',
@@ -78,13 +85,19 @@ class Commands {
                 brightBlue: '#5fcbd8',
                 brightCyan: '#5fcbd8',
                 blue: '#5fcbd8',
-                white: '#d0d0d0',
+                white: that.ColorReverse(that.color2),
                 brightBlack: '#808080',
-                brightWhite: '#000'
+                brightWhite: that.ColorReverse(that.color1)
             }
         });
         that.term.open(element);
         that.term.fit();
+    }
+
+    ColorReverse(OldColorValue) {
+        OldColorValue = "0x" + OldColorValue.replace(/#/g, "");
+        let str = "000000" + (0xFFFFFF - OldColorValue).toString(16);
+        return '#' + str.substring(str.length - 6, str.length);
     }
 
     fitTerm() {
