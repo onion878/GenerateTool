@@ -232,7 +232,7 @@ class JscodeUtil {
         return JSON.stringify(data);
     }
 
-    importModule(file, newName) {
+    importModule(file, newName, serveId, detailId) {
         const unZip = require('decompress');
         const path = help.getDataPath(), that = this;
         return new Promise((resolve, reject) => {
@@ -278,6 +278,10 @@ class JscodeUtil {
 
                         }
                         mode['data'].forEach(e => e.id = pId);
+                        if (!utils.isEmpty(serveId)) {
+                            mode['data'].forEach(e => e.serveId = serveId);
+                            mode['data'].forEach(e => e.detailId = detailId);
+                        }
                         pack['data'].forEach(e => e.pId = pId);
                         require('../dao/controls.js').addAllData(controls);
                         require('../dao/file.js').addAllData(file);
@@ -318,6 +322,10 @@ class JscodeUtil {
 
                             }
                             mode['data'].forEach(e => e.id = pId);
+                            if (!utils.isEmpty(serveId)) {
+                                mode['data'].forEach(e => e.serveId = serveId);
+                                mode['data'].forEach(e => e.detailId = detailId);
+                            }
                             pack['data'].forEach(e => e.pId = pId);
                             require('../dao/controls.js').addAllData(controls);
                             require('../dao/file.js').addAllData(file);

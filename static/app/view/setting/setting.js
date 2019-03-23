@@ -18,89 +18,105 @@ Ext.define('OnionSpace.view.setting.setting', {
             anchor: '100%',
             hideEmptyLabel: false
         },
-        items: [{
-            xtype: 'filefield',
-            name: 'terminal',
-            fieldLabel: '终端',
-            listeners: {
-                render: function (dom) {
-                    dom.setRawValue(systemConfig.getConfig('terminal'));
-                },
-                change: function (dom, val) {
-                    systemConfig.setConfig('terminal', val);
-                }
-            }
-        }, {
-            xtype: 'filefield',
-            name: 'editor',
-            fieldLabel: '编辑器',
-            listeners: {
-                render: function (dom) {
-                    dom.setRawValue(systemConfig.getConfig('editor'));
-                },
-                change: function (dom, val) {
-                    systemConfig.setConfig('editor', val);
-                }
-            }
-        }, {
-            xtype: 'slider',
-            name: 'editor',
-            fieldLabel: '界面缩放',
-            increment: 10,
-            minValue: 0,
-            maxValue: 200,
-            tipText: function (thumb) {
-                return Ext.String.format('<b>{0}% 缩放</b>', thumb.value);
-            },
-            value: systemConfig.getZoom() * 100,
-            listeners: {
-                dragend: function (dom) {
-                    const v = dom.getValue();
-                    systemConfig.setZoom(v / 100);
-                    webFrame.setZoomFactor(v / 100);
-                }
-            }
-        }, {
-            xtype: 'radiogroup',
-            fieldLabel: '主题',
-            layout: {
-                autoFlex: false
-            },
-            defaults: {
-                margin: '0 15 0 0'
-            },
-            items: [{
-                boxLabel: 'neptune',
-                inputValue: 'neptune'
-            }, {
-                boxLabel: 'aria',
-                inputValue: 'aria'
-            }],
-            listeners: {
-                render: function (dom) {
-                    let index = 0;
-                    const t = systemConfig.getTheme();
-                    if (t == 'aria') {
-                        index = 1;
-                    }
-                    dom.items.items[index].setValue(true);
-                },
-                change: function (dom, val) {
-                    let t = '';
-                    for (let v in val) {
-                        t = val[v];
-                    }
-                    if(t != systemConfig.getTheme()) {
-                        systemConfig.setTheme(t);
-                        showConfirm(`是否重新启动?`, function (text) {
-                            const {app} = require('electron').remote;
-                            app.relaunch();
-                            app.exit(0);
-                        }, dom, Ext.MessageBox.ERROR);
+        items: [
+            {
+                xtype: 'filefield',
+                name: 'terminal',
+                fieldLabel: '终端',
+                listeners: {
+                    render: function (dom) {
+                        dom.setRawValue(systemConfig.getConfig('terminal'));
+                    },
+                    change: function (dom, val) {
+                        systemConfig.setConfig('terminal', val);
                     }
                 }
+            },
+            {
+                xtype: 'filefield',
+                name: 'editor',
+                fieldLabel: '编辑器',
+                listeners: {
+                    render: function (dom) {
+                        dom.setRawValue(systemConfig.getConfig('editor'));
+                    },
+                    change: function (dom, val) {
+                        systemConfig.setConfig('editor', val);
+                    }
+                }
+            },
+            {
+                xtype: 'slider',
+                name: 'editor',
+                fieldLabel: '界面缩放',
+                increment: 10,
+                minValue: 0,
+                maxValue: 200,
+                tipText: function (thumb) {
+                    return Ext.String.format('<b>{0}% 缩放</b>', thumb.value);
+                },
+                value: systemConfig.getZoom() * 100,
+                listeners: {
+                    dragend: function (dom) {
+                        const v = dom.getValue();
+                        systemConfig.setZoom(v / 100);
+                        webFrame.setZoomFactor(v / 100);
+                    }
+                }
+            },
+            {
+                xtype: 'radiogroup',
+                fieldLabel: '主题',
+                layout: {
+                    autoFlex: false
+                },
+                defaults: {
+                    margin: '0 15 0 0'
+                },
+                items: [{
+                    boxLabel: 'neptune',
+                    inputValue: 'neptune'
+                }, {
+                    boxLabel: 'aria',
+                    inputValue: 'aria'
+                }],
+                listeners: {
+                    render: function (dom) {
+                        let index = 0;
+                        const t = systemConfig.getTheme();
+                        if (t == 'aria') {
+                            index = 1;
+                        }
+                        dom.items.items[index].setValue(true);
+                    },
+                    change: function (dom, val) {
+                        let t = '';
+                        for (let v in val) {
+                            t = val[v];
+                        }
+                        if (t != systemConfig.getTheme()) {
+                            systemConfig.setTheme(t);
+                            showConfirm(`是否重新启动?`, function (text) {
+                                const {app} = require('electron').remote;
+                                app.relaunch();
+                                app.exit(0);
+                            }, dom, Ext.MessageBox.ERROR);
+                        }
+                    }
+                }
+            },
+            {
+                xtype: 'textfield',
+                fieldLabel: '服务端地址',
+                value: userConfig.getUrl(),
+                emptyText: 'http://localhost:8000',
+                listeners: {
+                    change: function (dom, val) {
+                        userConfig.setUrl(val);
+                    }
+                }
             }
-        }]
+        ]
     }],
     initComponent: function () {
         const pId = this.pId, that = this;

@@ -82,6 +82,90 @@ Ext.define('OnionSpace.view.templet.templet', {
                         },
                         {
                             xtype: 'button',
+                            text: '上传',
+                            handler: function (btn) {
+                                const d = btn.up().getWidgetRecord().getData();
+                                const auth = userConfig.getAuth();
+                                if (auth.trim() === "") {
+                                    login();
+                                } else {
+                                    const data = {id: d.id, text: d.text + '-' + utils.getNowTimeCode()};
+                                    Ext.Ajax.request({
+                                        url: userConfig.getUrl() + '/auth',
+                                        method: 'POST',
+                                        headers: {
+                                            "Authorization": "Bearer " + userConfig.getAuth()
+                                        },
+                                        success: function (response) {
+
+                                        },
+                                        failure: function (response) {
+                                            if (response.status == 401) {
+                                                login();
+                                            } else {
+                                                console.error(response);
+                                                Ext.MessageBox.show({
+                                                    title: '错误',
+                                                    msg: '系统错误,请查看日志!',
+                                                    buttons: Ext.MessageBox.OK,
+                                                    icon: Ext.MessageBox.ERROR
+                                                });
+                                            }
+                                        }
+                                    });
+                                    data.folder = require('../service/utils/help').getDataPath();
+                                    Ext.create('Ext.window.Window', {
+                                        title: '模板说明',
+                                        width: 450,
+                                        layout: 'fit',
+                                        maximizable: true,
+                                        items: [{
+                                            xtype: 'htmleditor'
+                                        }],
+                                        buttons: [
+                                            {
+                                                text: '上传',
+                                                handler: function (btn) {
+                                                    const v = btn.up('window').down('htmleditor').getValue();
+                                                    btn.up('window').close();
+                                                    Ext.getBody().mask('上传中,请稍等...');
+                                                    jsCode.exportModule(data).then(t => {
+                                                        const file = data.folder + data.text + '.zip';
+                                                        const param = {info: v, name: d.text};
+                                                        utils.uploadFile(file, file, param, userConfig.getAuth()).then(c => {
+                                                            showToast(c.message);
+                                                            jsCode.deleteFile(file);
+                                                            Ext.getBody().unmask();
+                                                        }).catch(() => {
+                                                            Ext.getBody().unmask();
+                                                            jsCode.deleteFile(file);
+                                                            Ext.MessageBox.show({
+                                                                title: '错误',
+                                                                msg: '系统错误,请查看日志!',
+                                                                buttons: Ext.MessageBox.OK,
+                                                                icon: Ext.MessageBox.ERROR
+                                                            });
+                                                        });
+                                                    }).catch(err => {
+                                                        console.error(err);
+                                                        showError(err);
+                                                        Ext.getBody().unmask();
+                                                        Ext.MessageBox.show({
+                                                            title: '错误',
+                                                            msg: '系统错误,请查看日志!',
+                                                            buttons: Ext.MessageBox.OK,
+                                                            icon: Ext.MessageBox.ERROR
+                                                        });
+                                                    });
+                                                }
+                                            }
+                                        ]
+                                    }).show().focus();
+                                }
+                            }
+                        },
+                        {
+                            xtype: 'button',
                             text: '删除',
                             handler: function (btn) {
                                 const data = btn.up().getWidgetRecord().getData();

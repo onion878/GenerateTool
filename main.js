@@ -10,6 +10,7 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 const shell = require('shelljs');
+const need = require('require-uncached');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false, globalStoreDirPath;
 
@@ -31,7 +32,7 @@ function createWindow() {
         createMainWindow();
         setTimeout(() => {
             if (!loadFlag) {
-                const systemConfig = require('./service/dao/system');
+                const systemConfig = need('./service/dao/system');
                 if (systemConfig.getWin().maximal) {
                     mainWindow.maximize();
                 }
@@ -59,18 +60,19 @@ function createMainWindow() {
     if (!fs.existsSync(globalStoreDirPath + '/jscode')) {
         fs.mkdirSync(globalStoreDirPath + '/jscode');
     }
-    const systemConfig = require('./service/dao/system');
+    const systemConfig = need('./service/dao/system');
     let data = systemConfig.getWin();
     if (data.id == undefined) {
         data = {id: '', width: 800, height: 600, maximal: false, x: 100, y: 100};
     }
+    const icon = path.join(__dirname, 'static/images/icon.ico');
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: data.width,
         height: data.height,
         show: false,
         title: '代码构建工具',
-        icon: path.join(__dirname, 'static/images/icon.ico')
+        icon: icon
     });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
@@ -111,8 +113,25 @@ function createMainWindow() {
                 {
                     label: '重新启动',
                     click() {
-                        app.relaunch();
-                        app.exit(0);
+                        dialog.showMessageBox(mainWindow, {
+                            type: 'question',
+                            buttons: ['否', '是'],
+                            title: '提示',
+                            defaultId: 1,
+                            message: '是否重新启动?',
+                            noLink: true
+                        }, function (response) {
+                            if (response === 1) {
+                                app.relaunch();
+                                app.exit(0);
+                            }
+                        });
+                    }
+                },
+                {
+                    label: '重新登录',
+                    click() {
+                        mainWindow.webContents.executeJavaScript('login()');
                     }
                 },
                 {
@@ -125,10 +144,22 @@ function createMainWindow() {
         },
         {
             label: '模板管理',
-            click() {
-                let code = `openSome({id:'templet',title:'模板管理',type:'templet'})`;
-                mainWindow.webContents.executeJavaScript(code);
-            }
+            submenu: [
+                {
+                    label: '本地模板',
+                    click() {
+                        let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    },
+                },
+                {
+                    label: '在线模板',
+                    click() {
+                        let code = `openSome({id:'online-temp',title:'在线模板',type:'online-temp'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                }
+            ]
         },
         {
             label: '帮助',
@@ -180,9 +211,11 @@ function createMainWindow() {
                 type: 'question',
                 buttons: ['否', '是'],
                 title: '提示',
-                message: '是否退出?'
+                defaultId: 1,
+                message: '是否退出?',
+                noLink: true
             }, function (response) {
-                if (response === 1) { // Runs the following if 'Yes' is clicked
+                if (response === 1) {
                     app.showExitPrompt = false;
                     mainWindow.close();
                     if (loading && loading != null) {
@@ -197,7 +230,7 @@ function createMainWindow() {
                         x = data.x;
                         y = data.y;
                     }
-                    systemConfig.setWin({id: 'system', x: x, y: y, width: width, height: height, maximal: maximal});
+                    need('./service/dao/system').setWin({id: 'system', x: x, y: y, width: width, height: height, maximal: maximal});
                 }
             });
         }

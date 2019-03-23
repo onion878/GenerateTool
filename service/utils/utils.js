@@ -1,4 +1,5 @@
 const fs = require('fs');
+const request = require('request');
 const shell = require('shelljs');
 const child = require('child_process').execFile;
 
@@ -132,6 +133,76 @@ class Utils {
 
     fileExists(path) {
         return fs.existsSync(path);
+    }
+
+    getNowTimeCode() {
+        let date = new Date();
+        let month = (date.getMonth()) + 1;
+        let day = date.getDate();
+        let hours = date.getHours();
+        let min = date.getMinutes();
+        let sec = date.getSeconds();
+
+        let code = date.getFullYear() + toForMatter(month) +
+            toForMatter(day) + toForMatter(hours) + toForMatter(min)
+            + toForMatter(sec);
+
+        function toForMatter(num) {
+            if (num < 10) {
+                num = "0" + num;
+            }
+            return num + "";
+        }
+
+        return code;
+    }
+
+    uploadFile(file, name, data, auth) {
+        return new Promise((resolve, reject) => {
+            data['file'] = {
+                value: fs.createReadStream(file),
+                options: {
+                    filename: name,
+                    contentType: 'application/zip'
+                }
+            };
+            const userConfig = require('../dao/user');
+            const url = userConfig.getUrl() + '/upload';
+            const options = {
+                method: "POST",
+                url: url,
+                headers: {
+                    "Authorization": "Bearer " + auth,
+                    "Content-Type": "multipart/form-data"
+                },
+                formData: data
+            };
+
+            request(options, function (err, res, body) {
+                if (err) {
+                    console.log(err);
+                    reject(err);
+                }
+                resolve(JSON.parse(body));
+            });
+        });
+    }
+
+    downloadFile(file, f) {
+        return new Promise((resolve, reject) => {
+            const url = userConfig.getUrl() + '/download/' + file;
+            const r = request(url);
+            const help = require('./help');
+            const p = help.getDataPath();
+            r.on('response', function (res) {
+                if (res.statusCode == 200) {
+                    res.pipe(fs.createWriteStream(p + '/' + f));
+                    resolve(p + '/' + f);
+                } else {
+                    reject('文件失效!');
+                }
+            });
+        });
     }
 }
 

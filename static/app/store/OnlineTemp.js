@@ -1,12 +1,25 @@
 /**
  * http://usejsdoc.org/
  */
-Ext.define('OnionSpace.store.Pkg', {
+Ext.define('OnionSpace.store.OnlineTemp', {
     extend: 'Ext.data.Store',
+    pageSize: 30,
     proxy: {
         type: 'ajax',
         api: {
-            read: 'https://www.npmjs.com/search/suggestions'
+            read: userConfig.getUrl() + '/getTemplate'
+        },
+        headers: {
+            "Authorization": "Bearer " + userConfig.getAuth()
+        },
+        reader: {
+            type: 'json',
+            root: 'rows',
+            totalProperty: 'total'
+        },
+        writer: {
+            writeAllFields: true,
+            writeRecordId: false
         },
         listeners: {
             exception: function (proxy, response, operation) {
@@ -23,5 +36,10 @@ Ext.define('OnionSpace.store.Pkg', {
             }
         }
     },
-    autoLoad: false
+    sorters: [{
+        property: 'Created',
+        direction: 'desc'
+    }],
+    autoLoad: true,
+    autoSync: false
 });

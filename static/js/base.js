@@ -48,7 +48,7 @@ amdRequire.config({
 amdRequire(['vs/editor/editor.main'], function () {
     console.log('code init success');
     // Register a new language
-    monaco.languages.register({id: 'consoleLanguage'});
+    monaco.languages.register({ id: 'consoleLanguage' });
 
     // Register a tokens provider for the language
     monaco.languages.setMonarchTokensProvider('consoleLanguage', {
@@ -74,11 +74,11 @@ amdRequire(['vs/editor/editor.main'], function () {
         base: systemConfig.getTheme() == 'aria' ? 'vs-dark' : 'vs',
         inherit: true,
         rules: [
-            {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},
-            {token: 'custom-info', foreground: '26c6da'},
-            {token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold'},
-            {token: 'custom-warn', foreground: 'FFA500'},
-            {token: 'custom-date', foreground: '008800'}
+            { token: 'custom-click', foreground: '448aff', fontStyle: 'underline' },
+            { token: 'custom-info', foreground: '26c6da' },
+            { token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
+            { token: 'custom-warn', foreground: 'FFA500' },
+            { token: 'custom-date', foreground: '008800' }
         ]
     });
 
@@ -958,7 +958,7 @@ let runWin = null;
 
 const nodeRun = (content) => {
     if (runWin == null) {
-        const {BrowserWindow, getCurrentWindow} = require('electron').remote;
+        const { BrowserWindow, getCurrentWindow } = require('electron').remote;
         runWin = new BrowserWindow({
             parent: getCurrentWindow(),
             show: false,
@@ -978,3 +978,68 @@ const closeNodeWin = () => {
     }
     runWin = null;
 };
+
+function login() {
+    const { Password, UserName } = userConfig.getUser();
+    Ext.create('Ext.window.Window', {
+        title: '登录',
+        width: 320,
+        modal: true,
+        items: [{
+            bodyPadding: 8,
+            defaultType: 'textfield',
+            xtype: 'form',
+            layout: {
+                type: 'vbox',
+                pack: 'start',
+                align: 'stretch'
+            },
+            items: [{
+                allowBlank: false,
+                fieldLabel: '用户名',
+                name: 'UserName',
+                flex: 1,
+                emptyText: '用户名',
+                value: UserName
+            }, {
+                allowBlank: false,
+                fieldLabel: '密码',
+                name: 'Password',
+                emptyText: '密码',
+                flex: 1,
+                inputType: 'password',
+                value: Password
+            }],
+        }],
+        buttons: [
+            {
+                text: '登录',
+                handler: function (btn) {
+                    var form = btn.up('window').down('form');
+                    if (form.isValid()) {
+                        Ext.Ajax.request({
+                            url: userConfig.getUrl() + '/login',
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            jsonData: form.getValues(),
+                            success: function (response) {
+                                const jsonResp = Ext.util.JSON.decode(response.responseText);
+                                userConfig.setAuth(jsonResp.token);
+                                userConfig.setUser(form.getValues());
+                                btn.up('window').close();
+                            },
+                            failure: function (response) {
+                                Ext.MessageBox.show({
+                                    title: '错误',
+                                    msg: '用户名或密码错误',
+                                    buttons: Ext.MessageBox.OK,
+                                    icon: Ext.MessageBox['ERROR']
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        ]
+    }).show().focus();
+}
