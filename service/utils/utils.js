@@ -196,8 +196,14 @@ class Utils {
             const p = help.getDataPath();
             r.on('response', function (res) {
                 if (res.statusCode == 200) {
-                    res.pipe(fs.createWriteStream(p + '/' + f));
-                    resolve(p + '/' + f);
+                    const re = res.pipe(fs.createWriteStream(p + '/' + f));
+                    re.on('finish', () => {
+                        console.log('end');
+                        resolve(p + f);
+                    });
+                    re.on('error', () => {
+                        reject('文件失效!');
+                    });
                 } else {
                     reject('文件失效!');
                 }
