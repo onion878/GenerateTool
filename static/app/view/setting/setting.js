@@ -115,6 +115,37 @@ Ext.define('OnionSpace.view.setting.setting', {
                         userConfig.setUrl(val);
                     }
                 }
+            },
+            {
+                xtype: 'filefield',
+                fieldLabel: '背景图',
+                listeners: {
+                    render: function (dom) {
+                        dom.setRawValue(userConfig.getBg());
+                    },
+                    change: function (dom, val) {
+                        userConfig.setBg(val);
+                        document.body.style.backgroundImage = `url(${val.replace(/\\/g, '/')})`;
+                    }
+                }
+            },
+            {
+                xtype: 'slider',
+                fieldLabel: '透明度',
+                increment: 1,
+                minValue: 20,
+                maxValue: 100,
+                tipText: function (thumb) {
+                    return Ext.String.format('<b>{0}% 不透明</b>', thumb.value);
+                },
+                value: userConfig.getOpacity() * 100,
+                listeners: {
+                    dragend: function (dom) {
+                        const v = dom.getValue();
+                        userConfig.setOpacity(v / 100);
+                        document.getElementById("border-example").style.opacity = v / 100;
+                    }
+                }
             }
         ]
     }],

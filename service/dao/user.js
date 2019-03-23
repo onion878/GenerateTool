@@ -12,7 +12,9 @@ class User {
                 UserName: ""
             },
             auth: '',
-            url: ''
+            url: '',
+            background: '',
+            opacity: 1
         }).write();
     }
 
@@ -41,6 +43,24 @@ class User {
 
     getUrl() {
         return this.udb.get('url').value();
+    }
+
+    setBg(v) {
+        this.udb.set('background', v)
+            .write();
+    }
+
+    getBg() {
+        return this.udb.get('background').value();
+    }
+
+    setOpacity(v) {
+        this.udb.set('opacity', v)
+            .write();
+    }
+
+    getOpacity() {
+        return this.udb.get('opacity').value();
     }
 }
 

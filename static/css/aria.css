@@ -1,5 +1,9 @@
 body {
     font-family: 微软雅黑;
+    background-size: cover;
+    display: block;
+    background-position: center center;
+    background-repeat: no-repeat no-repeat;
 }
 
 /* 定义滚动条宽度 */
