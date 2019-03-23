@@ -1283,6 +1283,9 @@ Ext.application({
         checkNew(pId);
         Ext.getCmp('mainmenutab').setActiveTab(Ext.getCmp(showTab));
         document.body.style.backgroundImage = `url('${userConfig.getBg().replace(/\\/g, '/')}')`;
+        document.body.style.backgroundPosition = 'center center !important';
+        document.body.style.backgroundRepeat = 'no-repeat no-repeat';
+        document.body.style.backgroundSize = '100% 100%';
         document.body.style.opacity = userConfig.getOpacity();
         ipcRenderer.send('loading-success', '加载完成!');
     }
