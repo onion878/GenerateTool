@@ -16,7 +16,7 @@ Ext.define('OnionSpace.controller.DetailTemp', {
     query: function (dom, val) {
         const grid = dom.up('gridpanel');
         const store = grid.getStore();
-        store.getProxy().extraParams = {name: val, pid: grid.dataId, size: 30};
+        store.getProxy().extraParams = {q: val, name: val, pid: grid.dataId, size: 30};
         store.load();
     },
     onPanelRendered: function () {
