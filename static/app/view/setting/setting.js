@@ -125,7 +125,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                     },
                     change: function (dom, val) {
                         userConfig.setBg(val);
-                        document.body.style.backgroundImage = `url(${val.replace(/\\/g, '/')})`;
+                        document.body.style.backgroundImage = `url('${val.replace(/\\/g, '/')}')`;
                     }
                 }
             },
