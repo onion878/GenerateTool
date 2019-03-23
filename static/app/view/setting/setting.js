@@ -143,7 +143,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                     dragend: function (dom) {
                         const v = dom.getValue();
                         userConfig.setOpacity(v / 100);
-                        document.getElementById("border-example").style.opacity = v / 100;
+                        document.body.style.opacity = v / 100;
                     }
                 }
             }

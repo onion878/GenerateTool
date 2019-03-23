@@ -1283,7 +1283,7 @@ Ext.application({
         checkNew(pId);
         Ext.getCmp('mainmenutab').setActiveTab(Ext.getCmp(showTab));
         document.body.style.backgroundImage = `url(${userConfig.getBg().replace(/\\/g, '/')})`;
-        document.getElementById("border-example").style.opacity = userConfig.getOpacity();
+        document.body.style.opacity = userConfig.getOpacity();
         ipcRenderer.send('loading-success', '加载完成!');
     }
 });
