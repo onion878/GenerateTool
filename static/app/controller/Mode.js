@@ -49,7 +49,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     {
                         xtype: 'textfield',
                         margin: '10',
-                        labelWidth: 45,
+                        labelWidth: 60,
                         name: 'name',
                         allowBlank: false,
                         fieldLabel: '变量名'
@@ -58,7 +58,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         xtype: 'combobox',
                         fieldLabel: '名称',
                         margin: '10',
-                        labelWidth: 45,
+                        labelWidth: 60,
                         store: {
                             fields: ['id', 'text'],
                             data: [

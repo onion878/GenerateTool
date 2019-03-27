@@ -1,11 +1,11 @@
 const help = require('../utils/help');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync(help.getDataPath() + 'data/user.json');
 
 class User {
+
     constructor() {
-        this.udb = low(adapter);
+        this.udb = low(new FileSync(help.getDataPath() + 'data/user.json'));
         this.udb.defaults({
             user: {
                 Password: "",

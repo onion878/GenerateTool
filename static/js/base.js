@@ -979,7 +979,7 @@ const closeNodeWin = () => {
     runWin = null;
 };
 
-function login() {
+function login(call) {
     const { Password, UserName } = userConfig.getUser();
     Ext.create('Ext.window.Window', {
         title: '登录',
@@ -1027,6 +1027,9 @@ function login() {
                                 userConfig.setAuth(jsonResp.token);
                                 userConfig.setUser(form.getValues());
                                 btn.up('window').close();
+                                if(call) {
+                                    call(jsonResp.token);
+                                }
                             },
                             failure: function (response) {
                                 Ext.MessageBox.show({

@@ -49,14 +49,17 @@ Ext.define('OnionSpace.view.setting.setting', {
                 xtype: 'slider',
                 name: 'editor',
                 fieldLabel: '界面缩放',
+                id: 'setting-zoom',
                 increment: 10,
                 minValue: 0,
                 maxValue: 200,
                 tipText: function (thumb) {
                     return Ext.String.format('<b>{0}% 缩放</b>', thumb.value);
                 },
-                value: systemConfig.getZoom() * 100,
                 listeners: {
+                    render: function (dom) {
+                        Ext.getCmp('setting-zoom').setValue(systemConfig.getZoom() * 100);
+                    },
                     dragend: function (dom) {
                         const v = dom.getValue();
                         systemConfig.setZoom(v / 100);
@@ -108,9 +111,11 @@ Ext.define('OnionSpace.view.setting.setting', {
             {
                 xtype: 'textfield',
                 fieldLabel: '服务端地址',
-                value: userConfig.getUrl(),
                 emptyText: 'http://localhost:8000',
                 listeners: {
+                    render: function (dom) {
+                        dom.setRawValue(userConfig.getUrl());
+                    },
                     change: function (dom, val) {
                         userConfig.setUrl(val);
                     }
@@ -133,13 +138,16 @@ Ext.define('OnionSpace.view.setting.setting', {
                 xtype: 'slider',
                 fieldLabel: '透明度',
                 increment: 1,
+                id: 'setting-opacity',
                 minValue: 20,
                 maxValue: 100,
                 tipText: function (thumb) {
                     return Ext.String.format('<b>{0}% 不透明</b>', thumb.value);
                 },
-                value: userConfig.getOpacity() * 100,
                 listeners: {
+                    render: function (dom) {
+                        Ext.getCmp('setting-opacity').setValue(userConfig.getOpacity() * 100);
+                    },
                     dragend: function (dom) {
                         const v = dom.getValue();
                         userConfig.setOpacity(v / 100);

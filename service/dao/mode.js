@@ -56,6 +56,16 @@ class Mode {
             .remove({id: pId})
             .write();
     }
+
+    updateTemplate(id, serveId, detailId) {
+        m.get('data')
+            .find({
+                id: id
+            })
+            .set('serveId', serveId)
+            .set('detailId', detailId)
+            .write();
+    }
 }
 
 module.exports = new Mode();

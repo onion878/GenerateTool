@@ -19,6 +19,7 @@ Ext.define('OnionSpace.view.templet.templet', {
     }],
     initComponent: function () {
         const pId = this.pId;
+        let token = userConfig.getAuth();
         this.store = Ext.create('Ext.data.Store', {
             storeId: 'id',
             fields: ['id', 'text'],
@@ -101,7 +102,9 @@ Ext.define('OnionSpace.view.templet.templet', {
                                         },
                                         failure: function (response) {
                                             if (response.status == 401) {
-                                                login();
+                                                login(t => {
+                                                    token = t;
+                                                });
                                             } else {
                                                 console.error(response);
                                                 Ext.MessageBox.show({
@@ -132,8 +135,11 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                     jsCode.exportModule(data).then(t => {
                                                         const file = data.folder + data.text + '.zip';
                                                         const param = {info: v, name: d.text};
-                                                        utils.uploadFile(file, file, param, userConfig.getAuth()).then(c => {
+                                                        utils.uploadFile(file, file, param, token).then(c => {
                                                             showToast(c.message);
+                                                            if (c.serveId) {
+                                                                parentData.updateTemplate(d.id, c.serveId, c.detailId);
+                                                            }
                                                             jsCode.deleteFile(file);
                                                             Ext.getBody().unmask();
                                                         }).catch(() => {

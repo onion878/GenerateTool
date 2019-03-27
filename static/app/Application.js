@@ -817,11 +817,12 @@ Ext.application({
                                         Ext.create('Ext.window.Window', {
                                             title: '生成文件',
                                             fixed: true,
-                                            width: 500,
+                                            width: '85%',
                                             layout: 'fit',
                                             resizable: true,
                                             constrain: true,
                                             animateTarget: this,
+											maxHeight: 600,
                                             modal: true,
                                             viewModel: {
                                                 data: {
@@ -835,6 +836,7 @@ Ext.application({
                                                     bind: '{before}',
                                                     fieldLabel: '执行创建前脚本',
                                                     inputValue: 'before',
+													labelWidth: 110,
                                                     boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`
                                                 }, '-',
                                                 {
@@ -842,6 +844,7 @@ Ext.application({
                                                     bind: '{after}',
                                                     fieldLabel: '执行创建后脚本',
                                                     name: 'after',
+													labelWidth: 110,
                                                     boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`
                                                 }
                                             ],
@@ -851,6 +854,7 @@ Ext.application({
                                                 selType: 'checkboxmodel',
                                                 columnLines: true,
                                                 enableLocking: true,
+												maxHeight: 600,
                                                 store: Ext.create('Ext.data.Store', {
                                                     data: files
                                                 }),
@@ -865,7 +869,7 @@ Ext.application({
                                                         text: '是否存在',
                                                         align: 'center',
                                                         dataIndex: 'flag',
-                                                        width: 80,
+                                                        width: 100,
                                                         locked: true,
                                                         renderer: function (value, metaData) {
                                                             if (value == '是')
