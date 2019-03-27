@@ -113,7 +113,7 @@ Ext.define('OnionSpace.controller.Mode', {
                                         id: 'combo-language',
                                         fieldLabel: '语言',
                                         margin: '10',
-                                        labelWidth: 45,
+                                        labelWidth: 60,
                                         store: {
                                             fields: ['id', 'text'],
                                             data: languageType
