@@ -263,6 +263,7 @@ Ext.application({
                                                 const combo = this.up('window').down('combobox');
                                                 const row = combo.getSelectedRecord();
                                                 if (row !== null) {
+                                                    closeNodeWin();
                                                     pId = row.id;
                                                     moduleId = pId;
                                                     history.setMode(pId);

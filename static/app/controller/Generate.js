@@ -38,22 +38,24 @@ Ext.define('OnionSpace.controller.Generate', {
     preview: function (btn) {
         const that = this;
         that.type = 'view';
-        const params = btn.up('generate').params;
-        const vsCode = btn.up('generate').down('minicode');
+        const dom = btn.up('generate');
+        const params = dom.params;
+        const vsCode = dom.down('minicode');
         const code = vsCode.codeEditor;
         code.updateOptions({
             readOnly: true
         });
+        dom.mask('处理中...');
         if (params.updateType == 'add') {
-            try {
-                const tpl = swig.compile(code.getValue());
-                const output = tpl(controlData.getModuleData(btn.up('generate').pId));
+            nodeRun(`compileTemplate('${params.fileId}')`).then(output => {
                 code.setValue(output);
-            } catch (e) {
+                dom.unmask();
+            }).catch(e => {
+                dom.down('button[action=edit]').click();
+                dom.unmask();
                 console.error(e);
-                that.editFile(btn);
                 showError(e);
-            }
+            });
         } else {
             const {file} = geFileData.getOneData(params.fileId);
             if (file.trim().length == 0) {
@@ -68,15 +70,23 @@ Ext.define('OnionSpace.controller.Generate', {
                 if (d instanceof Promise) {
                     d.then(v => {
                         code.setValue(v);
+                        dom.unmask();
+                    }).catch(e => {
+                        console.error(e);
+                        dom.unmask();
+                        dom.down('button[action=edit]').click();
+                        showError(e);
                     });
                 } else {
+                    dom.unmask();
                     if (d != undefined) {
                         code.setValue(d);
                     }
                 }
             } catch (e) {
                 console.error(e);
-                that.editFile(btn);
+                dom.unmask();
+                dom.down('button[action=edit]').click();
                 showError(e);
             }
         }
