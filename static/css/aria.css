@@ -124,7 +124,7 @@ body {
     float: left;
     display: block;
     height: 100%;
-    color: #000030;
+    color: #acdcff;
     text-align: center;
     padding: 0px 6px;
     text-decoration: none;
@@ -152,7 +152,7 @@ body {
 
 .states-toolbar .status-msg {
     line-height: 20px;
-    color: #aba719;
+    color: #dfe079;
     float: right;
     margin-right: 10px;
     white-space: nowrap;
@@ -163,7 +163,7 @@ body {
 
 .states-toolbar a.active {
     background-color: #3F4757;
-    color: #000000;
+    color: papayawhip;
 }
 
 .states-toolbar a img {
