@@ -231,6 +231,7 @@ function createMainWindow() {
                         y = data.y;
                     }
                     need('./service/dao/system').setWin({id: 'system', x: x, y: y, width: width, height: height, maximal: maximal});
+                    process.exit(0);
                 }
             });
         }
