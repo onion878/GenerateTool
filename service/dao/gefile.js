@@ -143,6 +143,33 @@ class GeFile {
         }
     }
 
+    updateAll({data, swig, shell, beforeShell, pId}) {
+        gdb.get('data')
+            .remove({pId: pId})
+            .write();
+        gdb.set('data', gdb.get('data').value().concat(data))
+            .write();
+
+
+        gdb.get('swig')
+            .remove({pId: pId})
+            .write();
+        gdb.set('swig', gdb.get('swig').value().concat(swig))
+            .write();
+
+        gdb.get('shell')
+            .remove({pId: pId})
+            .write();
+        gdb.set('shell', gdb.get('shell').value().concat(shell))
+            .write();
+
+        gdb.get('beforeShell')
+            .remove({pId: pId})
+            .write();
+        gdb.set('beforeShell', gdb.get('beforeShell').value().concat(beforeShell))
+            .write();
+    }
+
     removeAll(pId) {
         gdb.get('data')
             .remove({pId: pId})

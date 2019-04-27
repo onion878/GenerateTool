@@ -7,5 +7,12 @@ module.exports = {
     getPid() {
         const history = require('../dao/history');
         return history.getMode()
+    },
+    toJSON(data) {
+        const v = {};
+        data.forEach(d => {
+            v[d.id] = d;
+        });
+        return v;
     }
 };

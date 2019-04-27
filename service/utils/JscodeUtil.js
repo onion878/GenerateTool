@@ -290,9 +290,8 @@ class JscodeUtil {
                         require('../dao/modeData.js').addAllData(modeData);
                         require('../dao/package.js').addAllData(pack);
                         del([dir], {force: true});
-                        resolve(`[${mode.data[0].text}]导入成功!`);
+                        resolve({msg: `[${mode.data[0].text}]导入成功!`, pId: pId});
                     } else {
-                        console.log(controls['code']);
                         fs.rename(modeFolder, `${path}/jscode/${pId}`, (err) => {
                             modeData['data'].forEach(e => {
                                 e.pId = pId;
@@ -334,7 +333,7 @@ class JscodeUtil {
                             require('../dao/modeData.js').addAllData(modeData);
                             require('../dao/package.js').addAllData(pack);
                             del([dir], {force: true});
-                            resolve(`[${mode.data[0].text}]导入成功!`);
+                            resolve({msg: `[${mode.data[0].text}]导入成功!`, pId: pId});
                         });
                     }
                 });
@@ -342,6 +341,79 @@ class JscodeUtil {
                 reject(e);
             }
         });
+    }
+
+    updateTemplate(file, local, tempData) {
+        const unZip = require('decompress');
+        const path = help.getDataPath(), that = this;
+        return new Promise((resolve, reject) => {
+            const dir = `${path}data/cache`, codeFolder = `${path}jscode/${local.id}`;
+            try {
+                unZip(file, dir).then(files => {
+                    const data = JSON.parse(utils.readFile(`${dir}/data.json`));
+                    const controls = data['controls'], file = data['file'], gefile = data['gefile'],
+                        modeData = data['modeData'], pack = data['package'];
+                    require('../dao/controls.js').updateAll({...controls, pId: local.id});
+                    require('../dao/file.js').updateAll({...file, pId: local.id});
+                    require('../dao/gefile.js').updateAll({...gefile, pId: local.id});
+                    require('../dao/mode.js').updateTemplate(local.id, local.serveId, tempData.id);
+                    require('../dao/modeData.js').updateAll({...modeData, pId: local.id});
+                    require('../dao/package.js').updateAll({...pack, pId: local.id});
+                    if (fs.existsSync(dir + '/' + local.id)) {
+                        that.copyDir(dir + '/' + local.id, codeFolder, function (err) {
+                            if (err) {
+                                del([dir], {force: true});
+                                reject(err);
+                            }
+                        });
+                    }
+                    del([dir], {force: true});
+                    resolve(true);
+                }).catch(e => {
+                    del([dir], {force: true});
+                    reject(e);
+                });
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    copyDir(src, dist, callback) {
+        const that = this;
+        if(!fs.existsSync(dist)) {
+            fs.mkdirSync(dist);
+        }
+        _copy(null, src, dist);
+        function _copy(err, src, dist) {
+            if (err) {
+                callback(err);
+            } else {
+                fs.readdir(src, function (err, paths) {
+                    if (err) {
+                        callback(err)
+                    } else {
+                        paths.forEach(function (path) {
+                            const _src = src + '/' + path;
+                            const _dist = dist + '/' + path;
+                            fs.stat(_src, function (err, stat) {
+                                if (err) {
+                                    callback(err);
+                                } else {
+                                    // 判断是文件还是目录
+                                    if (stat.isFile()) {
+                                        fs.writeFileSync(_dist, fs.readFileSync(_src));
+                                    } else if (stat.isDirectory()) {
+                                        // 当是目录是，递归复制
+                                        that.copyDir(_src, _dist, callback)
+                                    }
+                                }
+                            })
+                        });
+                    }
+                })
+            }
+        }
     }
 
     getNewModuleName(name, total) {

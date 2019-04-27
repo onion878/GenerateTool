@@ -27,6 +27,10 @@ class Mode {
         return m.get('data').find({id: id}).value();
     }
 
+    getByServeId(serveId) {
+        return m.get('data').find({serveId: serveId}).value();
+    }
+
     getAll() {
         return m.get('data').value();
     }

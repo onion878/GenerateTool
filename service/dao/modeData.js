@@ -8,12 +8,12 @@ const utils = require('../utils/utils');
 class ModeData {
 
     constructor() {
-        mdb.defaults({ data: [] }).write();
+        mdb.defaults({data: []}).write();
     }
 
     setData(name, pId) {
         mdb.get('data')
-            .push({id: utils.getUUID(),pId: pId, text: name, leaf: true})
+            .push({id: utils.getUUID(), pId: pId, text: name, leaf: true})
             .write();
     }
 
@@ -43,9 +43,17 @@ class ModeData {
         mdb.set('data', newData).write();
     }
 
+    updateAll({data, pId}) {
+        mdb.get('data')
+            .remove({pId: pId})
+            .write();
+        mdb.set('data', mdb.get('data').value().concat(data))
+            .write();
+    }
+
     removeAll(pId) {
         mdb.get('data')
-            .remove({ pId: pId })
+            .remove({pId: pId})
             .write();
     }
 }

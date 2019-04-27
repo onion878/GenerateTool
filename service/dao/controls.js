@@ -130,6 +130,28 @@ class Controls {
             .write();
     }
 
+    updateAll({ext, code, pId}) {
+        const oldExt = con.get('ext').filter({pId: pId}).value();
+        const newExt = help.toJSON(oldExt);
+        ext.forEach((o, i) => {
+            const d = newExt[o.id];
+            if (d) {
+                ext[i].data = d.data;
+            }
+        });
+
+        con.get('ext')
+            .remove({pId: pId})
+            .write();
+        con.get('code')
+            .remove({pId: pId})
+            .write();
+
+        con.set('ext', con.get('ext').value().concat(ext))
+            .set('code', con.get('ext').value().concat(code))
+            .write();
+    }
+
     removeAll(pId) {
         con.get('code')
             .remove({pId: pId})

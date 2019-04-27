@@ -14,6 +14,7 @@ const utils = require('../service/utils/utils');
 const command = require('../service/utils/commands');
 
 let consoleShowFlag = false;
+let pId = history.getMode();
 
 ipcRenderer.send('loading-msg', '服务加载中...');
 Ext.application({
@@ -42,7 +43,6 @@ Ext.application({
     ],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
-        let pId = history.getMode();
         moduleId = pId;
         const datas = data.getData(pId);
         datas.forEach(d => d.icon = './images/database_save.svg');
@@ -262,12 +262,7 @@ Ext.application({
                                             handler: function () {
                                                 const combo = this.up('window').down('combobox');
                                                 const row = combo.getSelectedRecord();
-                                                if (row !== null) {
-                                                    closeNodeWin();
-                                                    pId = row.id;
-                                                    moduleId = pId;
-                                                    history.setMode(pId);
-                                                } else {
+                                                if (row === null) {
                                                     Ext.toast({
                                                         html: `<span style="color: red;">请选择至少一条数据!</span>`,
                                                         autoClose: true,
@@ -277,31 +272,8 @@ Ext.application({
                                                     });
                                                     return;
                                                 }
-                                                Ext.getBody().mask('切换中...');
                                                 this.up('window').close();
-                                                const root = Ext.getCmp('panel-model').getRootNode();
-                                                root.removeAll();
-                                                const list = data.getData(pId);
-                                                list.forEach(d => d.icon = './images/database_save.svg');
-                                                root.appendChild(list);
-                                                history.removeAll();
-                                                Ext.getCmp('panel-model').setTitle(row.data.text);
-                                                Ext.getCmp('mainmenutab').removeAll();
-                                                try {
-                                                    eval(geFileData.getSwig(pId));
-                                                } catch (e) {
-                                                    console.error(e);
-                                                    showError(e);
-                                                }
-                                                jsCode.createFolder(pId);
-                                                jsCode.initFile(pId);
-                                                setJsData();
-                                                command.cdTargetFolder(jsCode.getFolder(pId));
-                                                getFilesData();
-                                                registerAllSuggestion();
-                                                checkNew(pId);
-                                                Ext.getBody().unmask();
-                                                showToast('[info] 切换模板为:' + row.data.text);
+                                                changeTemplate(row.id);
                                             }
                                         }, {
                                             text: '取消',
@@ -823,7 +795,7 @@ Ext.application({
                                             resizable: true,
                                             constrain: true,
                                             animateTarget: this,
-											maxHeight: 600,
+                                            maxHeight: 600,
                                             modal: true,
                                             viewModel: {
                                                 data: {
@@ -837,7 +809,7 @@ Ext.application({
                                                     bind: '{before}',
                                                     fieldLabel: '执行创建前脚本',
                                                     inputValue: 'before',
-													labelWidth: 110,
+                                                    labelWidth: 110,
                                                     boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`
                                                 }, '-',
                                                 {
@@ -845,7 +817,7 @@ Ext.application({
                                                     bind: '{after}',
                                                     fieldLabel: '执行创建后脚本',
                                                     name: 'after',
-													labelWidth: 110,
+                                                    labelWidth: 110,
                                                     boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`
                                                 }
                                             ],
@@ -855,7 +827,7 @@ Ext.application({
                                                 selType: 'checkboxmodel',
                                                 columnLines: true,
                                                 enableLocking: true,
-												maxHeight: 600,
+                                                maxHeight: 600,
                                                 store: Ext.create('Ext.data.Store', {
                                                     data: files
                                                 }),
@@ -1111,23 +1083,6 @@ Ext.application({
 
         ipcRenderer.send('loading-msg', '缓存加载中...');
 
-        function getFilesData() {
-            let GfData = fileData.getFiles(pId, '0');
-            GfData.forEach(d => {
-                d.children = undefined;
-                d.loaded = false;
-                d.expanded = false;
-                if (d.type == 'file') {
-                    d.icon = getFileIcon(d.text);
-                } else {
-                    d.icon = './icons/folder-core.svg';
-                }
-            });
-            const root = Ext.getCmp('ge-tree').getRootNode();
-            root.removeAll();
-            root.appendChild(GfData);
-        }
-
         getFilesData();
 
         function addbutton(item, url, icon, title, data) {
@@ -1253,19 +1208,6 @@ Ext.application({
             }, btn, d.text);
         }
 
-        function setJsData() {
-            if (pId == undefined || pId == null || pId.trim().length == 0) {
-                showToast('请先[选择模板]或[创建模板]!');
-                return;
-            }
-            const main = Ext.getCmp('js-data');
-            main.removeAll(true);
-            main.add({
-                xtype: 'editor',
-                pId: pId
-            });
-        }
-
         setJsData();
 
         try {
@@ -1295,6 +1237,36 @@ Ext.application({
         ipcRenderer.send('loading-success', '加载完成!');
     }
 });
+
+function setJsData() {
+    if (pId == undefined || pId == null || pId.trim().length == 0) {
+        showToast('请先[选择模板]或[创建模板]!');
+        return;
+    }
+    const main = Ext.getCmp('js-data');
+    main.removeAll(true);
+    main.add({
+        xtype: 'editor',
+        pId: pId
+    });
+}
+
+function getFilesData() {
+    let GfData = fileData.getFiles(pId, '0');
+    GfData.forEach(d => {
+        d.children = undefined;
+        d.loaded = false;
+        d.expanded = false;
+        if (d.type == 'file') {
+            d.icon = getFileIcon(d.text);
+        } else {
+            d.icon = './icons/folder-core.svg';
+        }
+    });
+    const root = Ext.getCmp('ge-tree').getRootNode();
+    root.removeAll();
+    root.appendChild(GfData);
+}
 
 function openSome({id, title, type, params, icon}) {
     const panel = "mainmenutab";
@@ -1419,19 +1391,93 @@ function checkNew(id) {
         method: 'POST',
         jsonData: {id: d.detailId, pid: d.serveId},
         success: function (response) {
-            const jsonResp = Ext.util.JSON.decode(response.responseText);
-            if (jsonResp) {
-                Ext.MessageBox.show({
-                    title: '模板更新',
-                    msg: '检查到新的模板,请及时更新!',
-                    buttons: Ext.MessageBox.OK,
-                    scope: this,
-                    icon: Ext.MessageBox.INFO
+            const res = Ext.util.JSON.decode(response.responseText);
+            if (res) {
+                Ext.Ajax.request({
+                    url: userConfig.getUrl() + '/getNewest/' + d.serveId,
+                    method: 'POST',
+                    jsonData: {},
+                    success: function (response) {
+                        const jsonResp = Ext.util.JSON.decode(response.responseText);
+                        console.log(jsonResp);
+                        showConfirm(`检查到新的模板,是否立即更新?`, function (text) {
+                            Ext.getBody().mask('下载中, 请稍等...');
+                            const local = parentData.getByServeId(jsonResp.Pid);
+                            utils.downloadFile(jsonResp.User + '/' + jsonResp.Id + '.zip', jsonResp.Id + '.zip').then(d => {
+                                jsCode.updateTemplate(d, local, jsonResp).then(msg => {
+                                    Ext.getBody().unmask();
+                                    showToast('[info] [' + data.Name + ']更新成功!');
+                                    jsCode.deleteFile(d);
+                                    if (history.getMode() == local.id) {
+                                        changeTemplate(local.id, true);
+                                        return;
+                                    }
+                                }).catch(e => {
+                                    console.error(e);
+                                    Ext.getBody().unmask();
+                                    showError(e);
+                                    jsCode.deleteFile(d);
+                                });
+                            }).catch(err => {
+                                console.error(err);
+                                Ext.getBody().unmask();
+                                showError('[error] ' + err);
+                            });
+                        }, null, Ext.MessageBox.QUESTION);
+                    }
                 });
             }
         },
         failure: function (response) {
             console.log(response);
         }
+    });
+}
+
+function changeTemplate(newPId, flag) {
+    closeNodeWin();
+    pId = newPId;
+    moduleId = pId;
+    history.setMode(pId);
+    Ext.getBody().mask('切换中...');
+    const root = Ext.getCmp('panel-model').getRootNode();
+    root.removeAll();
+    const list = data.getData(pId);
+    list.forEach(d => d.icon = './images/database_save.svg');
+    root.appendChild(list);
+    history.removeAll();
+    const mode = parentData.getById(pId);
+    Ext.getCmp('panel-model').setTitle(mode.text);
+    Ext.getCmp('mainmenutab').removeAll();
+    try {
+        eval(geFileData.getSwig(pId));
+    } catch (e) {
+        console.error(e);
+        showError(e);
+    }
+    jsCode.createFolder(pId);
+    jsCode.initFile(pId);
+    setJsData();
+    command.cdTargetFolder(jsCode.getFolder(pId));
+    getFilesData();
+    registerAllSuggestion();
+    checkNew(pId);
+    Ext.getBody().unmask();
+    require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${mode.text}]`);
+    showToast('[info] 切换模板为:' + mode.text);
+    if (flag) {
+        installTemplateAllPkg();
+    }
+}
+
+function installTemplateAllPkg() {
+    const packages = packageConfig.getAll(pId);
+    if (Ext.getCmp('terminal').hidden) {
+        document.getElementById('terminal-btn').click();
+        const folder = jsCode.getFolder(pId);
+        command.cdTargetFolder(folder);
+    }
+    packages.forEach(p => {
+        command.write('npm install ' + p.name + '@' + p.version);
     });
 }

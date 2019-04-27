@@ -45,6 +45,14 @@ class Package {
         db.set('data', newData).write();
     }
 
+    updateAll({data, pId}) {
+        db.get('data')
+            .remove({pId: pId})
+            .write();
+        db.set('data', db.get('data').value().concat(data))
+            .write();
+    }
+
     removeAll(pId) {
         db.get('data')
             .remove({pId: pId})

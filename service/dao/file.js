@@ -83,9 +83,17 @@ class File {
         fdb.set('data', newData).write();
     }
 
+    updateAll({data, pId}) {
+        fdb.get('data')
+            .remove({pId: pId})
+            .write();
+        fdb.set('data', fdb.get('data').value().concat(data))
+            .write();
+    }
+
     removeAll(pId) {
         fdb.get('data')
-            .remove({ pId: pId })
+            .remove({pId: pId})
             .write();
     }
 }
