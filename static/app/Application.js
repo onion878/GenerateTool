@@ -62,6 +62,7 @@ Ext.application({
         let title = '数据模板';
         if (pId !== '') {
             title = parentData.getById(pId).text;
+            require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${title}]`);
         }
 
         ipcRenderer.send('loading-msg', '界面加载中...');
@@ -1378,7 +1379,7 @@ function doSomeThing(text) {
     }
 }
 
-function checkNew(id) {
+function checkNew(id, flag) {
     if (utils.isEmpty(id)) {
         return;
     }
@@ -1399,7 +1400,6 @@ function checkNew(id) {
                     jsonData: {},
                     success: function (response) {
                         const jsonResp = Ext.util.JSON.decode(response.responseText);
-                        console.log(jsonResp);
                         showConfirm(`检查到新的模板,是否立即更新?`, function (text) {
                             Ext.getBody().mask('下载中, 请稍等...');
                             const local = parentData.getByServeId(jsonResp.Pid);
@@ -1426,12 +1426,26 @@ function checkNew(id) {
                         }, null, Ext.MessageBox.QUESTION);
                     }
                 });
+            } else {
+                if(flag) {
+                    Ext.MessageBox.show({
+                        title: '检查更新',
+                        msg: '当前模板已经是最新模板!',
+                        buttons: Ext.MessageBox.OK,
+                        icon: Ext.MessageBox.INFO
+                    });
+                }
             }
         },
         failure: function (response) {
             console.log(response);
         }
     });
+}
+
+function updateNowTemplate() {
+    showToast('[info] 检查当前模板是否有新版本中...');
+    checkNew(pId, true);
 }
 
 function changeTemplate(newPId, flag) {

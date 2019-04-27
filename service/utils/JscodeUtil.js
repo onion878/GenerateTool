@@ -356,7 +356,7 @@ class JscodeUtil {
                     require('../dao/controls.js').updateAll({...controls, pId: local.id});
                     require('../dao/file.js').updateAll({...file, pId: local.id});
                     require('../dao/gefile.js').updateAll({...gefile, pId: local.id});
-                    require('../dao/mode.js').updateTemplate(local.id, local.serveId, tempData.id);
+                    require('../dao/mode.js').updateTemplate(local.id, local.serveId, tempData.Id);
                     require('../dao/modeData.js').updateAll({...modeData, pId: local.id});
                     require('../dao/package.js').updateAll({...pack, pId: local.id});
                     if (fs.existsSync(dir + '/' + local.id)) {

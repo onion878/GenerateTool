@@ -158,6 +158,13 @@ function createMainWindow() {
                         let code = `openSome({id:'online-temp',title:'在线模板',type:'online-temp'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
+                },
+                {
+                    label: '更新模板',
+                    click() {
+                        let code = `updateNowTemplate()`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
                 }
             ]
         },
