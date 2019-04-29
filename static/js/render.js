@@ -1,13 +1,13 @@
 const swig = require('swig');
 const appPath = require('app-root-path').path;
 const need = require('require-uncached');
-const controlData = require('../service/dao/controls');
+let controlData = need( appPath + '/service/dao/controls');
 const jsC = require('../service/utils/JscodeUtil');
 const logger = require('../service/utils/logger');
-const history = require('../service/dao/history');
-const moduleId = history.getMode();
+let history = need( appPath + '/service/dao/history');
+let moduleId = history.getMode();
 const remote = require('electron').remote;
-const geFileData = require('../service/dao/gefile');
+let geFileData = need( appPath + '/service/dao/gefile');
 process
     .on('unhandledRejection', (reason, p) => {
         console.error(reason, 'Unhandled Rejection at Promise', p);
@@ -24,6 +24,7 @@ try {
 }
 //获取已经定义的数据
 let getAllData = () => {
+	controlData = need( appPath + '/service/dao/controls');
     return controlData.getModuleData(moduleId);
 };
 
@@ -35,7 +36,9 @@ let req = (module) => {
 let compileTemplate = (fileId) => {
     return new Promise((resolve, reject) => {
         try {
-            const tpl = swig.compile(need(appPath + '/service/dao/gefile').getOneData(fileId).content);
+			geFileData = need( appPath + '/service/dao/gefile');
+			controlData = need( appPath + '/service/dao/controls');
+            const tpl = swig.compile(geFileData.getOneData(fileId).content);
             resolve(tpl(controlData.getModuleData(moduleId)));
         } catch (e) {
             reject(e);
