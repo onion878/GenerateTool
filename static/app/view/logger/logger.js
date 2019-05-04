@@ -17,7 +17,7 @@ Ext.define('OnionSpace.view.logger.logger', {
                 lineDecorationsWidth: '0px',
                 scrollBeyondLastLine: false,
                 minimap: {
-                    enabled: false
+                    enabled: true
                 },
                 automaticLayout: true
             });
