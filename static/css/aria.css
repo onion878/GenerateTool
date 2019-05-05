@@ -177,3 +177,7 @@ body {
 .mtku {
     cursor: pointer;
 }
+
+.direction-rtl {
+    direction: rtl;
+}

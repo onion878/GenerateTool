@@ -1,8 +1,11 @@
 Ext.define('OnionSpace.view.welcome.welcome', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.welcome',
-    html: `<iframe width="100%" height="100%" frameBorder="0" src="https://generate-docs.netlify.com/"></iframe>`,
+    html: '',
+    margin: 10,
+    scrollable: true,
     initComponent: function () {
+        this.html = utils.showUpdate();
         this.callParent(arguments);
     }
 });

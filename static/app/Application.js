@@ -9,6 +9,7 @@ const packageConfig = require('../service/dao/package');
 const controlData = require('../service/dao/controls');
 const fileData = require('../service/dao/file');
 const geFileData = require('../service/dao/gefile');
+const operation = require('../service/dao/operation');
 const swig = require('swig');
 const utils = require('../service/utils/utils');
 const command = require('../service/utils/commands');
@@ -39,7 +40,8 @@ Ext.application({
         'Message',
         'AfterShell',
         'BeforeShell',
-        'Logger'
+        'Logger',
+        'Operation'
     ],
     launch: function () {
         ipcRenderer.send('loading-msg', '模块加载中...');
@@ -838,7 +840,13 @@ Ext.application({
                                                 }],
                                                 columns: [
                                                     new Ext.grid.RowNumberer(),
-                                                    {text: '名称', align: 'center', dataIndex: 'name', flex: 1},
+                                                    {
+                                                        text: '名称',
+                                                        align: 'center',
+                                                        dataIndex: 'name',
+                                                        flex: 1,
+                                                        tdCls: 'direction-rtl'
+                                                    },
                                                     {
                                                         text: '是否存在',
                                                         align: 'center',
@@ -880,6 +888,7 @@ Ext.application({
                                                         const grid = this.up('window').down('grid');
                                                         const selected = grid.getSelectionModel().getSelection();
                                                         this.up('window').close();
+                                                        let operationId = null;
                                                         if (before) {
                                                             nodeRun('(function(){' + geFileData.getBeforeShell(pId) + '})();').then(d => {
                                                                 showToast('[info] 创建前JS脚本执行成功');
@@ -908,7 +917,22 @@ Ext.application({
                                                                             throw e;
                                                                         }
                                                                     }
+                                                                    const oldContent = utils.readFile(f.name);
                                                                     utils.createFile(f.name, f.preview);
+                                                                    operationId = operation.setOperation({
+                                                                        id: operationId,
+                                                                        date: utils.getNowTime(),
+                                                                        pId: pId,
+                                                                        name: `[${parentData.getById(pId).text}]`
+                                                                    }, {
+                                                                        pId: operationId,
+                                                                        date: utils.getNowTime(),
+                                                                        type: f.type,
+                                                                        file: f.name,
+                                                                        tempId: f.id,
+                                                                        content: f.preview,
+                                                                        oldContent: oldContent
+                                                                    });
                                                                     showToast('[info] ' + f.name + ' 生成成功!');
                                                                 });
                                                                 showToast('[info] 文件创建完成');
@@ -957,7 +981,22 @@ Ext.application({
                                                                         throw e;
                                                                     }
                                                                 }
+                                                                const oldContent = utils.readFile(f.name);
                                                                 utils.createFile(f.name, f.preview);
+                                                                operationId = operation.setOperation({
+                                                                    id: operationId,
+                                                                    date: utils.getNowTime(),
+                                                                    pId: pId,
+                                                                    name: `[${parentData.getById(pId).text}]`
+                                                                }, {
+                                                                    pId: operationId,
+                                                                    date: utils.getNowTime(),
+                                                                    type: f.type,
+                                                                    file: f.name,
+                                                                    tempId: f.id,
+                                                                    content: f.preview,
+                                                                    oldContent: oldContent
+                                                                });
                                                                 showToast('[info] ' + f.name + ' 生成成功!');
                                                             });
                                                             showToast('[info] 文件创建完成');
@@ -1236,8 +1275,18 @@ Ext.application({
         document.body.style.backgroundSize = '100% 100%';
         document.body.style.opacity = userConfig.getOpacity();
         ipcRenderer.send('loading-success', '加载完成!');
+        checkVersion();
     }
 });
+
+function checkVersion() {
+    const v = systemConfig.getConfig('version'), nV = utils.getVersion();
+    if (v == nV) {
+        return;
+    }
+    systemConfig.setConfig('version', nV);
+    openSome({id: 'welcome', title: '更新日志', type: 'welcome'});
+}
 
 function setJsData() {
     if (pId == undefined || pId == null || pId.trim().length == 0) {
@@ -1318,6 +1367,15 @@ function showError(s) {
 function showErrorFlag() {
     Ext.toast({
         html: `<span style="color: red">出现错误, 请查看日志!</span>`,
+        closable: false,
+        align: 't',
+        slideInDuration: 400
+    });
+}
+
+function toast(msg) {
+    Ext.toast({
+        html: msg,
         closable: false,
         align: 't',
         slideInDuration: 400
@@ -1427,7 +1485,7 @@ function checkNew(id, flag) {
                     }
                 });
             } else {
-                if(flag) {
+                if (flag) {
                     Ext.MessageBox.show({
                         title: '检查更新',
                         msg: '当前模板已经是最新模板!',

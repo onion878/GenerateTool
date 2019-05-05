@@ -106,7 +106,21 @@ function createMainWindow() {
                 {
                     label: '系统日志',
                     click() {
-                        let code = `openSome({id:'logger',title:'系统日志',type:'logger'})`;
+                        const code = `openSome({id:'logger',title:'系统日志',type:'logger'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                },
+                {
+                    label: '操作历史',
+                    click() {
+                        const code = `openSome({id:'operation',title:'操作历史',type:'operation'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                },
+                {
+                    label: '更新日志',
+                    click() {
+                        const code = `openSome({id:'welcome',title:'更新日志',type:'welcome'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },
@@ -237,7 +251,14 @@ function createMainWindow() {
                         x = data.x;
                         y = data.y;
                     }
-                    need('./service/dao/system').setWin({id: 'system', x: x, y: y, width: width, height: height, maximal: maximal});
+                    need('./service/dao/system').setWin({
+                        id: 'system',
+                        x: x,
+                        y: y,
+                        width: width,
+                        height: height,
+                        maximal: maximal
+                    });
                     process.exit(0);
                 }
             });

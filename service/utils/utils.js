@@ -119,7 +119,19 @@ class Utils {
     }
 
     readFile(path) {
-        return fs.readFileSync(path, 'utf8');
+        path = path.replace(/\\/g, '/');
+        if (fs.existsSync(path)) {
+            return fs.readFileSync(path, 'utf8');
+        } else {
+            return null;
+        }
+    }
+
+    unLinkFile(path) {
+        path = path.replace(/\\/g, '/');
+        if (fs.existsSync(path)) {
+            fs.unlinkSync(path);
+        }
     }
 
     openCodeFolder(file, folder) {
@@ -209,6 +221,15 @@ class Utils {
                 }
             });
         });
+    }
+
+    showUpdate() {
+        const marked = require('marked');
+        return marked(this.readFile(require('app-root-path').path + '/UPDATE.md'));
+    }
+
+    getVersion() {
+        return require(require('app-root-path').path + '/package.json').version;
     }
 }
 

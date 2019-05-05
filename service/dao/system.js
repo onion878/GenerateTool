@@ -15,7 +15,8 @@ class System {
             auth: '',
             terminal: '',
             editor: '',
-            win: {}
+            win: {},
+            version: ''
         }).write();
     }
 
