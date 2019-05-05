@@ -36,7 +36,14 @@ class Operation {
     }
 
     findDetail(pId) {
-        return this.db.get('details').filter({pId: pId}).value();
+        const rows = this.db.get('details').filter({pId: pId}).value();
+        rows.map(r => {
+            if (r.oldContent !== null)
+                r.oldHtml = r.oldContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            else
+                r.oldHtml = null
+        });
+        return rows;
     }
 
     deleteById(id) {

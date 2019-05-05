@@ -111,7 +111,7 @@ Ext.define('OnionSpace.view.operation.operation', {
                 xtype: 'grid',
                 store: Ext.create('Ext.data.Store', {
                     storeId: 'tempId',
-                    fields: ['pId', 'date', 'type', 'file', 'tempId', 'content', 'oldContent'],
+                    fields: ['pId', 'date', 'type', 'file', 'tempId', 'content', 'oldContent', 'oldHtml'],
                     data: operation.findDetail(data.id),
                     sorters: [{
                         property: 'date',
@@ -120,7 +120,7 @@ Ext.define('OnionSpace.view.operation.operation', {
                 }),
                 plugins: [{
                     ptype: 'rowexpander',
-                    rowBodyTpl: ['<p style="white-space: pre;"><b>原内容:</b><br/>{oldContent}</p>']
+                    rowBodyTpl: ['<p style="white-space: pre;"><b>原内容:</b><br/>{oldHtml}</p>']
                 }],
                 columns: [
                     new Ext.grid.RowNumberer(),
