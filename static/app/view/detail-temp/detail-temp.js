@@ -54,12 +54,14 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                 utils.downloadFile(data.User + '/' + data.Id + '.zip', data.Id + '.zip').then(d => {
                                     if (local === undefined) {
                                         jsCode.importModule(d, "", data.Pid, data.Id).then(({msg, pId}) => {
-                                            Ext.getBody().unmask();
                                             showToast('[info] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);
-                                            showConfirm(`下载成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
-                                                changeTemplate(pId, true);
-                                            }, null, Ext.MessageBox.QUESTION);
+                                            setTimeout(() => {
+                                                Ext.getBody().unmask();
+                                                showConfirm(`下载成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
+                                                    changeTemplate(pId, true);
+                                                }, undefined, Ext.MessageBox.QUESTION);
+                                            }, 500);
                                         }).catch(e => {
                                             console.error(e);
                                             Ext.getBody().unmask();
@@ -68,16 +70,18 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                         });
                                     } else {
                                         jsCode.updateTemplate(d, local, data).then(msg => {
-                                            Ext.getBody().unmask();
-                                            showToast('[info] [' + data.Name + ']更新成功!');
+                                            showToast('[info] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);
                                             if (history.getMode() == local.id) {
                                                 changeTemplate(local.id, true);
                                                 return;
                                             }
-                                            showConfirm(`更新成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
-                                                changeTemplate(local.id, true);
-                                            }, view, Ext.MessageBox.QUESTION);
+                                            setTimeout(() => {
+                                                Ext.getBody().unmask();
+                                                showConfirm(`更新成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
+                                                    changeTemplate(local.id, true);
+                                                }, view, Ext.MessageBox.QUESTION);
+                                            }, 500);
                                         }).catch(e => {
                                             console.error(e);
                                             Ext.getBody().unmask();

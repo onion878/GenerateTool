@@ -108,6 +108,7 @@ Ext.define('OnionSpace.controller.Templet', {
                         this.up('window').close();
                         const data = {id: oldName, text: name};
                         data.folder = require('../service/utils/help').getDataPath();
+                        data.newId = utils.getUUID();
                         jsCode.exportModule(data).then(t => {
                             const file = data.folder + data.text + '.zip';
                             jsCode.importModule(file, data.text).then(() => {

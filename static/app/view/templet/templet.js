@@ -69,6 +69,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                         data.folder = folder[0];
                                         const el = btn.up('templet').getEl();
                                         el.mask('导出中...');
+                                        data.newId = utils.getUUID();
                                         jsCode.exportModule(data).then(t => {
                                             el.unmask();
                                             showToast(`导出为[${data.folder}\\${data.text}.zip]`);

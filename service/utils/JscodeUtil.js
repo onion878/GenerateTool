@@ -40,7 +40,7 @@ class JscodeUtil {
             path = this.getFolder(id) + '/' + fileName;
             parentFolder = fileName;
         }
-        let status = utils.writeFile({path: path, content: ''});
+        utils.writeFile({path: path, content: ''});
         return {text: fileName, type: 'file', leaf: true, parentFolder: parentFolder};
     }
 
@@ -164,7 +164,7 @@ class JscodeUtil {
         return eval(content);
     }
 
-    exportModule({id, text, folder}) {
+    exportModule({id, text, folder, newId}) {
         const path = help.getDataPath(), that = this;
         return new Promise(function (resolve, reject) {
             const output = fs.createWriteStream(`${folder}/${text}.zip`);
@@ -193,8 +193,12 @@ class JscodeUtil {
                 fs.rename(`${path}/jscode/${id}/node_modules`, `${dir}/node_modules`, (err) => {
                     if (err) throw err;
                     archive.pipe(output);
-                    archive.append(that.getAllExportData(id), {name: 'data.json'});
-                    archive.directory(`${path}jscode/${id}/`, id);
+                    archive.append(that.getAllExportData(id, newId), {name: 'data.json'});
+                    if (newId) {
+                        archive.directory(`${path}jscode/${id}/`, newId);
+                    } else {
+                        archive.directory(`${path}jscode/${id}/`, id);
+                    }
                     archive.finalize();
                     fs.rename(`${dir}/node_modules`, `${path}/jscode/${id}/node_modules`, (err) => {
                         if (err) throw err;
@@ -203,14 +207,18 @@ class JscodeUtil {
                 });
             } else {
                 archive.pipe(output);
-                archive.append(that.getAllExportData(id), {name: 'data.json'});
-                archive.directory(`${path}jscode/${id}/`, id);
+                archive.append(that.getAllExportData(id, newId), {name: 'data.json'});
+                if (newId) {
+                    archive.directory(`${path}jscode/${id}/`, newId);
+                } else {
+                    archive.directory(`${path}jscode/${id}/`, id);
+                }
                 archive.finalize();
             }
         });
     }
 
-    getAllExportData(id) {
+    getAllExportData(id, newId) {
         const data = {controls: {}, file: {}, gefile: {}, mode: {}, modeData: {}, package: {}};
         const controls = require('../dao/controls.js');
         const controlsData = controls.getExtByPid(id);
@@ -229,7 +237,13 @@ class JscodeUtil {
         data.modeData['data'] = modeData.getData(id);
         const pack = require('../dao/package.js');
         data.package['data'] = pack.getAll(id);
-        return JSON.stringify(data);
+        if (newId) {
+            delete data.mode['data'][0].serveId;
+            delete data.mode['data'][0].detailId;
+            return JSON.stringify(data).replace(new RegExp(id, 'g'), newId);
+        } else {
+            return JSON.stringify(data);
+        }
     }
 
     importModule(file, newName, serveId, detailId) {
@@ -381,10 +395,11 @@ class JscodeUtil {
 
     copyDir(src, dist, callback) {
         const that = this;
-        if(!fs.existsSync(dist)) {
+        if (!fs.existsSync(dist)) {
             fs.mkdirSync(dist);
         }
         _copy(null, src, dist);
+
         function _copy(err, src, dist) {
             if (err) {
                 callback(err);
