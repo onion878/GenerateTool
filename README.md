@@ -34,8 +34,7 @@ npm run dist
 ```
 
 ## 下载
-- [安装包](http://118.24.168.209:8080/share/6B0G-TwY)
-- [压缩包](http://118.24.168.209:8080/share/FUadAkVM)
+- [Releases](https://github.com/onion878/GenerateTool/releases)
 
 
 ## 相关文档
