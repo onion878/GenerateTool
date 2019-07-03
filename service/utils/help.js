@@ -1,8 +1,18 @@
-const path = require('path');
+const path = require('path'), os = require('os');
 
 module.exports = {
     getDataPath() {
-        return path.join(process.env.ProgramData || 'C:/ProgramData', '/', 'GenerateTool', '/').replace(/\\/g, '\/');
+        const platform = process.platform;
+        switch (platform) {
+            case 'win32':
+                return path.join(process.env.ProgramData || 'C:/ProgramData', '/', 'GenerateTool', '/').replace(/\\/g, '\/');
+            case 'darwin':
+                return path.join(os.homedir(), 'Library', 'Application Support') + '/GenerateTool';
+            case 'linux':
+                return process.env['XDG_CONFIG_HOME'] || path.join(os.homedir(), '.config') + '/GenerateTool';
+            default:
+                throw new Error('Platform not supported');
+        }
     },
     getPid() {
         const history = require('../dao/history');

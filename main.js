@@ -11,6 +11,7 @@ const url = require('url');
 const fs = require('fs');
 const shell = require('shelljs');
 const need = require('require-uncached');
+const {getDataPath} = require('./service/utils/help');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false, globalStoreDirPath;
 
@@ -50,7 +51,7 @@ function createWindow() {
 }
 
 function createMainWindow() {
-    globalStoreDirPath = path.join(process.env.ProgramData || 'C:/ProgramData', '/', app.getName());
+    globalStoreDirPath = getDataPath();
     if (!fs.existsSync(globalStoreDirPath)) {
         shell.mkdir('-p', globalStoreDirPath);
     }
