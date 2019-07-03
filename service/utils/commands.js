@@ -2,7 +2,7 @@ const os = require('os');
 const pty = require('node-pty');
 const Terminal = require('xterm').Terminal;
 const fit = require('xterm/lib/addons/fit/fit');
-const { remote } = require('electron');
+const {remote} = require('electron');
 
 class Commands {
     constructor() {
@@ -11,7 +11,7 @@ class Commands {
         this.systemCmd = false;
         this.workFlag = false;
         this.config = require('../dao/system');
-        if(this.config.getTheme() == 'aria') {
+        if (this.config.getTheme() == 'aria') {
             this.color1 = '#424242';
             this.color2 = '#232D38';
         } else {
@@ -120,7 +120,8 @@ class Commands {
 
     cdTargetFolder(folder) {
         if (this.nowPty == null) return;
-        if (this.systemCmd) {
+        const platform = process.platform;
+        if (this.systemCmd && platform == 'win32') {
             this.nowPty.write(`cd /d ${folder}\r`);
         } else {
             this.nowPty.write(`cd ${folder}\r`);
