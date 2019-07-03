@@ -7,9 +7,9 @@ module.exports = {
             case 'win32':
                 return path.join(process.env.ProgramData || 'C:/ProgramData', '/', 'GenerateTool', '/').replace(/\\/g, '\/');
             case 'darwin':
-                return path.join(os.homedir(), 'Library', 'Application Support') + '/GenerateTool';
+                return path.join(os.homedir(), 'Library', 'Application Support') + '/GenerateTool/';
             case 'linux':
-                return process.env['XDG_CONFIG_HOME'] || path.join(os.homedir(), '.config') + '/GenerateTool';
+                return process.env['XDG_CONFIG_HOME'] || path.join(os.homedir()) + '/GenerateTool/';
             default:
                 throw new Error('Platform not supported');
         }
