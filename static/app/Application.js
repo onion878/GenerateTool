@@ -908,7 +908,7 @@ Ext.application({
                                                                     } else {
                                                                         const filePath = f.name.replace(/\\/g, '\/');
                                                                         try {
-                                                                            f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\$/g, '\\\$').replace(/\`/g, '\\\`').replace(/\\/g, '\\\\')}\`;` + f.content);
+                                                                            f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
                                                                         } catch (e) {
                                                                             console.error(e);
                                                                             showError(e);

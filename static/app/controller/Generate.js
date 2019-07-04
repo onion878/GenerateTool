@@ -66,7 +66,7 @@ Ext.define('OnionSpace.controller.Generate', {
             try {
                 const tplFile = swig.compile(file);
                 const f = tplFile(controlData.getModuleData(btn.up('generate').pId)).replace(/\\/g, '\/');
-                const d = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(f, 'utf8').replace(/\$/g, '\\\$').replace(/\`/g, '\\\`').replace(/\\/g, '\\\\')}\`;` + code.getValue());
+                const d = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(f, 'utf8').replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + code.getValue());
                 if (d instanceof Promise) {
                     d.then(v => {
                         code.setValue(v);
