@@ -6,7 +6,7 @@
   "scripts": {
     "install": "node copy.js",
     "start": "electron .",
-    "dist": "electron-builder --win --x64",
+    "dist": "electron-builder --x64",
     "postinstall": "install-app-deps"
   },
   "keywords": [
