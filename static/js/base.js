@@ -1,5 +1,6 @@
 const {
-    webFrame
+    webFrame,
+    remote
 } = require('electron');
 const jsC = require('../service/utils/JscodeUtil');
 const logger = require('../service/utils/logger');
@@ -48,7 +49,7 @@ amdRequire.config({
 amdRequire(['vs/editor/editor.main'], function () {
     console.log('code init success');
     // Register a new language
-    monaco.languages.register({ id: 'consoleLanguage' });
+    monaco.languages.register({id: 'consoleLanguage'});
 
     // Register a tokens provider for the language
     monaco.languages.setMonarchTokensProvider('consoleLanguage', {
@@ -74,11 +75,11 @@ amdRequire(['vs/editor/editor.main'], function () {
         base: systemConfig.getTheme() == 'aria' ? 'vs-dark' : 'vs',
         inherit: true,
         rules: [
-            { token: 'custom-click', foreground: '448aff', fontStyle: 'underline' },
-            { token: 'custom-info', foreground: '26c6da' },
-            { token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold' },
-            { token: 'custom-warn', foreground: 'FFA500' },
-            { token: 'custom-date', foreground: '008800' }
+            {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},
+            {token: 'custom-info', foreground: '26c6da'},
+            {token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold'},
+            {token: 'custom-warn', foreground: 'FFA500'},
+            {token: 'custom-date', foreground: '008800'}
         ]
     });
 
@@ -950,7 +951,12 @@ ipc.on('runNodeErr', (event, message) => {
     showError('[error] 出现了错误, 请检查您的脚本, 错误信息如下:');
     showError('[error] ' + JSON.stringify(message));
     showToast('查看完整日志: [查看详情]');
-    Ext.getBody().unmask();
+    Ext.getCmp('main-content').unmask();
+    remote.getCurrentWindow().setProgressBar(-1);
+    new Notification('代码创建失败', {
+        body: `出现了错误, 错误信息:${message}`,
+        icon: './images/error.png'
+    });
     showErrorFlag();
 });
 
@@ -958,7 +964,7 @@ let runWin = null;
 
 const nodeRun = (content) => {
     if (runWin == null) {
-        const { BrowserWindow, getCurrentWindow } = require('electron').remote;
+        const {BrowserWindow, getCurrentWindow} = require('electron').remote;
         runWin = new BrowserWindow({
             parent: getCurrentWindow(),
             show: false,
@@ -980,7 +986,7 @@ const closeNodeWin = () => {
 };
 
 function login(call) {
-    const { Password, UserName } = userConfig.getUser();
+    const {Password, UserName} = userConfig.getUser();
     Ext.create('Ext.window.Window', {
         title: '登录',
         width: 320,
@@ -1020,14 +1026,14 @@ function login(call) {
                         Ext.Ajax.request({
                             url: userConfig.getUrl() + '/login',
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: {'Content-Type': 'application/json'},
                             jsonData: form.getValues(),
                             success: function (response) {
                                 const jsonResp = Ext.util.JSON.decode(response.responseText);
                                 userConfig.setAuth(jsonResp.token);
                                 userConfig.setUser(form.getValues());
                                 btn.up('window').close();
-                                if(call) {
+                                if (call) {
                                     call(jsonResp.token);
                                 }
                             },

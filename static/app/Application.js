@@ -1000,6 +1000,11 @@ Ext.application({
                                                                                 console.error(e);
                                                                                 showError(f.file + ':模板错误');
                                                                                 Ext.getCmp('main-content').unmask();
+                                                                                win.setProgressBar(-1);
+                                                                                new Notification('代码创建失败', {
+                                                                                    body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                                                                    icon: 'images/error.png'
+                                                                                });
                                                                                 throw e;
                                                                             }
                                                                         } else {
@@ -1010,6 +1015,11 @@ Ext.application({
                                                                                 console.error(e);
                                                                                 showError(e);
                                                                                 Ext.getCmp('main-content').unmask();
+                                                                                win.setProgressBar(-1);
+                                                                                new Notification('代码创建失败', {
+                                                                                    body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                                                                    icon: 'images/error.png'
+                                                                                });
                                                                                 throw e;
                                                                             }
                                                                         }
