@@ -21,14 +21,14 @@
     "appId": "onion.app.GenaretorTool",
     "asar": true,
     "mac": {
-      "icon": "static/images/icon.ico",
+      "icon": "static/images/code.png",
       "target": [
         "dmg",
         "zip"
       ]
     },
     "win": {
-      "icon": "static/images/icon.ico",
+      "icon": "static/images/code.png",
       "target": [
         "nsis",
         "zip"
