@@ -124,7 +124,11 @@ class Commands {
         if (this.systemCmd && platform == 'win32') {
             this.nowPty.write(`cd /d ${folder}\r`);
         } else {
-            this.nowPty.write(`cd ${folder}\r`);
+            if (platform == 'darwin') {
+                this.nowPty.write(`cd ${folder.replace(/ /g, '\\ ')}\r`);
+            } else {
+                this.nowPty.write(`cd ${folder}\r`);
+            }
         }
         this.workFlag = true;
     }
