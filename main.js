@@ -94,7 +94,7 @@ function createMainWindow() {
                 {
                     label: '设置',
                     click() {
-                        let code = `openSome({id:'setting',title:'设置',type:'setting'})`;
+                        let code = `openSome({id:'setting',title:'设置',type:'setting', icon: './images/set.svg'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },
@@ -107,21 +107,21 @@ function createMainWindow() {
                 {
                     label: '系统日志',
                     click() {
-                        const code = `openSome({id:'logger',title:'系统日志',type:'logger'})`;
+                        const code = `openSome({id:'logger',title:'系统日志',type:'logger', icon: './images/system-log.svg'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },
                 {
                     label: '操作历史',
                     click() {
-                        const code = `openSome({id:'operation',title:'操作历史',type:'operation'})`;
+                        const code = `openSome({id:'operation',title:'操作历史',type:'operation', icon: './images/history.svg'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },
                 {
                     label: '更新日志',
                     click() {
-                        const code = `openSome({id:'welcome',title:'更新日志',type:'welcome'})`;
+                        const code = `openSome({id:'welcome',title:'更新日志',type:'welcome', icon: './images/readme.svg'})`;
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },
