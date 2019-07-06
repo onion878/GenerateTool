@@ -66,7 +66,7 @@ function createMainWindow() {
     if (data.id == undefined) {
         data = {id: '', width: 800, height: 600, maximal: false, x: 100, y: 100};
     }
-    const icon = path.join(__dirname, 'static/images/icon.ico');
+    const icon = path.join(__dirname, 'static/images/code.png');
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: data.width,
