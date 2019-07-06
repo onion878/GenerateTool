@@ -896,10 +896,101 @@ Ext.application({
                                                                 const selected = grid.getSelectionModel().getSelection();
                                                                 this.up('window').close();
                                                                 let operationId = null;
-                                                                if (before) {
-                                                                    nodeRun('(function(){' + geFileData.getBeforeShell(pId) + '})();').then(d => {
-                                                                        showToast('[info] 创建前JS脚本执行成功');
-                                                                        win.setProgressBar(0.2);
+                                                                setTimeout(() => {
+                                                                    if (before) {
+                                                                        nodeRun('(function(){' + geFileData.getBeforeShell(pId) + '})();').then(d => {
+                                                                            showToast('[info] 创建前JS脚本执行成功');
+                                                                            win.setProgressBar(0.2);
+                                                                            selected.map((row, i) => {
+                                                                                const f = row.data;
+                                                                                if (f.type == 'add') {
+                                                                                    try {
+                                                                                        const tplPre = swig.compile(f.content);
+                                                                                        f.preview = tplPre(allModuleData);
+                                                                                    } catch (e) {
+                                                                                        console.error(e);
+                                                                                        showError(f.file + ':模板错误');
+                                                                                        Ext.getCmp('main-content').unmask();
+                                                                                        throw e;
+                                                                                    }
+                                                                                } else {
+                                                                                    const filePath = f.name.replace(/\\/g, '\/');
+                                                                                    try {
+                                                                                        f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
+                                                                                    } catch (e) {
+                                                                                        console.error(e);
+                                                                                        showError(e);
+                                                                                        Ext.getCmp('main-content').unmask();
+                                                                                        throw e;
+                                                                                    }
+                                                                                }
+                                                                                const oldContent = utils.readFile(f.name);
+                                                                                utils.createFile(f.name, f.preview);
+                                                                                operationId = operation.setOperation({
+                                                                                    id: operationId,
+                                                                                    date: utils.getNowTime(),
+                                                                                    pId: pId,
+                                                                                    name: `[${parentData.getById(pId).text}]`
+                                                                                }, {
+                                                                                    pId: operationId,
+                                                                                    date: utils.getNowTime(),
+                                                                                    type: f.type,
+                                                                                    file: f.name,
+                                                                                    tempId: f.id,
+                                                                                    content: f.preview,
+                                                                                    oldContent: oldContent
+                                                                                });
+                                                                                showToast('[info] ' + f.name + ' 生成成功!');
+                                                                                if (after) {
+                                                                                    win.setProgressBar((0.6 / selected.length) * (i + 1) + 0.2);
+                                                                                } else {
+                                                                                    win.setProgressBar((0.8 / selected.length) * (i + 1) + 0.2);
+                                                                                }
+                                                                            });
+                                                                            showToast('[info] 文件创建完成');
+                                                                            if (after) {
+                                                                                nodeRun('(function(){' + geFileData.getShell(pId) + '})();').then(d => {
+                                                                                    showToast('[info] 创建后JS脚本执行成功');
+                                                                                    Ext.getCmp('main-content').unmask();
+                                                                                    win.setProgressBar(1);
+                                                                                    setTimeout(() => {
+                                                                                        win.setProgressBar(-1);
+                                                                                        new Notification('代码创建成功', {
+                                                                                            body: `[${title}]代码创建成功`,
+                                                                                            icon: 'images/success.png'
+                                                                                        });
+                                                                                    }, 200);
+                                                                                }).catch(e => {
+                                                                                    console.error(e);
+                                                                                    showError(e);
+                                                                                    showErrorFlag();
+                                                                                    Ext.getCmp('main-content').unmask();
+                                                                                    win.setProgressBar(-1);
+                                                                                    new Notification('代码创建失败', {
+                                                                                        body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                                                                        icon: 'images/error.png'
+                                                                                    });
+                                                                                });
+                                                                            } else {
+                                                                                Ext.getCmp('main-content').unmask();
+                                                                                win.setProgressBar(-1);
+                                                                                new Notification('代码创建成功', {
+                                                                                    body: `[${title}]代码创建成功`,
+                                                                                    icon: 'images/success.png'
+                                                                                });
+                                                                            }
+                                                                        }).catch(e => {
+                                                                            console.error(e);
+                                                                            showError(e);
+                                                                            showErrorFlag();
+                                                                            Ext.getCmp('main-content').unmask();
+                                                                            win.setProgressBar(-1);
+                                                                            new Notification('代码创建失败', {
+                                                                                body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                                                                icon: 'images/error.png'
+                                                                            });
+                                                                        });
+                                                                    } else {
                                                                         selected.map((row, i) => {
                                                                             const f = row.data;
                                                                             if (f.type == 'add') {
@@ -910,6 +1001,11 @@ Ext.application({
                                                                                     console.error(e);
                                                                                     showError(f.file + ':模板错误');
                                                                                     Ext.getCmp('main-content').unmask();
+                                                                                    win.setProgressBar(-1);
+                                                                                    new Notification('代码创建失败', {
+                                                                                        body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                                                                        icon: 'images/error.png'
+                                                                                    });
                                                                                     throw e;
                                                                                 }
                                                                             } else {
@@ -920,6 +1016,11 @@ Ext.application({
                                                                                     console.error(e);
                                                                                     showError(e);
                                                                                     Ext.getCmp('main-content').unmask();
+                                                                                    win.setProgressBar(-1);
+                                                                                    new Notification('代码创建失败', {
+                                                                                        body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                                                                        icon: 'images/error.png'
+                                                                                    });
                                                                                     throw e;
                                                                                 }
                                                                             }
@@ -941,9 +1042,9 @@ Ext.application({
                                                                             });
                                                                             showToast('[info] ' + f.name + ' 生成成功!');
                                                                             if (after) {
-                                                                                win.setProgressBar((0.6 / selected.length) * (i + 1) + 0.2);
+                                                                                win.setProgressBar((0.8 / selected.length) * (i + 1));
                                                                             } else {
-                                                                                win.setProgressBar((0.8 / selected.length) * (i + 1) + 0.2);
+                                                                                win.setProgressBar((1 / selected.length) * (i + 1));
                                                                             }
                                                                         });
                                                                         showToast('[info] 文件创建完成');
@@ -978,107 +1079,8 @@ Ext.application({
                                                                                 icon: 'images/success.png'
                                                                             });
                                                                         }
-                                                                    }).catch(e => {
-                                                                        console.error(e);
-                                                                        showError(e);
-                                                                        showErrorFlag();
-                                                                        Ext.getCmp('main-content').unmask();
-                                                                        win.setProgressBar(-1);
-                                                                        new Notification('代码创建失败', {
-                                                                            body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                            icon: 'images/error.png'
-                                                                        });
-                                                                    });
-                                                                } else {
-                                                                    selected.map((row, i) => {
-                                                                        const f = row.data;
-                                                                        if (f.type == 'add') {
-                                                                            try {
-                                                                                const tplPre = swig.compile(f.content);
-                                                                                f.preview = tplPre(allModuleData);
-                                                                            } catch (e) {
-                                                                                console.error(e);
-                                                                                showError(f.file + ':模板错误');
-                                                                                Ext.getCmp('main-content').unmask();
-                                                                                win.setProgressBar(-1);
-                                                                                new Notification('代码创建失败', {
-                                                                                    body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                    icon: 'images/error.png'
-                                                                                });
-                                                                                throw e;
-                                                                            }
-                                                                        } else {
-                                                                            const filePath = f.name.replace(/\\/g, '\/');
-                                                                            try {
-                                                                                f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
-                                                                            } catch (e) {
-                                                                                console.error(e);
-                                                                                showError(e);
-                                                                                Ext.getCmp('main-content').unmask();
-                                                                                win.setProgressBar(-1);
-                                                                                new Notification('代码创建失败', {
-                                                                                    body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                    icon: 'images/error.png'
-                                                                                });
-                                                                                throw e;
-                                                                            }
-                                                                        }
-                                                                        const oldContent = utils.readFile(f.name);
-                                                                        utils.createFile(f.name, f.preview);
-                                                                        operationId = operation.setOperation({
-                                                                            id: operationId,
-                                                                            date: utils.getNowTime(),
-                                                                            pId: pId,
-                                                                            name: `[${parentData.getById(pId).text}]`
-                                                                        }, {
-                                                                            pId: operationId,
-                                                                            date: utils.getNowTime(),
-                                                                            type: f.type,
-                                                                            file: f.name,
-                                                                            tempId: f.id,
-                                                                            content: f.preview,
-                                                                            oldContent: oldContent
-                                                                        });
-                                                                        showToast('[info] ' + f.name + ' 生成成功!');
-                                                                        if (after) {
-                                                                            win.setProgressBar((0.8 / selected.length) * (i + 1) + 0.2);
-                                                                        } else {
-                                                                            win.setProgressBar((1 / selected.length) * (i + 1) + 0.2);
-                                                                        }
-                                                                    });
-                                                                    showToast('[info] 文件创建完成');
-                                                                    if (after) {
-                                                                        nodeRun('(function(){' + geFileData.getShell(pId) + '})();').then(d => {
-                                                                            showToast('[info] 创建后JS脚本执行成功');
-                                                                            Ext.getCmp('main-content').unmask();
-                                                                            win.setProgressBar(1);
-                                                                            setTimeout(() => {
-                                                                                win.setProgressBar(-1);
-                                                                                new Notification('代码创建成功', {
-                                                                                    body: `[${title}]代码创建成功`,
-                                                                                    icon: 'images/success.png'
-                                                                                });
-                                                                            }, 200);
-                                                                        }).catch(e => {
-                                                                            console.error(e);
-                                                                            showError(e);
-                                                                            showErrorFlag();
-                                                                            Ext.getCmp('main-content').unmask();
-                                                                            win.setProgressBar(-1);
-                                                                            new Notification('代码创建失败', {
-                                                                                body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                icon: 'images/error.png'
-                                                                            });
-                                                                        });
-                                                                    } else {
-                                                                        Ext.getCmp('main-content').unmask();
-                                                                        win.setProgressBar(-1);
-                                                                        new Notification('代码创建成功', {
-                                                                            body: `[${title}]代码创建成功`,
-                                                                            icon: 'images/success.png'
-                                                                        });
                                                                     }
-                                                                }
+                                                                }, 500);
                                                             }
                                                         },
                                                         {
