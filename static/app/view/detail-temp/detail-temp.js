@@ -49,7 +49,7 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                             const btn = this;
                             showConfirm(`是否下载[${data.Name}]?`, function (text) {
                                 btn.up('detail-temp').up('window').close();
-                                Ext.getBody().mask('下载中, 请稍等...');
+                                Ext.getCmp('main-content').mask('下载中, 请稍等...');
                                 const local = parentData.getByServeId(data.Pid);
                                 utils.downloadFile(data.User + '/' + data.Id + '.zip', data.Id + '.zip').then(d => {
                                     if (local === undefined) {
@@ -57,14 +57,14 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                             showToast('[info] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);
                                             setTimeout(() => {
-                                                Ext.getBody().unmask();
+                                                Ext.getCmp('main-content').unmask();
                                                 showConfirm(`下载成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
                                                     changeTemplate(pId, true);
                                                 }, undefined, Ext.MessageBox.QUESTION);
                                             }, 500);
                                         }).catch(e => {
                                             console.error(e);
-                                            Ext.getBody().unmask();
+                                            Ext.getCmp('main-content').unmask();
                                             showError(e);
                                             jsCode.deleteFile(d);
                                         });
@@ -77,21 +77,21 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                                 return;
                                             }
                                             setTimeout(() => {
-                                                Ext.getBody().unmask();
+                                                Ext.getCmp('main-content').unmask();
                                                 showConfirm(`更新成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
                                                     changeTemplate(local.id, true);
                                                 }, view, Ext.MessageBox.QUESTION);
                                             }, 500);
                                         }).catch(e => {
                                             console.error(e);
-                                            Ext.getBody().unmask();
+                                            Ext.getCmp('main-content').unmask();
                                             showError(e);
                                             jsCode.deleteFile(d);
                                         });
                                     }
                                 }).catch(err => {
                                     console.error(err);
-                                    Ext.getBody().unmask();
+                                    Ext.getCmp('main-content').unmask();
                                     showError('[error] ' + err);
                                 });
                             }, this, Ext.MessageBox.QUESTION);

@@ -132,7 +132,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                 handler: function (btn) {
                                                     const v = btn.up('window').down('htmleditor').getValue();
                                                     btn.up('window').close();
-                                                    Ext.getBody().mask('上传中,请稍等...');
+                                                    Ext.getCmp('main-content').mask('上传中,请稍等...');
                                                     jsCode.exportModule(data).then(t => {
                                                         const file = data.folder + data.text + '.zip';
                                                         const param = {info: v, name: d.text};
@@ -142,9 +142,9 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                                 parentData.updateTemplate(d.id, c.serveId, c.detailId);
                                                             }
                                                             jsCode.deleteFile(file);
-                                                            Ext.getBody().unmask();
+                                                            Ext.getCmp('main-content').unmask();
                                                         }).catch(() => {
-                                                            Ext.getBody().unmask();
+                                                            Ext.getCmp('main-content').unmask();
                                                             jsCode.deleteFile(file);
                                                             Ext.MessageBox.show({
                                                                 title: '错误',
@@ -156,7 +156,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                     }).catch(err => {
                                                         console.error(err);
                                                         showError(err);
-                                                        Ext.getBody().unmask();
+                                                        Ext.getCmp('main-content').unmask();
                                                         Ext.MessageBox.show({
                                                             title: '错误',
                                                             msg: '系统错误,请查看日志!',

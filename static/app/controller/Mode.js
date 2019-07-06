@@ -615,7 +615,7 @@ Ext.define('OnionSpace.controller.Mode', {
         const that = this,
             id = btn.up('mode').id;
         showConfirm('是否重新获取数据?', function () {
-            Ext.getBody().mask('执行中...');
+            Ext.getCmp('main-content').mask('执行中...');
             const reData = [],
                 conData = controlData.getAllCode(id);
             closeNodeWin();
@@ -627,7 +627,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     console.error(e);
                     showError('[error] ' + e);
                     reData.push(null);
-                    Ext.getBody().unmask();
+                    Ext.getCmp('main-content').unmask();
                 }
             });
             Promise.all(reData).then(values => {
@@ -637,11 +637,11 @@ Ext.define('OnionSpace.controller.Mode', {
                     showToast('[info] 执行结果:' + JSON.stringify(v));
                     that.setComponentValue(type, btn, v, id);
                 });
-                Ext.getBody().unmask();
+                Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
                 showError('[error] ' + e.toString());
-                Ext.getBody().unmask();
+                Ext.getCmp('main-content').unmask();
             });
         }, btn, Ext.MessageBox.QUESTION);
     },
@@ -660,7 +660,7 @@ Ext.define('OnionSpace.controller.Mode', {
             return;
         }
         controlData.setCode(bId, valStr, cId);
-        Ext.getBody().mask('执行中...');
+        Ext.getCmp('main-content').mask('执行中...');
         let d = '',
             btn = Ext.getCmp(bId),
             type = btn.bType;
@@ -670,7 +670,7 @@ Ext.define('OnionSpace.controller.Mode', {
         } catch (e) {
             console.error(e);
             showError(e);
-            Ext.getBody().unmask();
+            Ext.getCmp('main-content').unmask();
             throw e;
         }
         if (d instanceof Promise) {
@@ -678,16 +678,16 @@ Ext.define('OnionSpace.controller.Mode', {
                 showToast('[info] 需要执行的脚本:' + valStr);
                 showToast('[info] 执行结果:' + JSON.stringify(v));
                 this.setComponentValue(type, btn, v, bId);
-                Ext.getBody().unmask();
+                Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
-                Ext.getBody().unmask();
+                Ext.getCmp('main-content').unmask();
             });
         } else {
             showToast('[info] 需要执行的脚本:' + valStr);
             showToast('[info] 执行结果:' + JSON.stringify(d));
             this.setComponentValue(type, btn, d, bId);
-            Ext.getBody().unmask();
+            Ext.getCmp('main-content').unmask();
         }
     },
     setComponentValue(type, btn, v, bId) {

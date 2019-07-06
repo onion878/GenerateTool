@@ -40,7 +40,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                         tooltip: '下载最新',
                         handler: function (view, recIndex, cellIndex, item, e, {data}) {
                             showConfirm(`是否下载[${data.Name}]?`, function (text) {
-                                Ext.getBody().mask('下载中, 请稍等...');
+                                Ext.getCmp('main-content').mask('下载中, 请稍等...');
                                 Ext.Ajax.request({
                                     url: userConfig.getUrl() + '/getNewest/' + data.Id,
                                     method: 'POST',
@@ -53,14 +53,14 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                                     showToast('[info] [' + data.Name + ']下载成功!');
                                                     jsCode.deleteFile(d);
                                                     setTimeout(() => {
-                                                        Ext.getBody().unmask();
+                                                        Ext.getCmp('main-content').unmask();
                                                         showConfirm(`下载成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
                                                             changeTemplate(pId, true);
                                                         }, undefined, Ext.MessageBox.QUESTION);
                                                     }, 500);
                                                 }).catch(e => {
                                                     console.error(e);
-                                                    Ext.getBody().unmask();
+                                                    Ext.getCmp('main-content').unmask();
                                                     showError(e);
                                                     jsCode.deleteFile(d);
                                                 });
@@ -73,26 +73,26 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                                         return;
                                                     }
                                                     setTimeout(() => {
-                                                        Ext.getBody().unmask();
+                                                        Ext.getCmp('main-content').unmask();
                                                         showConfirm(`更新成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
                                                             changeTemplate(local.id, true);
                                                         }, undefined, Ext.MessageBox.QUESTION);
                                                     }, 500);
                                                 }).catch(e => {
                                                     console.error(e);
-                                                    Ext.getBody().unmask();
+                                                    Ext.getCmp('main-content').unmask();
                                                     showError(e);
                                                     jsCode.deleteFile(d);
                                                 });
                                             }
                                         }).catch(err => {
                                             console.error(err);
-                                            Ext.getBody().unmask();
+                                            Ext.getCmp('main-content').unmask();
                                             showError('[error] ' + err);
                                         });
                                     },
                                     failure: function (response) {
-                                        Ext.getBody().unmask();
+                                        Ext.getCmp('main-content').unmask();
                                         Ext.MessageBox.show({
                                             title: '错误',
                                             msg: response.message,

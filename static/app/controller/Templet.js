@@ -102,7 +102,7 @@ Ext.define('OnionSpace.controller.Templet', {
                 handler: function () {
                     const form = this.up('window').down('form').getForm();
                     if (form.isValid()) {
-                        const el = Ext.getBody();
+                        const el = Ext.getCmp('main-content');
                         el.mask('处理中...');
                         const {name, oldName} = form.getValues();
                         this.up('window').close();
