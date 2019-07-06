@@ -152,7 +152,7 @@ function createMainWindow() {
                 {
                     label: '停止loading',
                     click() {
-                        mainWindow.webContents.executeJavaScript(`Ext.getBody().unmask()`);
+                        mainWindow.webContents.executeJavaScript(`Ext.getCmp('main-content').unmask();`);
                     }
                 }
             ]
