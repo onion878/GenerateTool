@@ -10,12 +10,21 @@
      unselectable="on"
      onselectstart="return false;"
      onmousedown="return false;" id="content">
-    <div class="spinner"></div>
+    <div class="spinner">
+        <div class="loader">
+            <div class="loader__bar"></div>
+            <div class="loader__bar loader__bar--delay-1"></div>
+            <div class="loader__bar loader__bar--delay-2"></div>
+            <div class="loader__bar loader__bar--delay-3"></div>
+            <div class="loader__bar loader__bar--delay-4"></div>
+            <div class="loader__bar loader__bar--delay-5"></div>
+        </div>
+    </div>
     <span id="msg">加载中...</span><br>
-    <div class="w3-light-grey w3-round-xlarge" style="margin-top: 20px;background-color: #a88235 !important; margin-top: 5px;">
+    <div class="w3-light-grey w3-round-xlarge"
+         style="margin-top: 20px;background-color: #a88235 !important; margin-top: 5px;">
         <div id="bar" class="w3-green w3-round-xlarge"></div>
     </div>
-</div>
-<script src="loading.js"></script>
+    <script src="loading.js"></script>
 </body>
 </html>

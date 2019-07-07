@@ -1,5 +1,7 @@
 body {
     background: #d2c3c8;
+    margin: 2px;
+    padding: 2px;
 }
 
 .content {
@@ -16,15 +18,15 @@ body {
 }
 
 .spinner {
-    width: 90px;
-    height: 90px;
-    margin: 35px auto;
-    -webkit-animation: sk-rotateplane 0.8s infinite ease-in-out;
+    width: 90%;
+    height: 150px;
+    margin: 10px auto;
+    /*-webkit-animation: sk-rotateplane 0.8s infinite ease-in-out;*/
     border-radius: 16px;
-    animation: sk-rotateplane 0.8s infinite ease-in-out;
-    background: linear-gradient(217deg, rgba(255, 0, 0, .8), rgba(255, 0, 0, 0) 70.71%),
-    linear-gradient(127deg, rgba(0, 255, 0, .8), rgba(0, 255, 0, 0) 70.71%),
-    linear-gradient(336deg, rgba(0, 0, 255, .8), rgba(0, 0, 255, 0) 70.71%);
+    /*animation: sk-rotateplane 0.8s infinite ease-in-out;*/
+    /*background: linear-gradient(217deg, rgba(255, 0, 0, .8), rgba(255, 0, 0, 0) 70.71%),*/
+    /*linear-gradient(127deg, rgba(0, 255, 0, .8), rgba(0, 255, 0, 0) 70.71%),*/
+    /*linear-gradient(336deg, rgba(0, 0, 255, .8), rgba(0, 0, 255, 0) 70.71%);*/
 }
 
 #msg {
@@ -32,11 +34,15 @@ body {
     font-size: 20px;
     text-align: center;
     width: 100%;
+    position: absolute;
+    bottom: 10px;
 }
 
 #bar {
+    position: absolute;
     height: 6px;
     width: 0;
+    bottom: 2px;
 }
 
 @-webkit-keyframes sk-rotateplane {
@@ -74,11 +80,137 @@ body {
 
 .w3-green, .w3-hover-green:hover {
     color: #fff !important;
-    background: linear-gradient(217deg, rgba(255,0,0,.8), rgba(255,0,0,0) 70.71%),
-    linear-gradient(127deg, rgba(0,255,0,.8), rgba(0,255,0,0) 70.71%),
-    linear-gradient(336deg, rgba(0,0,255,.8), rgba(0,0,255,0) 70.71%);
+    background: linear-gradient(217deg, rgba(255, 0, 0, .8), rgba(255, 0, 0, 0) 70.71%),
+    linear-gradient(127deg, rgba(0, 255, 0, .8), rgba(0, 255, 0, 0) 70.71%),
+    linear-gradient(336deg, rgba(0, 0, 255, .8), rgba(0, 0, 255, 0) 70.71%);
 }
 
 .w3-round-xlarge {
     border-radius: 10px
+}
+
+:root {
+    --color-light: #FFA54F;
+    --color-medium: #FF9834;
+    --color-dark: #FF8919;
+    --color-darkest: #FF7C00;
+    --animation-speed: 8s;
+    --animation-loop: infinite;
+}
+
+@keyframes loader {
+    0% {
+        background: var(--color-dark);
+        width: 0%;
+    }
+    20% {
+        width: 100%;
+    }
+    39% {
+        background: var(--color-dark);
+    }
+    40% {
+        background: var(--color-light);
+        width: 0%
+    }
+    60% {
+        width: 100%;
+    }
+    80% {
+        width: 0%;
+    }
+    100% {
+        background: var(--color-light);
+        width: 0%;
+    }
+}
+
+@keyframes loaderAlt {
+    0% {
+        background: var(--color-darkest);
+        width: 100%;
+    }
+    19% {
+        background: var(--color-darkest);
+    }
+    20% {
+        background: var(--color-medium);
+        width: 0%;
+    }
+    40% {
+        width: 100%;
+    }
+    59% {
+        background: var(--color-medium);
+    }
+    60% {
+        background: var(--color-darkest);
+        width: 0;
+    }
+    80% {
+        width: 100%;
+    }
+    100% {
+        background: var(--color-darkest);
+        width: 100%
+    }
+}
+
+.loader {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+}
+
+.loader__bar {
+    display: flex;
+    flex: 1;
+    position: relative;
+    width: 100%;
+}
+
+.loader__bar:before {
+    animation: loader ease var(--animation-speed) var(--animation-loop);
+    animation-delay: 100ms;
+    background: var(--color-darkest);
+    background-size: 200% 200%;
+    content: "";
+    height: 100%;
+    width: 0%;
+}
+
+.loader__bar:after {
+    animation: loaderAlt ease var(--animation-speed) var(--animation-loop);
+    animation-delay: 100ms;
+    background: var(--color-darkest);
+    background-size: 200% 200%;
+    content: "";
+    height: 100%;
+    width: 100%;
+}
+
+.loader__bar--delay-1:before,
+.loader__bar--delay-1:after {
+    animation-delay: 200ms;
+}
+
+.loader__bar--delay-2:before,
+.loader__bar--delay-2:after {
+    animation-delay: 300ms;
+}
+
+.loader__bar--delay-3:before,
+.loader__bar--delay-3:after {
+    animation-delay: 400ms;
+}
+
+.loader__bar--delay-4:before,
+.loader__bar--delay-4:after {
+    animation-delay: 500ms;
+}
+
+.loader__bar--delay-5:before,
+.loader__bar--delay-5:after {
+    animation-delay: 600ms;
 }

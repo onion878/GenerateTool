@@ -1,6 +1,6 @@
 {
   "name": "GenerateTool",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {
@@ -37,26 +37,25 @@
   },
   "devDependencies": {
     "add": "^2.0.6",
-    "electron": "^4.1.1",
-    "electron-builder": "^20.39.0",
-    "yarn": "^1.15.2"
+    "electron": "^5.0.6",
+    "electron-builder": "^20.44.4",
+    "yarn": "^1.16.0"
   },
   "dependencies": {
     "app-root-path": "^2.2.1",
     "archiver": "^3.0.0",
-    "axios": "^0.18.0",
     "decompress": "^4.2.0",
-    "del": "^4.0.0",
-    "log4js": "^4.1.0",
+    "del": "^5.0.0",
+    "log4js": "^4.4.0",
     "lowdb": "^1.0.0",
-    "marked": "^0.6.2",
-    "monaco-editor": "^0.16.2",
+    "marked": "^0.7.0",
+    "monaco-editor": "^0.17.1",
     "node-pty": "^0.8.1",
-    "open": "^6.0.0",
+    "open": "^6.4.0",
     "request": "^2.88.0",
     "require-uncached": "^2.0.0",
     "shelljs": "^0.8.3",
     "swig": "^1.4.2",
-    "xterm": "^3.12.0"
+    "xterm": "^3.14.4"
   }
 }

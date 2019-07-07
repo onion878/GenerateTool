@@ -953,7 +953,7 @@ ipc.on('runNodeErr', (event, message) => {
     showToast('查看完整日志: [查看详情]');
     Ext.getCmp('main-content').unmask();
     remote.getCurrentWindow().setProgressBar(-1);
-    new Notification('代码创建失败', {
+    new Notification('[GenerateTool]错误', {
         body: `出现了错误, 错误信息:${message}`,
         icon: './images/error.png'
     });
@@ -966,6 +966,9 @@ const nodeRun = (content) => {
     if (runWin == null) {
         const {BrowserWindow, getCurrentWindow} = require('electron').remote;
         runWin = new BrowserWindow({
+            webPreferences: {
+                nodeIntegration: true
+            },
             parent: getCurrentWindow(),
             show: false,
             width: 200,

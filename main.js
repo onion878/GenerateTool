@@ -69,6 +69,9 @@ function createMainWindow() {
     const icon = path.join(__dirname, 'static/images/code.png');
     // Create the browser window.
     mainWindow = new BrowserWindow({
+        webPreferences: {
+            nodeIntegration: true
+        },
         width: data.width,
         height: data.height,
         show: false,
