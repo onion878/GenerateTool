@@ -1,6 +1,10 @@
 Ext.define('OnionSpace.view.unpkg.unpkg', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.unpkg',
+    requires: [
+        'OnionSpace.controller.Unpkg'
+    ],
+    controller: 'Unpkg',
     tbar: [{
         xtype: 'button',
         text: '删除',

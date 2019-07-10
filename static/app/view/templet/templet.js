@@ -1,6 +1,10 @@
 Ext.define('OnionSpace.view.templet.templet', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.templet',
+    requires: [
+        'OnionSpace.controller.Templet'
+    ],
+    controller: 'Templet',
     tbar: [{
         xtype: 'button',
         text: '刷新',

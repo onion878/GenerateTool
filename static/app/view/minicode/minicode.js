@@ -1,6 +1,10 @@
 Ext.define('OnionSpace.view.minicode.minicode', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.minicode',
+    requires: [
+        'OnionSpace.controller.Minicode'
+    ],
+    controller: 'Minicode',
     viewModel: true,
     html: `<div class="code-editor-content" style="width: 100%;height: 100%;"></div>`,
     layout: 'fit',

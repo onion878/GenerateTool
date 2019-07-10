@@ -1,19 +1,6 @@
 Ext.define('OnionSpace.controller.Operation', {
-    extend: 'Ext.app.Controller',
-    views: ['operation.operation'],
-    init: function () {
-        this.control({
-            'operation': {
-                render: this.onPanelRendered
-            },
-            'toolbar button[action=refreshOperation]': {
-                click: this.refreshOperation
-            },
-            'toolbar button[action=deleteOperation]': {
-                click: this.deleteOperation
-            }
-        });
-    },
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.Operation',
     refreshOperation: function (dom) {
         const grid = dom.up('operation');
         grid.getStore().setData(operation.getAll());
@@ -42,7 +29,5 @@ Ext.define('OnionSpace.controller.Operation', {
             });
             that.refreshOperation(dom);
         }, dom, Ext.MessageBox.ERROR);
-    },
-    onPanelRendered: function () {
     }
 });

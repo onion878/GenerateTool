@@ -1,8 +1,6 @@
 Ext.define('OnionSpace.controller.Pkg', {
-    extend: 'Ext.app.Controller',
-    views: ['pkg.pkg'],
-    models: ['Pkg'],
-    stores: ['Pkg'],
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.Pkg',
     init: function () {
         this.control({
             'pkg': {

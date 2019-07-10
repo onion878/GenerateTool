@@ -1,6 +1,10 @@
 Ext.define('OnionSpace.view.code.code', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.code',
+    requires: [
+        'OnionSpace.controller.Code'
+    ],
+    controller: 'Code',
     viewModel: true,
     html: `<div class="code-editor-content" style="width: 100%;height: 100%;"></div>`,
     layout: 'fit',

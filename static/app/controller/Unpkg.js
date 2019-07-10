@@ -1,6 +1,6 @@
 Ext.define('OnionSpace.controller.Unpkg', {
-    extend: 'Ext.app.Controller',
-    views: ['unpkg.unpkg'],
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.Unpkg',
     init: function () {
         this.control({
             'unpkg': {

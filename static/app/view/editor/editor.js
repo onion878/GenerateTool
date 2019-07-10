@@ -89,20 +89,24 @@ Ext.define('OnionSpace.view.editor.editor', {
                         if (nowItem) {
                             tPanel.setActiveTab(nowItem);
                         } else {
-                            const data = {
-                                id: id,
-                                pId: pId,
-                                title: record.data.parentFolder,
-                                filePath: file,
-                                fileContent: content,
-                                closable: true,
-                                icon: getFileIcon(file),
-                                useType: 'editor',
-                                xtype: 'code'
-                            };
-                            const jTab = tPanel.add(data);
-                            history.setCode(data);
-                            tPanel.setActiveTab(jTab);
+                            tPanel.mask('加载中...');
+                            Ext.require(controllers['code'], function () {
+                                tPanel.unmask();
+                                const data = {
+                                    id: id,
+                                    pId: pId,
+                                    title: record.data.parentFolder,
+                                    filePath: file,
+                                    fileContent: content,
+                                    closable: true,
+                                    icon: getFileIcon(file),
+                                    useType: 'editor',
+                                    xtype: 'code'
+                                };
+                                const jTab = tPanel.add(data);
+                                history.setCode(data);
+                                tPanel.setActiveTab(jTab);
+                            });
                         }
                     }
                 },
@@ -146,18 +150,22 @@ Ext.define('OnionSpace.view.editor.editor', {
                                         if (nowItem) {
                                             tPanel.setActiveTab(nowItem);
                                         } else {
-                                            const data = {
-                                                id: 'pkg-main',
-                                                pId: pId,
-                                                title: '安装包',
-                                                closable: true,
-                                                icon: './images/npm.svg',
-                                                useType: 'editor',
-                                                xtype: 'pkg'
-                                            };
-                                            const jTab = tPanel.add(data);
-                                            history.setCode(data);
-                                            tPanel.setActiveTab(jTab);
+                                            tPanel.mask('加载中...');
+                                            Ext.require(controllers['pkg'], function () {
+                                                tPanel.unmask();
+                                                const data = {
+                                                    id: 'pkg-main',
+                                                    pId: pId,
+                                                    title: '安装包',
+                                                    closable: true,
+                                                    icon: './images/npm.svg',
+                                                    useType: 'editor',
+                                                    xtype: 'pkg'
+                                                };
+                                                const jTab = tPanel.add(data);
+                                                history.setCode(data);
+                                                tPanel.setActiveTab(jTab);
+                                            });
                                         }
                                     }
                                 },
@@ -170,18 +178,22 @@ Ext.define('OnionSpace.view.editor.editor', {
                                         if (nowItem) {
                                             tPanel.setActiveTab(nowItem);
                                         } else {
-                                            const data = {
-                                                id: 'unpkg-main',
-                                                pId: pId,
-                                                title: '管理包',
-                                                closable: true,
-                                                useType: 'editor',
-                                                icon: './images/npm.svg',
-                                                xtype: 'unpkg'
-                                            };
-                                            const jTab = tPanel.add(data);
-                                            tPanel.setActiveTab(jTab);
-                                            history.setCode(data);
+                                            tPanel.mask('加载中...');
+                                            Ext.require(controllers['unpkg'], function () {
+                                                tPanel.unmask();
+                                                const data = {
+                                                    id: 'unpkg-main',
+                                                    pId: pId,
+                                                    title: '管理包',
+                                                    closable: true,
+                                                    useType: 'editor',
+                                                    icon: './images/npm.svg',
+                                                    xtype: 'unpkg'
+                                                };
+                                                const jTab = tPanel.add(data);
+                                                tPanel.setActiveTab(jTab);
+                                                history.setCode(data);
+                                            });
                                         }
                                     }
                                 },

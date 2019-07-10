@@ -3,6 +3,8 @@
  */
 Ext.define('OnionSpace.store.OnlineTemp', {
     extend: 'Ext.data.Store',
+    alias: 'store.OnlineTemp',
+    model: 'OnionSpace.model.OnlineTemp',
     pageSize: 30,
     proxy: {
         type: 'ajax',

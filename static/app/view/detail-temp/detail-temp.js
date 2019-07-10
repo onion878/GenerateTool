@@ -1,9 +1,16 @@
 Ext.define('OnionSpace.view.detail-temp.detail-temp', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.detail-temp',
+    requires: [
+        'OnionSpace.controller.DetailTemp',
+        'OnionSpace.store.DetailTemp'
+    ],
+    controller: 'DetailTemp',
+    store: {
+        type: 'DetailTemp'
+    },
     viewModel: true,
     codeEditor: null,
-    store: 'DetailTemp',
     plugins: [{
         ptype: 'rowexpander',
         rowBodyTpl: ['<p><b>更新日志:</b> {Info}</p>']

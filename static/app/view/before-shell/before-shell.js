@@ -1,6 +1,10 @@
 Ext.define('OnionSpace.view.before-shell.before-shell', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.before-shell',
+    requires: [
+        'OnionSpace.controller.BeforeShell'
+    ],
+    controller: 'BeforeShell',
     layout: 'fit',
     codeEditor: null,
     listeners: {

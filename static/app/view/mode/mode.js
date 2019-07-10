@@ -1,6 +1,10 @@
 Ext.define('OnionSpace.view.mode.mode', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.mode',
+    requires: [
+        'OnionSpace.controller.Mode'
+    ],
+    controller: 'Mode',
     scrollable: true,
     layout: {
         type: 'vbox',

@@ -1,13 +1,8 @@
 Ext.define('OnionSpace.controller.DetailTemp', {
-    extend: 'Ext.app.Controller',
-    views: ['detail-temp.detail-temp'],
-    models: ['DetailTemp'],
-    stores: ['DetailTemp'],
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.DetailTemp',
     init: function () {
         this.control({
-            'detail-temp': {
-                render: this.onPanelRendered
-            },
             'toolbar textfield[action=search]': {
                 change: this.query
             }
@@ -18,8 +13,5 @@ Ext.define('OnionSpace.controller.DetailTemp', {
         const store = grid.getStore();
         store.getProxy().extraParams = {q: val, name: val, pid: grid.dataId, size: 30};
         store.load();
-    },
-    onPanelRendered: function () {
-
     }
 });

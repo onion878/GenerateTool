@@ -1,6 +1,6 @@
 Ext.define('OnionSpace.controller.Templet', {
-    extend: 'Ext.app.Controller',
-    views: ['templet.templet'],
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.Templet',
     init: function () {
         this.control({
             'templet': {

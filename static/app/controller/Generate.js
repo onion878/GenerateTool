@@ -1,6 +1,6 @@
 Ext.define('OnionSpace.controller.Generate', {
-    extend: 'Ext.app.Controller',
-    views: ['generate.generate'],
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.Generate',
     type: 'edit',
     init: function () {
         this.control({

@@ -1,9 +1,16 @@
 Ext.define('OnionSpace.view.pkg.pkg', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.pkg',
+    requires: [
+        'OnionSpace.controller.Pkg',
+        'OnionSpace.store.Pkg'
+    ],
+    controller: 'Pkg',
+    store: {
+        type: 'Pkg'
+    },
     viewModel: true,
     codeEditor: null,
-    store: 'Pkg',
     plugins: [{
         ptype: 'rowexpander',
         rowBodyTpl: ['<p><b>描述:</b> {description}</p>']

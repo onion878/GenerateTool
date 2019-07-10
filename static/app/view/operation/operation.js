@@ -1,16 +1,20 @@
 Ext.define('OnionSpace.view.operation.operation', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.operation',
+    requires: [
+        'OnionSpace.controller.Operation'
+    ],
+    controller: 'Operation',
     tbar: [{
         xtype: 'button',
         text: '刷新',
         icon: 'images/refresh.svg',
-        action: 'refreshOperation'
+        handler: 'refreshOperation'
     }, {
         xtype: 'button',
         text: '删除',
         icon: 'images/cross.svg',
-        action: 'deleteOperation'
+        handler: 'deleteOperation'
     }, {
         xtype: 'combobox',
         fieldLabel: '按模板搜索',
@@ -45,6 +49,7 @@ Ext.define('OnionSpace.view.operation.operation', {
     selType: 'checkboxmodel',
     initComponent: function () {
         const that = this;
+        console.log(that.getController())
         this.store = Ext.create('Ext.data.Store', {
             storeId: 'id',
             fields: ['pId', 'name', 'date', 'id'],

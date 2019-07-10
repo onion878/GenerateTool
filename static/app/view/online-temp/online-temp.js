@@ -1,9 +1,16 @@
 Ext.define('OnionSpace.view.online-temp.online-temp', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.online-temp',
+    requires: [
+        'OnionSpace.controller.OnlineTemp',
+        'OnionSpace.store.OnlineTemp'
+    ],
+    controller: 'OnlineTemp',
+    store: {
+        type: 'OnlineTemp'
+    },
     viewModel: true,
     codeEditor: null,
-    store: 'OnlineTemp',
     plugins: [{
         ptype: 'rowexpander',
         rowBodyTpl: ['<p><b>描述:</b> {Info}</p><p><b>更新日志:</b> {Detail}</p>']
@@ -109,24 +116,29 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                         tooltip: '详情',
                         icon: 'images/view.svg',
                         handler: function (view, recIndex, cellIndex, item, e, {data}) {
-                            Ext.create('Ext.window.Window', {
-                                title: '模板说明',
-                                width: '80%',
-                                layout: 'fit',
-                                maximizable: true,
-                                items: [{
-                                    xtype: 'detail-temp',
-                                    dataId: data.Id
-                                }],
-                                buttons: [
-                                    {
-                                        text: '关闭',
-                                        handler: function (btn) {
-                                            btn.up('window').close();
+                            const p = this.up('grid');
+                            p.mask('加载中...');
+                            Ext.require(controllers['detail-temp'], function () {
+                                p.unmask();
+                                Ext.create('Ext.window.Window', {
+                                    title: '模板说明',
+                                    width: '80%',
+                                    layout: 'fit',
+                                    maximizable: true,
+                                    items: [{
+                                        xtype: 'detail-temp',
+                                        dataId: data.Id
+                                    }],
+                                    buttons: [
+                                        {
+                                            text: '关闭',
+                                            handler: function (btn) {
+                                                btn.up('window').close();
+                                            }
                                         }
-                                    }
-                                ]
-                            }).show().focus();
+                                    ]
+                                }).show().focus();
+                            });
                         }
                     }
                 ]

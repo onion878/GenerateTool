@@ -1,6 +1,10 @@
 Ext.define('OnionSpace.view.generate.generate', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.generate',
+    requires: [
+        'OnionSpace.controller.Generate'
+    ],
+    controller: 'Generate',
     viewModel: true,
     layout: 'fit',
     fileName: null,

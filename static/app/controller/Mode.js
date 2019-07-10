@@ -1,6 +1,6 @@
 Ext.define('OnionSpace.controller.Mode', {
-    extend: 'Ext.app.Controller',
-    views: ['mode.mode'],
+    extend: 'Ext.app.ViewController',
+    alias: 'controller.Mode',
     pId: null,
     init: function () {
         this.control({

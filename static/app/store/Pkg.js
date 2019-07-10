@@ -3,6 +3,8 @@
  */
 Ext.define('OnionSpace.store.Pkg', {
     extend: 'Ext.data.Store',
+    alias: 'store.Pkg',
+    model: 'OnionSpace.model.Pkg',
     proxy: {
         type: 'ajax',
         api: {
