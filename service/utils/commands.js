@@ -3,10 +3,12 @@ const pty = require('node-pty');
 const Terminal = require('xterm').Terminal;
 const fit = require('xterm/lib/addons/fit/fit');
 const {remote} = require('electron');
+const {strip} = require('ansicolor');
 
 class Commands {
     constructor() {
         this.term = null;
+        this.msg = null;
         this.nowPty = null;
         this.systemCmd = false;
         this.workFlag = false;
@@ -22,6 +24,7 @@ class Commands {
 
     init(element) {
         const that = this;
+        that.msg = document.getElementById('status-msg');
         return new Promise((resolve, reject) => {
             let terminal = this.config.getConfig('terminal');
             if (terminal.trim().length == 0) {
@@ -49,6 +52,7 @@ class Commands {
         that.nowPty = ptyProcess;
         that.initXterm(userBash, resolve, element);
         that.nowPty.on('data', function (data) {
+            that.msg.innerHTML = strip(data);
             if (data.toLocaleUpperCase().indexOf('(Y/N)?') > -1) {
                 that.nowPty.write('Y\r');
             }

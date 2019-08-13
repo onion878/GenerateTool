@@ -28,12 +28,16 @@ Ext.define('OnionSpace.view.before-shell.before-shell', {
         this.tbar = {
             xtype: 'statusbar',
             pId: this.pId,
-            list: [{img: './images/test.svg', name: 'Test'}],
+            list: [{img: './images/test.svg', name: 'Test'}, {img: './images/help.svg', name: 'Help'}],
             float: 'left',
-            click: function (tbar, d) {
-                const val = that.codeEditor.codeEditor.getValue();
-                closeNodeWin();
-                nodeRun(val);
+            click: function (tbar, d, n) {
+                if (n == 'Test') {
+                    const val = that.codeEditor.codeEditor.getValue();
+                    closeNodeWin();
+                    nodeRun(val);
+                } else {
+                    showHelpFile('模板/BeforeShell.md', '生成前脚本说明', d);
+                }
             }
         };
         this.callParent(arguments);

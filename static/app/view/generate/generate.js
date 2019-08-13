@@ -105,6 +105,13 @@ Ext.define('OnionSpace.view.generate.generate', {
                     action: 'preview',
                     cls: updateType == 'update' ? 'color-blue' : ''
                 }]
+            }, {
+                xtype: 'button',
+                icon: './images/help.svg',
+                tooltip: '模板说明',
+                handler: function () {
+                    showHelpFile('模板/Template.md', '模板定义说明', this);
+                }
             }]
         };
         this.callParent(arguments);

@@ -2,6 +2,7 @@ const fs = require('fs');
 const request = require('request');
 const shell = require('shelljs');
 const child = require('child_process').execFile;
+const marked = require('marked');
 
 class Utils {
 
@@ -224,12 +225,15 @@ class Utils {
     }
 
     showUpdate() {
-        const marked = require('marked');
         return marked(this.readFile(require('app-root-path').path + '/UPDATE.md'));
     }
 
     getVersion() {
         return require(require('app-root-path').path + '/package.json').version;
+    }
+
+    showHelp(file) {
+        return marked(this.readFile(require('app-root-path').path + '/help/' + file));
     }
 }
 

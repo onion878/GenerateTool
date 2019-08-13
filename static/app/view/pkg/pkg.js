@@ -47,8 +47,8 @@ Ext.define('OnionSpace.view.pkg.pkg', {
                             align: 't',
                             slideInDuration: 400
                         });
-                        jsCode.savePkg(pId, data.name);
-                        that.installPkg(pId, data.name);
+                        jsCode.savePkg(pId, data.name, data.version);
+                        that.installPkg(pId, data.name, data.version);
                     }
                 }, {
                     icon: 'images/other-database.svg',

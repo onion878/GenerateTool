@@ -24,6 +24,7 @@ const controllers = {
     'unpkg': ['OnionSpace.view.unpkg.unpkg'],
     'minicode': ['OnionSpace.view.minicode.minicode'],
     'welcome': ['OnionSpace.controller.Welcome'],
+    'help': ['OnionSpace.view.help.help'],
     'generate': ['OnionSpace.view.minicode.minicode', 'OnionSpace.view.generate.generate'],
     'templet': ['OnionSpace.view.templet.templet'],
     'online-temp': ['OnionSpace.view.online-temp.online-temp'],
@@ -1651,5 +1652,37 @@ function installTemplateAllPkg() {
     }
     packages.forEach(p => {
         command.write('npm install ' + p.name + '@' + p.version);
+    });
+}
+
+function showHelpFile(id, t, d) {
+    Ext.getBody().mask('加载中...');
+    Ext.require(controllers['help'], function () {
+        Ext.getBody().unmask();
+        Ext.create('Ext.window.Window', {
+            title: t,
+            fixed: true,
+            resizable: true,
+            maximizable: true,
+            modal: true,
+            constrain: true,
+            icon: './images/help.svg',
+            width: '80%',
+            height: '80%',
+            layout: 'fit',
+            minWidth: 300,
+            minHeight: 250,
+            animateTarget: d,
+            items: {
+                xtype: 'help',
+                id: id
+            },
+            buttons: [{
+                text: '关闭',
+                handler: function () {
+                    this.up('window').close();
+                }
+            }]
+        }).show().focus();
     });
 }

@@ -1,6 +1,6 @@
 {
   "name": "GenerateTool",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {
@@ -36,12 +36,11 @@
     }
   },
   "devDependencies": {
-    "add": "^2.0.6",
     "electron": "^4.2.6",
-    "electron-builder": "^20.44.4",
-    "yarn": "^1.16.0"
+    "electron-builder": "^20.44.4"
   },
   "dependencies": {
+    "ansicolor": "^1.1.92",
     "app-root-path": "^2.2.1",
     "archiver": "^3.0.0",
     "decompress": "^4.2.0",

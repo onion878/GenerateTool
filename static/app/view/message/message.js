@@ -39,13 +39,13 @@ Ext.define('OnionSpace.view.message.message', {
     },
     setValue: function (msg) {
         const nowTime = this.getNowTime();
-        Ext.getCmp('msg-bar').infoPanel.innerHTML = '[' + nowTime + '] ' + msg;
+        Ext.getCmp('msg-bar').infoPanel.innerText = '[' + nowTime + '] ' + msg;
         this.value += '[' + nowTime + '] ' + msg + '\n';
         this.codeEditor.setValue(this.value);
         this.codeEditor.revealLine(this.value.split('\n').length);
     },
     clear: function () {
-        Ext.getCmp('msg-bar').infoPanel.innerHTML = '';
+        Ext.getCmp('msg-bar').infoPanel.innerText = '';
         this.codeEditor.setValue('');
         this.value = '';
     },

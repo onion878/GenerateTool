@@ -28,12 +28,16 @@ Ext.define('OnionSpace.view.after-shell.after-shell', {
         this.tbar = {
             xtype: 'statusbar',
             pId: this.pId,
-            list: [{img: './images/test.svg', name: 'Test'}],
+            list: [{img: './images/test.svg', name: 'Test'}, {img: './images/help.svg', name: 'Help'}],
             float: 'left',
-            click: function (tbar, d) {
-                const val = that.codeEditor.codeEditor.getValue();
-                closeNodeWin();
-                nodeRun(val);
+            click: function (tbar, d, n) {
+                if (n == 'Test') {
+                    const val = that.codeEditor.codeEditor.getValue();
+                    closeNodeWin();
+                    nodeRun(val);
+                } else {
+                    showHelpFile('模板/AfterShell.md', '生成后脚本说明', d);
+                }
             }
         };
         this.callParent(arguments);

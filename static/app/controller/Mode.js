@@ -345,16 +345,32 @@ Ext.define('OnionSpace.controller.Mode', {
                     data.push(v);
                     if (i == 0) {
                         for (let key in v) {
-                            fields.push(key);
-                            columns.push({
-                                text: key,
-                                align: 'center',
-                                dataIndex: key,
-                                editor: {
-                                    xtype: 'textfield'
-                                },
-                                flex: 1
-                            });
+                            if (key != null && key == '操作') {
+                                const {width, html} = v[key];
+                                columns.push({
+                                    width: width,
+                                    text: '操作',
+                                    sortable: false,
+                                    align: 'center',
+                                    renderer: function (v) {
+                                        return html;
+                                    }
+                                });
+                            } else {
+                                if (key == 'id' && v[key].substring(0, 8) == 'extModel') {
+                                    continue;
+                                }
+                                fields.push(key);
+                                columns.push({
+                                    text: key,
+                                    align: 'center',
+                                    dataIndex: key,
+                                    editor: {
+                                        xtype: 'textfield'
+                                    },
+                                    flex: 1
+                                });
+                            }
                         }
                     }
                 });
@@ -477,6 +493,13 @@ Ext.define('OnionSpace.controller.Mode', {
             constrain: true,
             animateTarget: btn,
             modal: true,
+            tools: [{
+                type: 'help',
+                tooltip: '帮助说明',
+                handler: function (event, toolEl, panel) {
+                    showHelpFile('模板/UseScript.md', '使用脚本说明', toolEl);
+                }
+            }],
             items: {
                 value: v,
                 xtype: 'minicode'
@@ -722,16 +745,32 @@ Ext.define('OnionSpace.controller.Mode', {
             if (v.length > 0) {
                 const col = v[0];
                 for (let key in col) {
-                    fields.push(key);
-                    columns.push({
-                        text: key,
-                        align: 'center',
-                        dataIndex: key,
-                        editor: {
-                            xtype: 'textfield'
-                        },
-                        flex: 1
-                    });
+                    if (key != null && key == '操作') {
+                        const {width, html} = col[key];
+                        columns.push({
+                            width: width,
+                            text: '操作',
+                            sortable: false,
+                            align: 'center',
+                            renderer: function (v) {
+                                return html;
+                            }
+                        });
+                    } else {
+                        if (key == 'id' && v[key].substring(0, 8) == 'extModel') {
+                            continue;
+                        }
+                        fields.push(key);
+                        columns.push({
+                            text: key,
+                            align: 'center',
+                            dataIndex: key,
+                            editor: {
+                                xtype: 'textfield'
+                            },
+                            flex: 1
+                        });
+                    }
                 }
             }
             const store = grid.getStore();

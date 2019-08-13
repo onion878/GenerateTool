@@ -38,10 +38,14 @@ Ext.define('OnionSpace.view.code.code', {
             this.tbar = {
                 xtype: 'statusbar',
                 pId: pId,
-                list: [{img: './images/play.svg', name: 'Run'}],
+                list: [{img: './images/play.svg', name: 'Run'}, {img: './images/help.svg', name: 'Help'}],
                 float: 'left',
-                click: function (tbar, d) {
-                    that.runTest(pId, that.title);
+                click: function (tbar, d, n) {
+                    if (n == 'Run') {
+                        that.runTest(pId, that.title);
+                    } else {
+                        showHelpFile('js脚本/code.md', '数据脚本', d);
+                    }
                 }
             };
         }

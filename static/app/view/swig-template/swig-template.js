@@ -26,14 +26,20 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
         this.tbar = {
             xtype: 'statusbar',
             pId: this.pId,
-            list: [{img: './images/use.svg', name: '应用'}],
+            list: [{img: './images/use.svg', name: '应用'}, {img: './images/help.svg', name: 'Help'}],
             float: 'left',
-            click: function (tbar, d) {
-                const val = that.codeEditor.codeEditor.getValue();
-                try {
-                    eval(val);
-                } catch (e) {
-                    console.log(e);
+            click: function (tbar, d, n) {
+                if (n == '应用') {
+                    const val = that.codeEditor.codeEditor.getValue();
+                    try {
+                        eval(val);
+                        showToast('[info] swig模板应用成功!');
+                    } catch (e) {
+                        console.log(e);
+                        showError(e);
+                    }
+                } else {
+                    showHelpFile('模板/SwigTemplate.md', 'swig脚本说明', d);
                 }
             }
         };

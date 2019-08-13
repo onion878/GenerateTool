@@ -181,3 +181,11 @@ body {
 .direction-rtl {
     direction: rtl;
 }
+
+code {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #f7f6eb;
+    background-color: rgba(159, 153, 155, 0.87);
+    border-radius: 4px;
+}

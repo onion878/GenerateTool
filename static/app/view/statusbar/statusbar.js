@@ -31,12 +31,12 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
                 }
             });
             child = child + '</div>';
-            if(that.msg) {
-                child = child + '<div class="status-msg"></div>';
+            if (that.msg) {
+                child = child + '<div class="status-msg" id="status-msg"></div>';
             }
             const main = c.el.dom.querySelector('.states-toolbar');
             main.innerHTML = child;
-            if(that.dock == 'left') {
+            if (that.dock == 'left') {
                 main.style.transform = 'rotate(90deg)';
             }
             that.infoPanel = Ext.get(c.el.dom).query('.status-msg')[0];
