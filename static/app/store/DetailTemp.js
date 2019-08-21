@@ -9,10 +9,10 @@ Ext.define('OnionSpace.store.DetailTemp', {
     proxy: {
         type: 'ajax',
         api: {
-            read: userConfig.getUrl() + '/getDetailTemplate'
+            read: execute('userConfig', 'getUrl') + '/getDetailTemplate'
         },
         headers: {
-            "Authorization": "Bearer " + userConfig.getAuth()
+            "Authorization": "Bearer " + execute('userConfig', 'getAuth')
         },
         reader: {
             type: 'json',

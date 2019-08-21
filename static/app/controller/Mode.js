@@ -20,7 +20,7 @@ Ext.define('OnionSpace.controller.Mode', {
     },
     onPanelRendered: function (panel) {
         this.pId = panel.pId;
-        const data = controlData.getExt(panel.id),
+        const data = execute('controlData', 'getExt', [panel.id]),
             that = this;
         data.forEach(d => {
             panel.add(that.getDataModule(d.content, d.type, d.label, d.id, d.data));
@@ -56,7 +56,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     },
                     {
                         xtype: 'combobox',
-                        fieldLabel: '名称',
+                        fieldLabel: '类型',
                         margin: '10',
                         labelWidth: 60,
                         store: {
@@ -141,7 +141,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 handler: function () {
                     const form = this.up('window').down('form').getForm();
                     if (form.isValid()) {
-                        const moduleData = controlData.getModuleData(that.pId);
+                        const moduleData = execute('controlData', 'getModuleData', [that.pId]);
                         const {
                             type,
                             name,
@@ -268,14 +268,14 @@ Ext.define('OnionSpace.controller.Mode', {
             };
         }
         const bId = getUUID();
-        controlData.setExt({
+        execute('controlData', 'setExt', [{
             cId: id,
             content: content,
             type: type,
             label: label,
             id: bId,
             pId: this.pId
-        });
+        }]);
         return this.getDataModule(content, type, label, bId, null);
     },
     getDataModule(content, type, label, id, value) {
@@ -284,21 +284,21 @@ Ext.define('OnionSpace.controller.Mode', {
         if (type == 'text') {
             content.listeners = {
                 change: function (dom, val) {
-                    controlData.setDataValue(id, val);
+                    execute('controlData', 'setDataValue', [id, val]);
                 }
             };
             content.value = value;
         } else if (type == 'textarea') {
             content.listeners = {
                 change: function (dom, val) {
-                    controlData.setDataValue(id, val);
+                    execute('controlData', 'setDataValue', [that.pId]);
                 }
             };
             content.value = value;
         } else if (type == 'combobox') {
             content.listeners = {
                 change: function (dom, val) {
-                    controlData.setDataValue(id, {value: val, data: that.getStoreData(dom.getStore())});
+                    execute('controlData', 'setDataValue', [id, {value: val, data: that.getStoreData(dom.getStore())}]);
                 }
             };
             if (value && value != null && value != '') {
@@ -326,14 +326,14 @@ Ext.define('OnionSpace.controller.Mode', {
                 },
                 listeners: {
                     datachanged: function (store) {
-                        controlData.setDataValue(id, that.getListData(store));
+                        execute('controlData', 'setDataValue', [id, that.getListData(store)]);
                     }
                 }
             });
             content.plugins.listeners = {
                 edit: function (editor, e, eOpts) {
                     e.record.commit();
-                    controlData.setDataValue(id, that.getListData(editor.grid.getStore()));
+                    execute('controlData', 'setDataValue', [id, that.getListData(editor.grid.getStore())]);
                 }
             };
         } else if (type == 'datagrid') {
@@ -380,7 +380,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 data: data,
                 listeners: {
                     datachanged: function (store) {
-                        controlData.setDataValue(id, that.getGridData(store));
+                        execute('controlData', 'setDataValue', [id, that.getGridData(store)]);
                     }
                 }
             });
@@ -388,7 +388,7 @@ Ext.define('OnionSpace.controller.Mode', {
             content.plugins.listeners = {
                 edit: function (editor, e, eOpts) {
                     e.record.commit();
-                    controlData.setDataValue(id, that.getGridData(editor.grid.getStore()));
+                    execute('controlData', 'setDataValue', [id, that.getGridData(editor.grid.getStore())]);
                 }
             };
         } else if (type == 'file') {
@@ -397,7 +397,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     dom.setRawValue(value);
                 },
                 change: function (dom, val) {
-                    controlData.setDataValue(id, val);
+                    execute('controlData', 'setDataValue', [id, val]);
                 }
             };
         } else if (type == 'folder') {
@@ -406,19 +406,19 @@ Ext.define('OnionSpace.controller.Mode', {
                     dom.setRawValue(value);
                 },
                 change: function (dom, val) {
-                    controlData.setDataValue(id, val);
+                    execute('controlData', 'setDataValue', [id, val]);
                 }
             };
         } else if (type == 'json') {
             content.source = value;
             content.listeners = {
                 propertychange: function (dom, recordId, val) {
-                    controlData.setDataValue(id, that.getGridJsonData(this.getStore()));
+                    execute('controlData', 'setDataValue', [id, that.getGridJsonData(this.getStore())]);
                 }
             };
         } else {
             content.items.changeValue = function () {
-                controlData.setDataValue(id, this.codeEditor.getValue());
+                execute('controlData', 'setDataValue', [id, this.codeEditor.getValue()]);
             };
             content.items.value = value;
         }
@@ -477,7 +477,7 @@ Ext.define('OnionSpace.controller.Mode', {
         }
     },
     getJavaScriptData(btn) {
-        const val = controlData.getCode(btn.bId),
+        const val = execute('controlData', 'getCode', [btn.bId]),
             that = this,
             cId = btn.up('mode').id;
         let v = null;
@@ -523,8 +523,8 @@ Ext.define('OnionSpace.controller.Mode', {
     deleteData(btn) {
         showConfirm('是否删除?', function () {
             btn.up('container').destroy();
-            controlData.removeExt(btn.bId);
-            controlData.removeCode(btn.bId);
+            execute('controlData', 'removeExt', [btn.bId]);
+            execute('controlData', 'removeCode', [btn.bId]);
         }, btn, Ext.MessageBox.ERROR);
     },
     getStoreData(store) {
@@ -573,7 +573,7 @@ Ext.define('OnionSpace.controller.Mode', {
     sort(btn) {
         const that = this;
         const id = btn.up('mode').id;
-        const data = controlData.getExt(id);
+        const data = execute('controlData', 'getExt', [id]);
         Ext.create('Ext.window.Window', {
             title: '排序',
             fixed: true,
@@ -617,7 +617,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         newData.items.forEach(d => {
                             sortData.push(d.data);
                         });
-                        controlData.sortExt(sortData, id, that.pId);
+                        execute('controlData', 'sortExt', [sortData, id, that.pId]);
                         const panel = btn.up('mode');
                         panel.removeAll();
                         sortData.forEach(d => {
@@ -640,7 +640,7 @@ Ext.define('OnionSpace.controller.Mode', {
         showConfirm('是否重新获取数据?', function () {
             Ext.getCmp('main-content').mask('执行中...');
             const reData = [],
-                conData = controlData.getAllCode(id);
+                conData = execute('controlData', 'getAllCode', [id]);
             closeNodeWin();
             conData.forEach(d => {
                 try {
@@ -670,19 +670,19 @@ Ext.define('OnionSpace.controller.Mode', {
     },
     getCodeValue(valStr, bId, cId) {
         if (valStr.trim().length == 0) {
-            controlData.removeCode(bId);
+            execute('controlData', 'removeCode', [bId]);
             return;
         }
-        controlData.setCode(bId, valStr, cId);
+        execute('controlData', 'setCode', [bId, valStr, cId]);
         return nodeRun(valStr);
     },
     getCodeData(valStr, bId, cId) {
         if (valStr.trim().length == 0) {
             showToast('[warn] 没有执行的脚本!');
-            controlData.removeCode(bId);
+            execute('controlData', 'removeCode', [bId]);
             return;
         }
-        controlData.setCode(bId, valStr, cId);
+        execute('controlData', 'setCode', [bId, valStr, cId]);
         Ext.getCmp('main-content').mask('执行中...');
         let d = '',
             btn = Ext.getCmp(bId),
@@ -792,7 +792,7 @@ Ext.define('OnionSpace.controller.Mode', {
             const g = btn.up('container').down('propertygrid');
             g.setSource(v);
             const d = this.getGridJsonData(g.getStore());
-            controlData.setDataValue(bId, d);
+            execute('controlData', 'setDataValue', [bId, d]);
             const d1 = {};
             for (let k in d) {
                 d1[k] = `JSON: ... -> ${k}`;

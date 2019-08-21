@@ -27,7 +27,7 @@ Ext.define('OnionSpace.view.unpkg.unpkg', {
         this.store = Ext.create('Ext.data.Store', {
             storeId: 'id',
             fields: ['pId', 'name', 'version', 'date', 'id'],
-            data: packageConfig.getAll(pId)
+            data: execute('packageConfig', 'getAll', [pId])
         });
         this.columns = [
             new Ext.grid.RowNumberer(),
@@ -47,7 +47,7 @@ Ext.define('OnionSpace.view.unpkg.unpkg', {
                         showConfirm(`是否删除包[${data.name}@${data.version}]?`, function (text) {
                             jsCode.deletePkg(pId, data.name).then(f => {
                                 const grid = view.up('unpkg');
-                                grid.getStore().setData(packageConfig.getAll(grid.pId));
+                                grid.getStore().setData(execute('packageConfig', 'getAll', [grid.pId]));
                             });
                             that.runCommand('uninstall', pId, data.name);
                         }, this, Ext.MessageBox.ERROR);

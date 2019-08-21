@@ -3,7 +3,7 @@ Ext.define('OnionSpace.controller.Operation', {
     alias: 'controller.Operation',
     refreshOperation: function (dom) {
         const grid = dom.up('operation');
-        grid.getStore().setData(operation.getAll());
+        grid.getStore().setData(execute('operation', 'getAll'));
     },
     deleteOperation: function (dom) {
         const grid = dom.up('operation'), that = this;
@@ -25,7 +25,7 @@ Ext.define('OnionSpace.controller.Operation', {
         });
         showConfirm(`是否删除${names.join(',')},历史记录?`, function (text) {
             sm.map(d => {
-                operation.deleteById(d.data.id);
+                execute('operation', 'deleteById', [d.data.id]);
             });
             that.refreshOperation(dom);
         }, dom, Ext.MessageBox.ERROR);

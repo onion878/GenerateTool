@@ -104,7 +104,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                     xtype: 'code'
                                 };
                                 const jTab = tPanel.add(data);
-                                history.setCode(data);
+                                execute('history', 'setCode', [data]);
                                 tPanel.setActiveTab(jTab);
                             });
                         }
@@ -163,7 +163,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                                     xtype: 'pkg'
                                                 };
                                                 const jTab = tPanel.add(data);
-                                                history.setCode(data);
+                                                execute('history', 'setCode', [data]);
                                                 tPanel.setActiveTab(jTab);
                                             });
                                         }
@@ -192,7 +192,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                                 };
                                                 const jTab = tPanel.add(data);
                                                 tPanel.setActiveTab(jTab);
-                                                history.setCode(data);
+                                                execute('history', 'setCode', [data]);
                                             });
                                         }
                                     }
@@ -201,7 +201,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                     text: '编辑器打开',
                                     icon: 'images/javascript.svg',
                                     handler: function () {
-                                        utils.openCodeFolder(systemConfig.getConfig('editor'), jsCode.getFolder(pId));
+                                        utils.openCodeFolder(execute('systemConfig', 'getConfig', ['editor']), jsCode.getFolder(pId));
                                     }
                                 }
                             ]

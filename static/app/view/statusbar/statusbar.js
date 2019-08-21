@@ -36,9 +36,6 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
             }
             const main = c.el.dom.querySelector('.states-toolbar');
             main.innerHTML = child;
-            if (that.dock == 'left') {
-                main.style.transform = 'rotate(90deg)';
-            }
             that.infoPanel = Ext.get(c.el.dom).query('.status-msg')[0];
             const btn = Ext.get(c.el.dom).query('a');
             that.list.forEach((l, i) => {
@@ -52,6 +49,12 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
         }
     },
     initComponent: function () {
+        let style = '';
+        if(this.type == 'vertical' ) {
+            this.width = 20;
+            style = `width: ${this.param}px;height: ${this.param}px`;
+        }
+        this.html = `<div class="states-toolbar ${this.type == 'vertical' ? 'vertical' : ''}" style="${style}"></div>`;
         this.callParent(arguments);
     },
     click: function (that, dom) {

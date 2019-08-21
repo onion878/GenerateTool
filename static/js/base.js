@@ -7,7 +7,7 @@ const logger = require('../service/utils/logger');
 const need = require('require-uncached');
 let moduleId = null,
     editLabelId = null;
-webFrame.setZoomFactor(systemConfig.getZoom());
+webFrame.setZoomFactor(execute('systemConfig', 'getZoom'));
 
 (function () {
     const _log = console.log;
@@ -72,7 +72,7 @@ amdRequire(['vs/editor/editor.main'], function () {
 
     // Define a new theme that contains only rules that match this language
     monaco.editor.defineTheme('consoleTheme', {
-        base: systemConfig.getTheme() == 'aria' ? 'vs-dark' : 'vs',
+        base: execute('systemConfig', 'getTheme') == 'aria' ? 'vs-dark' : 'vs',
         inherit: true,
         rules: [
             {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},
@@ -151,11 +151,11 @@ const labelEditor = new Ext.Editor({
     listeners: {
         complete: function (dom, value, startValue, eOpts) {
             if (value != startValue)
-                controlData.setExtLabel(editLabelId, value);
+                execute('controlData', 'setExtLabel', [editLabelId, value]);
         },
         beforecomplete: function (dom, value, startValue) {
             if (value != startValue) {
-                const moduleData = controlData.getModuleData(moduleId);
+                const moduleData = execute('controlData', 'getModuleData', [moduleId]);
                 if (moduleData[value] != undefined) {
                     showToast(`已存在[${value}]!`);
                     return false;
@@ -179,7 +179,7 @@ let reqPath = (module) => {
 
 //获取已经定义的数据
 let getAllData = () => {
-    return controlData.getModuleData(moduleId);
+    return execute('controlData', 'getModuleData', [moduleId]);
 };
 
 const getUUID = () => {
@@ -440,24 +440,6 @@ let registerSingleData = (suggestions) => {
             };
         }
     });
-};
-
-let setZoom = (type) => {
-    const old = webFrame.getZoomFactor();
-    if (type == '+') {
-        const val = old + 0.1;
-        systemConfig.setZoom(val);
-        webFrame.setZoomFactor(val);
-    } else {
-        const val = old - 0.1;
-        systemConfig.setZoom(val);
-        webFrame.setZoomFactor(val);
-    }
-};
-
-let resetZoom = () => {
-    webFrame.setZoomFactor(1);
-    systemConfig.setZoom(1);
 };
 
 let getFileIcon = (file) => {
@@ -989,7 +971,7 @@ const closeNodeWin = () => {
 };
 
 function login(call) {
-    const {Password, UserName} = userConfig.getUser();
+    const {Password, UserName} = execute('userConfig', 'getUser');
     Ext.create('Ext.window.Window', {
         title: '登录',
         width: 320,
@@ -1027,14 +1009,14 @@ function login(call) {
                     var form = btn.up('window').down('form');
                     if (form.isValid()) {
                         Ext.Ajax.request({
-                            url: userConfig.getUrl() + '/login',
+                            url: execute('userConfig', 'getUrl') + '/login',
                             method: 'POST',
                             headers: {'Content-Type': 'application/json'},
                             jsonData: form.getValues(),
                             success: function (response) {
                                 const jsonResp = Ext.util.JSON.decode(response.responseText);
-                                userConfig.setAuth(jsonResp.token);
-                                userConfig.setUser(form.getValues());
+                                execute('userConfig', 'setAuth', [jsonResp.token]);
+                                execute('userConfig', 'setUser', [form.getValues()]);
                                 btn.up('window').close();
                                 if (call) {
                                     call(jsonResp.token);

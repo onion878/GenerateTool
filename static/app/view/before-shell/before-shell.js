@@ -12,13 +12,13 @@ Ext.define('OnionSpace.view.before-shell.before-shell', {
             const that = this;
             that.codeEditor = Ext.create({
                 language: 'javascript',
-                value: geFileData.getBeforeShell(that.pId),
+                value: execute('geFileData', 'getBeforeShell', [that.pId]),
                 xtype: 'minicode',
                 minimap: true
             });
             that.codeEditor.changeValue = function () {
                 const val = that.codeEditor.codeEditor.getValue();
-                geFileData.setBeforeShell(that.pId, val);
+                execute('geFileData', 'setBeforeShell', [that.pId, val]);
             };
             that.add(that.codeEditor);
         }

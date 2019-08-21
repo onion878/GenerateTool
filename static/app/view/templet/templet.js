@@ -23,11 +23,11 @@ Ext.define('OnionSpace.view.templet.templet', {
     }],
     initComponent: function () {
         const pId = this.pId;
-        let token = userConfig.getAuth();
+        let token = execute('userConfig', 'getAuth');
         this.store = Ext.create('Ext.data.Store', {
             storeId: 'id',
             fields: ['id', 'text'],
-            data: parentData.getAll()
+            data: execute('parentData', 'getAll')
         });
         this.plugins = {
             ptype: 'rowediting',
@@ -38,7 +38,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                 edit: function (editor, e, eOpts) {
                     e.record.commit();
                     editor.grid.getStore().getData().items.forEach(({data}) => {
-                        parentData.updateText(data);
+                        execute('parentData', 'updateText', [data]);
                     });
                 }
             }
@@ -91,16 +91,16 @@ Ext.define('OnionSpace.view.templet.templet', {
                             text: '上传',
                             handler: function (btn) {
                                 const d = btn.up().getWidgetRecord().getData();
-                                const auth = userConfig.getAuth();
+                                const auth = execute('userConfig', 'getAuth');
                                 if (auth.trim() === "") {
                                     login();
                                 } else {
                                     const data = {id: d.id, text: d.text + '-' + utils.getNowTimeCode()};
                                     Ext.Ajax.request({
-                                        url: userConfig.getUrl() + '/auth',
+                                        url: execute('userConfig', 'getUrl') + '/auth',
                                         method: 'POST',
                                         headers: {
-                                            "Authorization": "Bearer " + userConfig.getAuth()
+                                            "Authorization": "Bearer " + execute('userConfig', 'getAuth')
                                         },
                                         success: function (response) {
 
@@ -143,7 +143,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                         utils.uploadFile(file, file, param, token).then(c => {
                                                             showToast(c.message);
                                                             if (c.serveId) {
-                                                                parentData.updateTemplate(d.id, c.serveId, c.detailId);
+                                                                execute('parentData', 'updateTemplate', [d.id, c.serveId, c.detailId]);
                                                             }
                                                             jsCode.deleteFile(file);
                                                             Ext.getCmp('main-content').unmask();
@@ -181,7 +181,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                             handler: function (btn) {
                                 const data = btn.up().getWidgetRecord().getData();
                                 let msg = `是否删除模板[${data.text}]?`, flag = false;
-                                if (data.id == history.getMode()) {
+                                if (data.id == execute('history', 'getMode')) {
                                     flag = true;
                                     msg = `删除当前模板[${data.text}]系统会重新启动,是否继续?`;
                                 }
@@ -189,10 +189,10 @@ Ext.define('OnionSpace.view.templet.templet', {
                                     const el = btn.up('templet').getEl();
                                     el.mask('处理中...');
                                     jsCode.removeModule(data.id).then(() => {
-                                        btn.up('templet').getStore().setData(parentData.getAll());
+                                        btn.up('templet').getStore().setData(execute('parentData', 'getAll'));
                                         if (flag) {
-                                            history.setMode('');
-                                            history.removeAll();
+                                            execute('history', 'setMode', ['']);
+                                            execute('history', 'removeAll');
                                             el.unmask();
                                             const {app} = require('electron').remote;
                                             app.relaunch();

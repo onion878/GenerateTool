@@ -22,7 +22,7 @@ Ext.define('OnionSpace.view.operation.operation', {
         flex: 1,
         store: {
             fields: ['id', 'text'],
-            data: parentData.getAll()
+            data: execute('parentData', 'getAll')
         },
         name: 'type',
         queryMode: 'local',
@@ -31,7 +31,7 @@ Ext.define('OnionSpace.view.operation.operation', {
         listeners: {
             select: function (combo, record) {
                 const grid = combo.up('operation');
-                grid.getStore().setData(operation.find(record.id));
+                grid.getStore().setData(execute('operation', 'find', [record.id]));
             }
         },
         triggers: {
@@ -41,7 +41,7 @@ Ext.define('OnionSpace.view.operation.operation', {
                 handler: function (d) {
                     d.clearValue();
                     const grid = d.up('operation');
-                    grid.getStore().setData(operation.getAll());
+                    grid.getStore().setData(execute('operation', 'getAll'));
                 }
             }
         }
@@ -49,11 +49,10 @@ Ext.define('OnionSpace.view.operation.operation', {
     selType: 'checkboxmodel',
     initComponent: function () {
         const that = this;
-        console.log(that.getController())
         this.store = Ext.create('Ext.data.Store', {
             storeId: 'id',
             fields: ['pId', 'name', 'date', 'id'],
-            data: operation.getAll(),
+            data: execute('operation', 'getAll'),
             sorters: [{
                 property: 'date',
                 direction: 'desc'
@@ -74,8 +73,8 @@ Ext.define('OnionSpace.view.operation.operation', {
                     tooltip: '删除',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         showConfirm(`是否删除${data.name + data.date},历史记录?`, function (text) {
-                            operation.deleteById(data.id);
-                            that.store.setData(operation.getAll());
+                            execute('operation', 'deleteById', [data.id]);
+                            that.store.setData(execute('operation', 'getAll'));
                         }, this, Ext.MessageBox.ERROR);
                     }
                 }, {
@@ -83,7 +82,7 @@ Ext.define('OnionSpace.view.operation.operation', {
                     tooltip: '撤销操作',
                     handler: function (view, recIndex, cellIndex, item, e, {data}) {
                         showConfirm(`是否撤销${data.name + data.date}操作?`, function (text) {
-                            const rows = operation.findDetail(data.id);
+                            const rows = execute('operation', 'findDetail', [data.id]);
                             rows.map(r => {
                                 if (r.oldContent === null) {
                                     utils.unLinkFile(r.file);
@@ -117,7 +116,7 @@ Ext.define('OnionSpace.view.operation.operation', {
                 store: Ext.create('Ext.data.Store', {
                     storeId: 'tempId',
                     fields: ['pId', 'date', 'type', 'file', 'tempId', 'content', 'oldContent', 'oldHtml'],
-                    data: operation.findDetail(data.id),
+                    data: execute('operation', 'findDetail', [data.id]),
                     sorters: [{
                         property: 'date',
                         direction: 'desc'

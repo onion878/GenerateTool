@@ -57,9 +57,9 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                             showConfirm(`是否下载[${data.Name}]?`, function (text) {
                                 btn.up('detail-temp').up('window').close();
                                 Ext.getCmp('main-content').mask('下载中, 请稍等...');
-                                const local = parentData.getByServeId(data.Pid);
+                                const local = execute('parentData', 'getByServeId', [data.Pid]);
                                 utils.downloadFile(data.User + '/' + data.Id + '.zip', data.Id + '.zip').then(d => {
-                                    if (local === undefined) {
+                                    if (local === null) {
                                         jsCode.importModule(d, "", data.Pid, data.Id).then(({msg, pId}) => {
                                             showToast('[info] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);
@@ -79,7 +79,7 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                         jsCode.updateTemplate(d, local, data).then(msg => {
                                             showToast('[info] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);
-                                            if (history.getMode() == local.id) {
+                                            if (execute('history', 'getMode') == local.id) {
                                                 changeTemplate(local.id, true);
                                                 return;
                                             }

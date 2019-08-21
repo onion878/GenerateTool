@@ -25,10 +25,10 @@ Ext.define('OnionSpace.view.setting.setting', {
                 fieldLabel: '终端',
                 listeners: {
                     render: function (dom) {
-                        dom.setRawValue(systemConfig.getConfig('terminal'));
+                        dom.setRawValue(execute('systemConfig', 'getConfig', ['terminal']));
                     },
                     change: function (dom, val) {
-                        systemConfig.setConfig('terminal', val);
+                        execute('systemConfig', 'setConfig', ['terminal', val])
                     }
                 }
             },
@@ -38,10 +38,10 @@ Ext.define('OnionSpace.view.setting.setting', {
                 fieldLabel: '编辑器',
                 listeners: {
                     render: function (dom) {
-                        dom.setRawValue(systemConfig.getConfig('editor'));
+                        dom.setRawValue(execute('systemConfig', 'getConfig', ['editor']));
                     },
                     change: function (dom, val) {
-                        systemConfig.setConfig('editor', val);
+                        execute('systemConfig', 'setConfig', ['editor', val]);
                     }
                 }
             },
@@ -58,11 +58,11 @@ Ext.define('OnionSpace.view.setting.setting', {
                 },
                 listeners: {
                     render: function (dom) {
-                        Ext.getCmp('setting-zoom').setValue(systemConfig.getZoom() * 100);
+                        Ext.getCmp('setting-zoom').setValue(execute('systemConfig', 'getZoom') * 100);
                     },
                     dragend: function (dom) {
                         const v = dom.getValue();
-                        systemConfig.setZoom(v / 100);
+                        execute('systemConfig', 'setZoom', [v / 100]);
                         webFrame.setZoomFactor(v / 100);
                     }
                 }
@@ -86,7 +86,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                 listeners: {
                     render: function (dom) {
                         let index = 0;
-                        const t = systemConfig.getTheme();
+                        const t = execute('systemConfig', 'getTheme');
                         if (t == 'aria') {
                             index = 1;
                         }
@@ -97,8 +97,8 @@ Ext.define('OnionSpace.view.setting.setting', {
                         for (let v in val) {
                             t = val[v];
                         }
-                        if (t != systemConfig.getTheme()) {
-                            systemConfig.setTheme(t);
+                        if (t != execute('systemConfig', 'getTheme')) {
+                            execute('systemConfig', 'setTheme', [t]);
                             showConfirm(`是否重新启动?`, function (text) {
                                 const {app} = require('electron').remote;
                                 app.relaunch();
@@ -114,10 +114,10 @@ Ext.define('OnionSpace.view.setting.setting', {
                 emptyText: 'http://localhost:8000',
                 listeners: {
                     render: function (dom) {
-                        dom.setRawValue(userConfig.getUrl());
+                        dom.setRawValue(execute('userConfig', 'getUrl'));
                     },
                     change: function (dom, val) {
-                        userConfig.setUrl(val);
+                        execute('userConfig', 'setUrl', [val]);
                     }
                 }
             },
@@ -126,10 +126,10 @@ Ext.define('OnionSpace.view.setting.setting', {
                 fieldLabel: '背景图',
                 listeners: {
                     render: function (dom) {
-                        dom.setRawValue(userConfig.getBg());
+                        dom.setRawValue(execute('userConfig', 'getBg'));
                     },
                     change: function (dom, val) {
-                        userConfig.setBg(val);
+                        execute('userConfig', 'setBg', [val]);
                         document.body.style.backgroundImage = `url('${val.replace(/\\/g, '/')}')`;
                     }
                 }
@@ -146,11 +146,11 @@ Ext.define('OnionSpace.view.setting.setting', {
                 },
                 listeners: {
                     render: function (dom) {
-                        Ext.getCmp('setting-opacity').setValue(userConfig.getOpacity() * 100);
+                        Ext.getCmp('setting-opacity').setValue(execute('userConfig', 'getOpacity') * 100);
                     },
                     dragend: function (dom) {
                         const v = dom.getValue();
-                        userConfig.setOpacity(v / 100);
+                        execute('userConfig', 'setOpacity', [v / 100]);
                         document.body.style.opacity = v / 100;
                     }
                 }

@@ -19,7 +19,7 @@ Ext.define('OnionSpace.controller.Unpkg', {
     },
     refresh: function (dom) {
         const grid = dom.up('unpkg');
-        grid.getStore().setData(packageConfig.getAll(grid.pId));
+        grid.getStore().setData(execute('packageConfig', 'getAll', [grid.pId]));
     },
     deletePkg: function (dom) {
         const grid = dom.up('unpkg'), that = this;
@@ -41,7 +41,7 @@ Ext.define('OnionSpace.controller.Unpkg', {
         });
         showConfirm(`是否删除包[${names.join(',')}]?`, function (text) {
             jsCode.deleteAllPkg(grid.pId, names).then(name => {
-                grid.getStore().setData(packageConfig.getAll(grid.pId));
+                grid.getStore().setData(execute('packageConfig', 'getAll', [grid.pId]));
             });
             names.forEach(n => {
                 that.runDeletePkg(grid.pId, n);

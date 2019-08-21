@@ -109,6 +109,9 @@ body {
     color: #359fff;
 }
 
+#left-bar-outerCt {
+    background-color: #5C6B82;
+}
 
 .states-toolbar {
     overflow: hidden;
@@ -118,6 +121,10 @@ body {
     border-top: 1px solid #3F4757;
     border-bottom: 1px solid #3F4757;
     box-sizing: initial;
+}
+
+.states-toolbar.vertical {
+    transform: rotate(-90deg);
 }
 
 .states-toolbar a {
@@ -162,7 +169,7 @@ body {
 }
 
 .states-toolbar a.active {
-    background-color: #3F4757;
+    background-color: #ed9200;
     color: papayawhip;
 }
 

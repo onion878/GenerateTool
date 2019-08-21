@@ -1,21 +1,18 @@
 const ipcRenderer = require('electron').ipcRenderer;
-const data = require('../service/dao/modeData');
-const parentData = require('../service/dao/mode');
-const history = require('../service/dao/history');
 const jsCode = require('../service/utils/JscodeUtil');
-const systemConfig = require('../service/dao/system');
-const userConfig = require('../service/dao/user');
-const packageConfig = require('../service/dao/package');
-const controlData = require('../service/dao/controls');
-const fileData = require('../service/dao/file');
-const geFileData = require('../service/dao/gefile');
-const operation = require('../service/dao/operation');
 const swig = require('swig');
 const utils = require('../service/utils/utils');
 const command = require('../service/utils/commands');
 
+function execute(key, method, args) {
+    if (args === undefined) {
+        args = [];
+    }
+    return ipcRenderer.sendSync('run', {key: key, method: method, args: args});
+}
+
 let consoleShowFlag = false;
-let pId = history.getMode();
+let pId = execute('history', 'getMode');
 const controllers = {
     'mode': ['OnionSpace.view.minicode.minicode', 'OnionSpace.view.mode.mode'],
     'editor': ['OnionSpace.controller.Editor'],
@@ -52,7 +49,7 @@ function initMainView() {
         launch: function () {
             ipcRenderer.send('loading-msg', '模块加载中...');
             moduleId = pId;
-            const datas = data.getData(pId);
+            const datas = execute('data', 'getData', [pId]);
             datas.forEach(d => d.icon = './images/database_save.svg');
             let store = Ext.create('Ext.data.TreeStore', {
                 root: {
@@ -69,7 +66,7 @@ function initMainView() {
             });
             let title = '数据模板';
             if (pId !== '') {
-                title = parentData.getById(pId).text;
+                title = execute('parentData', 'getById', [pId]).text;
                 require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${title}]`);
             }
 
@@ -192,21 +189,18 @@ function initMainView() {
                     id: 'main-content',
                     layout: 'border',
                     items: [
-                        , {
+                        {
                             region: 'west',
-                            title: '系统菜单',
                             split: true,
                             width: 240,
                             minWidth: 160,
                             maxWidth: 400,
-                            collapsible: true,
-                            xtype: 'tabpanel',
-                            tabPosition: 'left',
-                            items: [{
-                                title: '模板',
-                                margins: '0 0 0 0',
-                                layout: 'accordion',
-                                items: [{
+                            margins: '0 0 0 0',
+                            hidden: true,
+                            layout: 'accordion',
+                            id: 'main-template',
+                            items: [
+                                {
                                     xtype: 'treepanel',
                                     title: title,
                                     store: store,
@@ -226,11 +220,11 @@ function initMainView() {
                                                     icon: 'images/cross.svg',
                                                     handler: function () {
                                                         showConfirm(`是否删除模板[${record.data.text}]?`, function (text) {
-                                                            data.removeById(record.data.id);
+                                                            execute('data', 'removeById', [record.data.id]);
                                                             store.setRoot({
                                                                 expanded: true,
                                                                 text: '',
-                                                                children: data.getData(pId)
+                                                                children: execute('data', 'getData', [pId])
                                                             });
                                                             Ext.getCmp('mainmenutab').remove(record.data.id);
                                                         }, this, Ext.MessageBox.ERROR);
@@ -265,7 +259,7 @@ function initMainView() {
                                                             margin: '10',
                                                             store: {
                                                                 fields: ['id', 'text'],
-                                                                data: parentData.getAll()
+                                                                data: execute('parentData', 'getAll')
                                                             },
                                                             queryMode: 'local',
                                                             displayField: 'text',
@@ -338,18 +332,18 @@ function initMainView() {
                                                                     });
                                                                     return;
                                                                 }
-                                                                pId = parentData.setData(text);
+                                                                pId = execute('parentData', 'setData', [text]);
                                                                 this.up('window').close();
                                                                 moduleId = pId;
-                                                                history.setMode(pId);
+                                                                execute('history', 'setMode', [pId]);
                                                                 const root = Ext.getCmp('panel-model').getRootNode();
                                                                 root.removeAll();
-                                                                root.appendChild(data.getData(pId));
-                                                                history.removeAll();
+                                                                root.appendChild(execute('data', 'getData', [pId]));
+                                                                execute('history', 'removeAll');
                                                                 Ext.getCmp('panel-model').setTitle(text);
                                                                 Ext.getCmp('mainmenutab').removeAll();
                                                                 try {
-                                                                    eval(geFileData.getSwig(pId));
+                                                                    eval(execute('geFileData', 'getSwig', [pId]));
                                                                 } catch (e) {
                                                                     console.error(e);
                                                                     showError(e);
@@ -381,7 +375,7 @@ function initMainView() {
                                                         showToast('请先[选择模板]或[创建模板]!');
                                                         return;
                                                     }
-                                                    const modes = data.getData(pId);
+                                                    const modes = execute('data', 'getData', [pId]);
                                                     Ext.create('Ext.window.Window', {
                                                         title: '模板详情名称',
                                                         fixed: true,
@@ -425,12 +419,12 @@ function initMainView() {
                                                                     }
                                                                 });
                                                                 if (ifAdd) {
-                                                                    data.setData(t, pId);
+                                                                    execute('data', 'setData', [t, pId]);
                                                                 }
                                                                 this.up('window').close();
                                                                 const root = Ext.getCmp('panel-model').getRootNode();
                                                                 root.removeAll();
-                                                                const list = data.getData(pId);
+                                                                const list = execute('data', 'getData', [pId]);
                                                                 list.forEach(d => d.icon = './images/database_save.svg');
                                                                 root.appendChild(list);
                                                             }
@@ -445,7 +439,8 @@ function initMainView() {
                                             }
                                         }
                                     ]
-                                }, {
+                                },
+                                {
                                     xtype: 'treepanel',
                                     title: '生成模板',
                                     store: fileStore,
@@ -461,7 +456,7 @@ function initMainView() {
                                             drop: function (node, data, overModel, dropPosition) {
                                                 const paId = data.records[0].parentNode.data.id;
                                                 const id = data.records[0].data.id;
-                                                fileData.updateRootId(id, paId);
+                                                execute('fileData', 'updateRootId', [id, paId]);
                                             }
                                         }
                                     },
@@ -489,7 +484,7 @@ function initMainView() {
                                         },
                                         afteritemexpand: function (node, index, item, eOpts) {
                                             node.removeAll();
-                                            const child = fileData.getFiles(pId, node.data.id);
+                                            const child = execute('fileData', 'getFiles', [pId, node.data.id]);
                                             child.forEach(d => {
                                                 d.children = undefined;
                                                 d.loaded = false;
@@ -511,94 +506,95 @@ function initMainView() {
                                             } = record.data;
                                             new Ext.menu.Menu({
                                                 minWidth: 60,
-                                                items: [{
-                                                    text: '添加模板文件',
-                                                    icon: 'images/add-file.svg',
-                                                    hidden: type != 'file' ? false : true,
-                                                    handler: function () {
-                                                        Ext.create('Ext.window.Window', {
-                                                            title: '模板文件',
-                                                            fixed: true,
-                                                            animateTarget: item,
-                                                            width: 280,
-                                                            layout: 'fit',
-                                                            resizable: false,
-                                                            constrain: true,
-                                                            modal: true,
-                                                            items: {
-                                                                xtype: 'form',
-                                                                layout: {
-                                                                    type: 'vbox',
-                                                                    pack: 'start',
-                                                                    align: 'stretch'
-                                                                },
-                                                                items: [{
-                                                                    xtype: 'textfield',
-                                                                    fieldLabel: '名称',
-                                                                    margin: '10',
-                                                                    labelWidth: 45,
-                                                                    name: 'name'
-                                                                },
-                                                                    {
-                                                                        xtype: 'radiogroup',
-                                                                        fieldLabel: '类型',
+                                                items: [
+                                                    {
+                                                        text: '添加模板文件',
+                                                        icon: 'images/add-file.svg',
+                                                        hidden: type != 'file' ? false : true,
+                                                        handler: function () {
+                                                            Ext.create('Ext.window.Window', {
+                                                                title: '模板文件',
+                                                                fixed: true,
+                                                                animateTarget: item,
+                                                                width: 280,
+                                                                layout: 'fit',
+                                                                resizable: false,
+                                                                constrain: true,
+                                                                modal: true,
+                                                                items: {
+                                                                    xtype: 'form',
+                                                                    layout: {
+                                                                        type: 'vbox',
+                                                                        pack: 'start',
+                                                                        align: 'stretch'
+                                                                    },
+                                                                    items: [{
+                                                                        xtype: 'textfield',
+                                                                        fieldLabel: '名称',
                                                                         margin: '10',
                                                                         labelWidth: 45,
-                                                                        name: 'type',
-                                                                        items: [{
-                                                                            boxLabel: '添加',
-                                                                            inputValue: 'add',
-                                                                            checked: true
-                                                                        },
-                                                                            {
-                                                                                boxLabel: '修改',
-                                                                                inputValue: 'update'
+                                                                        name: 'name'
+                                                                    },
+                                                                        {
+                                                                            xtype: 'radiogroup',
+                                                                            fieldLabel: '类型',
+                                                                            margin: '10',
+                                                                            labelWidth: 45,
+                                                                            name: 'type',
+                                                                            items: [{
+                                                                                boxLabel: '添加',
+                                                                                inputValue: 'add',
+                                                                                checked: true
+                                                                            },
+                                                                                {
+                                                                                    boxLabel: '修改',
+                                                                                    inputValue: 'update'
+                                                                                }
+                                                                            ]
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                buttonAlign: 'center',
+                                                                buttons: [{
+                                                                    text: '确定',
+                                                                    handler: function () {
+                                                                        const form = this.up('window').down('form').getForm();
+                                                                        if (form.isValid()) {
+                                                                            let {
+                                                                                name,
+                                                                                type
+                                                                            } = form.getValues();
+                                                                            if (type == 'update') {
+                                                                                name = name + '.js';
                                                                             }
-                                                                        ]
+                                                                            const data = {
+                                                                                text: name,
+                                                                                type: 'file',
+                                                                                leaf: true,
+                                                                                parentFolder: text,
+                                                                                rootId: id,
+                                                                                cls: type == 'update' ? 'color-blue' : '',
+                                                                                updateType: type,
+                                                                                pId: pId
+                                                                            };
+                                                                            const child = execute('fileData', 'saveOrUpdate', [data]);
+                                                                            execute('geFileData', 'save', [child.id, pId]);
+                                                                            child.icon = getFileIcon(name);
+                                                                            record.appendChild(child);
+                                                                            this.up('window').close();
+                                                                        }
+                                                                    }
+                                                                },
+                                                                    {
+                                                                        text: '取消',
+                                                                        handler: function () {
+                                                                            this.up('window').close();
+                                                                        }
                                                                     }
                                                                 ]
-                                                            },
-                                                            buttonAlign: 'center',
-                                                            buttons: [{
-                                                                text: '确定',
-                                                                handler: function () {
-                                                                    const form = this.up('window').down('form').getForm();
-                                                                    if (form.isValid()) {
-                                                                        let {
-                                                                            name,
-                                                                            type
-                                                                        } = form.getValues();
-                                                                        if (type == 'update') {
-                                                                            name = name + '.js';
-                                                                        }
-                                                                        const data = {
-                                                                            text: name,
-                                                                            type: 'file',
-                                                                            leaf: true,
-                                                                            parentFolder: text,
-                                                                            rootId: id,
-                                                                            cls: type == 'update' ? 'color-blue' : '',
-                                                                            updateType: type,
-                                                                            pId: pId
-                                                                        };
-                                                                        const child = fileData.saveOrUpdate(data);
-                                                                        geFileData.save(child.id, pId);
-                                                                        child.icon = getFileIcon(name);
-                                                                        record.appendChild(child);
-                                                                        this.up('window').close();
-                                                                    }
-                                                                }
-                                                            },
-                                                                {
-                                                                    text: '取消',
-                                                                    handler: function () {
-                                                                        this.up('window').close();
-                                                                    }
-                                                                }
-                                                            ]
-                                                        }).show().focus();
-                                                    }
-                                                },
+                                                            }).show().focus();
+                                                        }
+                                                    },
                                                     {
                                                         text: '添加模板文件夹',
                                                         icon: 'images/folder_add.svg',
@@ -613,7 +609,7 @@ function initMainView() {
                                                                     rootId: id,
                                                                     pId: pId
                                                                 };
-                                                                const child = fileData.saveOrUpdate(data);
+                                                                const child = execute('fileData', 'saveOrUpdate', [data]);
                                                                 child.icon = './icons/folder-core.svg';
                                                                 record.appendChild(child);
                                                             }, item);
@@ -626,9 +622,9 @@ function initMainView() {
                                                         handler: function () {
                                                             const {
                                                                 file
-                                                            } = geFileData.getOneData(record.get('id'));
+                                                            } = execute('geFileData', 'getOneData', [record.get('id')]);
                                                             const fileTpl = swig.compile(file);
-                                                            const fileOutput = fileTpl(controlData.getModuleData(pId));
+                                                            const fileOutput = fileTpl(execute('controlData', 'getModuleData', [pId]));
                                                             Ext.create('Ext.window.Window', {
                                                                 title: '设置路径',
                                                                 fixed: true,
@@ -659,7 +655,7 @@ function initMainView() {
                                                                                     let output = val;
                                                                                     try {
                                                                                         const tpl = swig.compile(val);
-                                                                                        output = tpl(controlData.getModuleData(pId));
+                                                                                        output = tpl(execute('controlData', 'getModuleData', [pId]));
                                                                                     } catch (e) {
                                                                                         console.error(e);
                                                                                     }
@@ -684,7 +680,7 @@ function initMainView() {
                                                                         const form = this.up('window').down('form').getForm();
                                                                         if (form.isValid()) {
                                                                             const d = form.getValues();
-                                                                            geFileData.updateDataFile(record.get('id'), d.file);
+                                                                            execute('geFileData', 'updateDataFile', [record.get('id'), d.file]);
                                                                             this.up('window').close();
                                                                         }
                                                                     }
@@ -705,7 +701,7 @@ function initMainView() {
                                                         handler: function () {
                                                             showPrompt('名称', '', function (val) {
                                                                 if (val.trim().length > 0) {
-                                                                    fileData.updateName(record.get('id'), val);
+                                                                    execute('fileData', 'updateName', [record.get('id'), val]);
                                                                     record.set('text', val);
                                                                     node.refresh();
                                                                 }
@@ -719,13 +715,13 @@ function initMainView() {
                                                             showConfirm(`是否删除[${record.data.text}]?`, function (text) {
                                                                 record.parentNode.removeChild(record);
                                                                 const rId = record.get('id');
-                                                                fileData.removeFile(rId);
-                                                                geFileData.removeData(rId);
+                                                                execute('fileData', 'removeFile', [rId]);
+                                                                execute('geFileData', 'removeData', [rId]);
                                                                 Ext.getCmp('mainmenutab').remove(rId);
-                                                                const removeList = fileData.getTreeData(record.get('id'), pId);
+                                                                const removeList = execute('fileData', 'getTreeData', [record.get('id'), rId]);
                                                                 removeList.forEach(r => {
-                                                                    fileData.removeFile(r.id);
-                                                                    geFileData.removeData(r.id);
+                                                                    execute('fileData', 'removeFile', [r.id]);
+                                                                    execute('geFileData', 'removeData', [r.id]);
                                                                     Ext.getCmp('mainmenutab').remove(r.id);
                                                                 });
                                                             }, item, Ext.MessageBox.ERROR);
@@ -775,327 +771,11 @@ function initMainView() {
                                             renderTpl: [
                                                 '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-cd-go" role="presentation"></div>'
                                             ],
-                                            qtip: '开始创建',
+                                            qtip: '开始创建(F5)',
+                                            id: 'create-btn',
                                             listeners: {
                                                 click: function () {
-                                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                                        showToast('请先[选择模板]或[创建模板]!');
-                                                        return;
-                                                    }
-                                                    Ext.getCmp('main-content').mask('执行中...');
-                                                    const files = [],
-                                                        generatorData = geFileData.getFileData(pId);
-                                                    const allModuleData = controlData.getModuleData(pId);
-                                                    generatorData.forEach(f => {
-                                                        if (!utils.isEmpty(f.file) && !utils.isEmpty(f.content)) {
-                                                            const type = fileData.getFile(f.id).updateType;
-                                                            const tpl = swig.compile(f.file);
-                                                            f.name = tpl(allModuleData);
-                                                            const flag = utils.fileExists(f.name);
-                                                            if (flag) {
-                                                                f.flag = '是';
-                                                            } else {
-                                                                f.flag = '否';
-                                                            }
-                                                            f.type = type;
-                                                            files.push(f);
-                                                        }
-                                                    });
-                                                    Ext.getCmp('main-content').unmask();
-                                                    Ext.create('Ext.window.Window', {
-                                                        title: '生成文件',
-                                                        fixed: true,
-                                                        width: '85%',
-                                                        layout: 'fit',
-                                                        resizable: true,
-                                                        constrain: true,
-                                                        animateTarget: this,
-                                                        maxHeight: 600,
-                                                        modal: true,
-                                                        viewModel: {
-                                                            data: {
-                                                                after: true,
-                                                                before: true,
-                                                            }
-                                                        },
-                                                        tbar: [
-                                                            {
-                                                                xtype: 'checkbox',
-                                                                bind: '{before}',
-                                                                fieldLabel: '执行创建前脚本',
-                                                                inputValue: 'before',
-                                                                labelWidth: 110,
-                                                                boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`
-                                                            }, '-',
-                                                            {
-                                                                xtype: 'checkbox',
-                                                                bind: '{after}',
-                                                                fieldLabel: '执行创建后脚本',
-                                                                name: 'after',
-                                                                labelWidth: 110,
-                                                                boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`
-                                                            }
-                                                        ],
-                                                        items: {
-                                                            xtype: 'grid',
-                                                            layout: 'fit',
-                                                            selType: 'checkboxmodel',
-                                                            columnLines: true,
-                                                            enableLocking: true,
-                                                            maxHeight: 600,
-                                                            store: Ext.create('Ext.data.Store', {
-                                                                data: files
-                                                            }),
-                                                            plugins: [{
-                                                                ptype: 'rowexpander',
-                                                                rowBodyTpl: ['<p><b>名称:</b> {file}</p>', '<p><b>文件:</b> {name}</p>']
-                                                            }],
-                                                            columns: [
-                                                                new Ext.grid.RowNumberer(),
-                                                                {
-                                                                    text: '名称',
-                                                                    align: 'center',
-                                                                    dataIndex: 'name',
-                                                                    flex: 1,
-                                                                    tdCls: 'direction-rtl'
-                                                                },
-                                                                {
-                                                                    text: '是否存在',
-                                                                    align: 'center',
-                                                                    dataIndex: 'flag',
-                                                                    width: 100,
-                                                                    locked: true,
-                                                                    renderer: function (value, metaData) {
-                                                                        if (value == '是')
-                                                                            metaData.style = "color:red";
-                                                                        return value;
-                                                                    }
-                                                                },
-                                                                {
-                                                                    text: '类型',
-                                                                    align: 'center',
-                                                                    dataIndex: 'type',
-                                                                    width: 70,
-                                                                    locked: true,
-                                                                    renderer: function (value, metaData) {
-                                                                        if (value == 'update')
-                                                                            metaData.style = "color:blue";
-                                                                        return value;
-                                                                    }
-                                                                }
-                                                            ],
-                                                            listeners: {
-                                                                render: function (dom) {
-                                                                    dom.getSelectionModel().selectAll();
-                                                                }
-                                                            }
-                                                        },
-                                                        buttonAlign: 'center',
-                                                        buttons: [
-                                                            {
-                                                                text: '生成', handler: function () {
-                                                                    const win = require('electron').remote.getCurrentWindow();
-                                                                    const {before, after} = this.up('window').getViewModel().getData();
-                                                                    Ext.getCmp('main-content').mask('执行中...');
-                                                                    closeNodeWin();
-                                                                    const grid = this.up('window').down('grid');
-                                                                    const selected = grid.getSelectionModel().getSelection();
-                                                                    this.up('window').close();
-                                                                    let operationId = null;
-                                                                    setTimeout(() => {
-                                                                        if (before) {
-                                                                            nodeRun('(function(){' + geFileData.getBeforeShell(pId) + '})();').then(d => {
-                                                                                showToast('[info] 创建前JS脚本执行成功');
-                                                                                win.setProgressBar(0.2);
-                                                                                selected.map((row, i) => {
-                                                                                    const f = row.data;
-                                                                                    if (f.type == 'add') {
-                                                                                        try {
-                                                                                            const tplPre = swig.compile(f.content);
-                                                                                            f.preview = tplPre(allModuleData);
-                                                                                        } catch (e) {
-                                                                                            console.error(e);
-                                                                                            showError(f.file + ':模板错误');
-                                                                                            Ext.getCmp('main-content').unmask();
-                                                                                            throw e;
-                                                                                        }
-                                                                                    } else {
-                                                                                        const filePath = f.name.replace(/\\/g, '\/');
-                                                                                        try {
-                                                                                            f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
-                                                                                        } catch (e) {
-                                                                                            console.error(e);
-                                                                                            showError(e);
-                                                                                            Ext.getCmp('main-content').unmask();
-                                                                                            throw e;
-                                                                                        }
-                                                                                    }
-                                                                                    const oldContent = utils.readFile(f.name);
-                                                                                    utils.createFile(f.name, f.preview);
-                                                                                    operationId = operation.setOperation({
-                                                                                        id: operationId,
-                                                                                        date: utils.getNowTime(),
-                                                                                        pId: pId,
-                                                                                        name: `[${parentData.getById(pId).text}]`
-                                                                                    }, {
-                                                                                        pId: operationId,
-                                                                                        date: utils.getNowTime(),
-                                                                                        type: f.type,
-                                                                                        file: f.name,
-                                                                                        tempId: f.id,
-                                                                                        content: f.preview,
-                                                                                        oldContent: oldContent
-                                                                                    });
-                                                                                    showToast('[info] ' + f.name + ' 生成成功!');
-                                                                                    if (after) {
-                                                                                        win.setProgressBar((0.6 / selected.length) * (i + 1) + 0.2);
-                                                                                    } else {
-                                                                                        win.setProgressBar((0.8 / selected.length) * (i + 1) + 0.2);
-                                                                                    }
-                                                                                });
-                                                                                showToast('[info] 文件创建完成');
-                                                                                if (after) {
-                                                                                    nodeRun('(function(){' + geFileData.getShell(pId) + '})();').then(d => {
-                                                                                        showToast('[info] 创建后JS脚本执行成功');
-                                                                                        Ext.getCmp('main-content').unmask();
-                                                                                        win.setProgressBar(1);
-                                                                                        setTimeout(() => {
-                                                                                            win.setProgressBar(-1);
-                                                                                            new Notification('代码创建成功', {
-                                                                                                body: `[${title}]代码创建成功`,
-                                                                                                icon: 'images/success.png'
-                                                                                            });
-                                                                                        }, 200);
-                                                                                    }).catch(e => {
-                                                                                        console.error(e);
-                                                                                        showError(e);
-                                                                                        showErrorFlag();
-                                                                                        Ext.getCmp('main-content').unmask();
-                                                                                        win.setProgressBar(-1);
-                                                                                        new Notification('代码创建失败', {
-                                                                                            body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                            icon: 'images/error.png'
-                                                                                        });
-                                                                                    });
-                                                                                } else {
-                                                                                    Ext.getCmp('main-content').unmask();
-                                                                                    win.setProgressBar(-1);
-                                                                                    new Notification('代码创建成功', {
-                                                                                        body: `[${title}]代码创建成功`,
-                                                                                        icon: 'images/success.png'
-                                                                                    });
-                                                                                }
-                                                                            }).catch(e => {
-                                                                                console.error(e);
-                                                                                showError(e);
-                                                                                showErrorFlag();
-                                                                                Ext.getCmp('main-content').unmask();
-                                                                                win.setProgressBar(-1);
-                                                                                new Notification('代码创建失败', {
-                                                                                    body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                    icon: 'images/error.png'
-                                                                                });
-                                                                            });
-                                                                        } else {
-                                                                            selected.map((row, i) => {
-                                                                                const f = row.data;
-                                                                                if (f.type == 'add') {
-                                                                                    try {
-                                                                                        const tplPre = swig.compile(f.content);
-                                                                                        f.preview = tplPre(allModuleData);
-                                                                                    } catch (e) {
-                                                                                        console.error(e);
-                                                                                        showError(f.file + ':模板错误');
-                                                                                        Ext.getCmp('main-content').unmask();
-                                                                                        win.setProgressBar(-1);
-                                                                                        new Notification('代码创建失败', {
-                                                                                            body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                            icon: 'images/error.png'
-                                                                                        });
-                                                                                        throw e;
-                                                                                    }
-                                                                                } else {
-                                                                                    const filePath = f.name.replace(/\\/g, '\/');
-                                                                                    try {
-                                                                                        f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
-                                                                                    } catch (e) {
-                                                                                        console.error(e);
-                                                                                        showError(e);
-                                                                                        Ext.getCmp('main-content').unmask();
-                                                                                        win.setProgressBar(-1);
-                                                                                        new Notification('代码创建失败', {
-                                                                                            body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                            icon: 'images/error.png'
-                                                                                        });
-                                                                                        throw e;
-                                                                                    }
-                                                                                }
-                                                                                const oldContent = utils.readFile(f.name);
-                                                                                utils.createFile(f.name, f.preview);
-                                                                                operationId = operation.setOperation({
-                                                                                    id: operationId,
-                                                                                    date: utils.getNowTime(),
-                                                                                    pId: pId,
-                                                                                    name: `[${parentData.getById(pId).text}]`
-                                                                                }, {
-                                                                                    pId: operationId,
-                                                                                    date: utils.getNowTime(),
-                                                                                    type: f.type,
-                                                                                    file: f.name,
-                                                                                    tempId: f.id,
-                                                                                    content: f.preview,
-                                                                                    oldContent: oldContent
-                                                                                });
-                                                                                showToast('[info] ' + f.name + ' 生成成功!');
-                                                                                if (after) {
-                                                                                    win.setProgressBar((0.8 / selected.length) * (i + 1));
-                                                                                } else {
-                                                                                    win.setProgressBar((1 / selected.length) * (i + 1));
-                                                                                }
-                                                                            });
-                                                                            showToast('[info] 文件创建完成');
-                                                                            if (after) {
-                                                                                nodeRun('(function(){' + geFileData.getShell(pId) + '})();').then(d => {
-                                                                                    showToast('[info] 创建后JS脚本执行成功');
-                                                                                    Ext.getCmp('main-content').unmask();
-                                                                                    win.setProgressBar(1);
-                                                                                    setTimeout(() => {
-                                                                                        win.setProgressBar(-1);
-                                                                                        new Notification('代码创建成功', {
-                                                                                            body: `[${title}]代码创建成功`,
-                                                                                            icon: 'images/success.png'
-                                                                                        });
-                                                                                    }, 200);
-                                                                                }).catch(e => {
-                                                                                    console.error(e);
-                                                                                    showError(e);
-                                                                                    showErrorFlag();
-                                                                                    Ext.getCmp('main-content').unmask();
-                                                                                    win.setProgressBar(-1);
-                                                                                    new Notification('代码创建失败', {
-                                                                                        body: `[${title}]代码创建失败, 错误信息:${e}`,
-                                                                                        icon: 'images/error.png'
-                                                                                    });
-                                                                                });
-                                                                            } else {
-                                                                                Ext.getCmp('main-content').unmask();
-                                                                                win.setProgressBar(-1);
-                                                                                new Notification('代码创建成功', {
-                                                                                    body: `[${title}]代码创建成功`,
-                                                                                    icon: 'images/success.png'
-                                                                                });
-                                                                            }
-                                                                        }
-                                                                    }, 500);
-                                                                }
-                                                            },
-                                                            {
-                                                                text: '取消', handler: function () {
-                                                                    this.up('window').close();
-                                                                }
-                                                            }
-                                                        ]
-                                                    }).show().focus();
+                                                    createFile(this);
                                                 }
                                             }
                                         },
@@ -1148,13 +828,21 @@ function initMainView() {
                                             }
                                         }
                                     ]
-                                }]
-                            }, {
-                                title: 'js脚本',
-                                id: 'js-data',
-                                scrollable: true
-                            }]
-                        }, {
+                                }
+                            ]
+                        },
+                        {
+                            region: 'west',
+                            split: true,
+                            width: 240,
+                            minWidth: 160,
+                            maxWidth: 400,
+                            id: 'js-data',
+                            useArrows: true,
+                            hidden: true,
+                            scrollable: true
+                        },
+                        {
                             region: 'center',
                             xtype: 'tabpanel',
                             fullscreen: true,
@@ -1163,32 +851,72 @@ function initMainView() {
                             items: [],
                             listeners: {
                                 tabchange: function (tabPanel, tab) {
-                                    history.setShowTab(tab.id);
+                                    execute('history', 'setShowTab', [tab.id]);
                                     labelEditor.cancelEdit();
                                 },
                                 add: function (tabPanel, tab) {
                                     if (tab.initialConfig.useType != 'editor') {
-                                        history.setTab({
+                                        execute('history', 'setTab', [{
                                             id: tab.config.id,
                                             params: tab.config.params,
                                             title: tab.config.title,
                                             type: tab.config.xtype,
                                             icon: tab.config.icon
-                                        });
+                                        }]);
                                     }
                                 },
                                 remove: function (tabPanel, tab) {
                                     if (tab.initialConfig.useType == 'editor') {
-                                        history.removeCodeTab(tab.config.id);
+                                        execute('history', 'removeCodeTab', [tab.config.id]);
                                     } else {
-                                        history.removeTab(tab.config.id);
+                                        execute('history', 'removeTab', [tab.config.id]);
                                     }
                                     labelEditor.cancelEdit();
                                 }
                             }
                         }
                     ]
-                }]
+                }],
+                dockedItems: [
+                    {
+                        id: 'left-bar',
+                        dock: 'left',
+                        xtype: 'statusbar',
+                        float: 'left',
+                        toggle: true,
+                        jsShow: false,
+                        templateShow: false,
+                        type: 'vertical',
+                        param: 119,
+                        list: [
+                            {img: './images/tab-script.svg', name: 'JS脚本'},
+                            {img: './images/tab-template.svg', name: '模板'}
+                        ],
+                        click: function (t, dom, name) {
+                            if (name == 'JS脚本') {
+                                if (t.jsShow) {
+                                    Ext.getCmp('js-data').hide();
+                                    dom.className = "";
+                                } else {
+                                    Ext.getCmp('main-template').hide();
+                                    Ext.getCmp('js-data').show();
+                                    t.templateShow = false;
+                                }
+                                t.jsShow = !t.jsShow;
+                            } else {
+                                if (t.templateShow) {
+                                    Ext.getCmp('main-template').hide();
+                                    dom.className = "";
+                                } else {
+                                    Ext.getCmp('js-data').hide();
+                                    Ext.getCmp('main-template').show();
+                                    t.jsShow = false;
+                                }
+                                t.templateShow = !t.templateShow;
+                            }
+                        }
+                    }
+                ]
             });
 
             Ext.create('Ext.Viewport', {
@@ -1227,7 +955,7 @@ function initMainView() {
             function setGeFile(btn, id) {
                 let d = {};
                 if (id != undefined) {
-                    d = fileData.getFile(id);
+                    d = execute('fileData', 'getFile', [id]);
                 }
                 const tree = btn.up('treepanel');
                 const root = tree.getRootNode();
@@ -1288,8 +1016,8 @@ function initMainView() {
                                         updateType: type,
                                         pId: pId
                                     };
-                                    const child = fileData.saveOrUpdate(data, id);
-                                    geFileData.save(child.id, pId);
+                                    const child = execute('fileData', 'saveOrUpdate', [data, id]);
+                                    execute('geFileData', 'save', [child.id, pId]);
                                     child.icon = getFileIcon(name);
                                     root.appendChild(child);
                                     this.up('window').close();
@@ -1308,7 +1036,7 @@ function initMainView() {
             function setGeFolder(btn, id) {
                 let d = {};
                 if (id != undefined) {
-                    d = fileData.getFile(id);
+                    d = execute('fileData', 'getFile', [id]);
                 }
                 const tree = btn.up('treepanel');
                 const root = tree.getRootNode();
@@ -1321,7 +1049,7 @@ function initMainView() {
                         rootId: '0',
                         pId: pId
                     };
-                    const child = fileData.saveOrUpdate(data, id);
+                    const child = execute('fileData', 'saveOrUpdate', [data, id]);
                     child.icon = './icons/folder-core.svg';
                     root.appendChild(child);
                 }, btn, d.text);
@@ -1330,15 +1058,15 @@ function initMainView() {
             setJsData();
 
             try {
-                eval(geFileData.getSwig(pId));
+                eval(execute('geFileData', 'getSwig', [pId]));
             } catch (e) {
                 console.error(e);
                 showError(e);
             }
             ipcRenderer.send('loading-msg', '历史加载中...');
-            const tabData = history.getTab();
-            const tabCode = history.getCode();
-            const showTab = history.getShowTab();
+            const tabData = execute('history', 'getTab');
+            const tabCode = execute('history', 'getCode');
+            const showTab = execute('history', 'getShowTab');
             for (let i = 0; i < tabData.length; i++) {
                 if (tabData[i].id == showTab) {
                     openSome(tabData[i]);
@@ -1355,11 +1083,11 @@ function initMainView() {
             }
             registerAllSuggestion();
             checkNew(pId);
-            document.body.style.backgroundImage = `url('${userConfig.getBg().replace(/\\/g, '/')}')`;
+            document.body.style.backgroundImage = `url('${execute('userConfig', 'getBg').replace(/\\/g, '/')}')`;
             document.body.style.backgroundPosition = 'center center !important';
             document.body.style.backgroundRepeat = 'no-repeat no-repeat';
             document.body.style.backgroundSize = '100% 100%';
-            document.body.style.opacity = userConfig.getOpacity();
+            document.body.style.opacity = execute('userConfig', 'getOpacity');
             ipcRenderer.send('loading-success', '加载完成!');
             checkVersion();
         }
@@ -1367,11 +1095,11 @@ function initMainView() {
 }
 
 function checkVersion() {
-    const v = systemConfig.getConfig('version'), nV = utils.getVersion();
+    const v = execute('systemConfig', 'getConfig', ['version']), nV = utils.getVersion();
     if (v == nV) {
         return;
     }
-    systemConfig.setConfig('version', nV);
+    execute('systemConfig', 'setConfig', ['version', nV]);
     openSome({id: 'welcome', title: '更新日志', type: 'welcome'});
 }
 
@@ -1391,7 +1119,7 @@ function setJsData() {
 }
 
 function getFilesData() {
-    let GfData = fileData.getFiles(pId, '0');
+    let GfData = execute('fileData', 'getFiles', [pId, '0']);
     GfData.forEach(d => {
         d.children = undefined;
         d.loaded = false;
@@ -1420,7 +1148,7 @@ function openSome({id, title, type, params, icon}, flag) {
             const tab = tabPanel.add({
                 id: id,
                 title: title,
-                pId: history.getMode(),
+                pId: execute('history', 'getMode'),
                 closable: true,
                 icon: icon,
                 params: params,
@@ -1542,32 +1270,32 @@ function checkNew(id, flag) {
     if (utils.isEmpty(id)) {
         return;
     }
-    const d = parentData.getById(id);
+    const d = execute('parentData', 'getById', [id]);
     if (utils.isEmpty(d.detailId)) {
         return;
     }
     Ext.Ajax.request({
-        url: userConfig.getUrl() + '/checkNew',
+        url: execute('userConfig', 'getUrl') + '/checkNew',
         method: 'POST',
         jsonData: {id: d.detailId, pid: d.serveId},
         success: function (response) {
             const res = Ext.util.JSON.decode(response.responseText);
             if (res) {
                 Ext.Ajax.request({
-                    url: userConfig.getUrl() + '/getNewest/' + d.serveId,
+                    url: execute('userConfig', 'getUrl') + '/getNewest/' + d.serveId,
                     method: 'POST',
                     jsonData: {},
                     success: function (response) {
                         const jsonResp = Ext.util.JSON.decode(response.responseText);
                         showConfirm(`检查到新的模板,是否立即更新?`, function (text) {
                             Ext.getCmp('main-content').mask('下载中, 请稍等...');
-                            const local = parentData.getByServeId(jsonResp.Pid);
+                            const local = execute('parentData', 'getByServeId', [jsonResp.Pid]);
                             utils.downloadFile(jsonResp.User + '/' + jsonResp.Id + '.zip', jsonResp.Id + '.zip').then(d => {
                                 jsCode.updateTemplate(d, local, jsonResp).then(msg => {
                                     Ext.getCmp('main-content').unmask();
-                                    showToast('[info] [' + data.Name + ']更新成功!');
+                                    showToast('[info] 更新成功!');
                                     jsCode.deleteFile(d);
-                                    if (history.getMode() == local.id) {
+                                    if (execute('history', 'getMode') == local.id) {
                                         changeTemplate(local.id, true);
                                         return;
                                     }
@@ -1611,19 +1339,19 @@ function changeTemplate(newPId, flag) {
     closeNodeWin();
     pId = newPId;
     moduleId = pId;
-    history.setMode(pId);
+    execute('history', 'setMode', [pId]);
     Ext.getCmp('main-content').mask('切换中...');
     const root = Ext.getCmp('panel-model').getRootNode();
     root.removeAll();
-    const list = data.getData(pId);
+    const list = execute('data', 'getData', [pId]);
     list.forEach(d => d.icon = './images/database_save.svg');
     root.appendChild(list);
-    history.removeAll();
-    const mode = parentData.getById(pId);
+    execute('history', 'removeAll');
+    const mode = execute('parentData', 'getById', [pId]);
     Ext.getCmp('panel-model').setTitle(mode.text);
     Ext.getCmp('mainmenutab').removeAll();
     try {
-        eval(geFileData.getSwig(pId));
+        eval(execute('geFileData', 'getSwig', [pId]));
     } catch (e) {
         console.error(e);
         showError(e);
@@ -1644,7 +1372,7 @@ function changeTemplate(newPId, flag) {
 }
 
 function installTemplateAllPkg() {
-    const packages = packageConfig.getAll(pId);
+    const packages = execute('packageConfig', 'getAll', [pId]);
     if (Ext.getCmp('terminal').hidden) {
         document.getElementById('terminal-btn').click();
         const folder = jsCode.getFolder(pId);
@@ -1686,3 +1414,337 @@ function showHelpFile(id, t, d) {
         }).show().focus();
     });
 }
+
+function createFile(dom) {
+    if (pId == undefined || pId == null || pId.trim().length == 0) {
+        showToast('请先[选择模板]或[创建模板]!');
+        return;
+    }
+    Ext.getCmp('main-content').mask('执行中...');
+    const files = [],
+        generatorData = execute('geFileData', 'getFileData', [pId]);
+    const allModuleData = execute('controlData', 'getModuleData', [pId]);
+    generatorData.forEach(f => {
+        if (!utils.isEmpty(f.file) && !utils.isEmpty(f.content)) {
+            const type = execute('fileData', 'getFiles', [f.id]).updateType;
+            const tpl = swig.compile(f.file);
+            f.name = tpl(allModuleData);
+            const flag = utils.fileExists(f.name);
+            if (flag) {
+                f.flag = '是';
+            } else {
+                f.flag = '否';
+            }
+            f.type = type;
+            files.push(f);
+        }
+    });
+    Ext.create('Ext.window.Window', {
+        id: 'generate-win',
+        title: '生成文件',
+        width: '85%',
+        height: '85%',
+        layout: 'fit',
+        resizable: true,
+        maximizable: true,
+        constrain: true,
+        animateTarget: dom,
+        modal: true,
+        viewModel: {
+            data: {
+                after: true,
+                before: true,
+            }
+        },
+        tbar: [
+            {
+                xtype: 'checkbox',
+                bind: '{before}',
+                fieldLabel: '执行创建前脚本',
+                inputValue: 'before',
+                labelWidth: 110,
+                boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`
+            }, '-',
+            {
+                xtype: 'checkbox',
+                bind: '{after}',
+                fieldLabel: '执行创建后脚本',
+                name: 'after',
+                labelWidth: 110,
+                boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`
+            }
+        ],
+        items: {
+            xtype: 'grid',
+            layout: 'fit',
+            selType: 'checkboxmodel',
+            columnLines: true,
+            enableLocking: true,
+            maxHeight: 600,
+            store: Ext.create('Ext.data.Store', {
+                data: files
+            }),
+            plugins: [{
+                ptype: 'rowexpander',
+                rowBodyTpl: ['<p><b>名称:</b> {file}</p>', '<p><b>文件:</b> {name}</p>']
+            }],
+            columns: [
+                new Ext.grid.RowNumberer(),
+                {
+                    text: '名称',
+                    align: 'center',
+                    dataIndex: 'name',
+                    flex: 1,
+                    tdCls: 'direction-rtl'
+                },
+                {
+                    text: '是否存在',
+                    align: 'center',
+                    dataIndex: 'flag',
+                    width: 100,
+                    locked: true,
+                    renderer: function (value, metaData) {
+                        if (value == '是')
+                            metaData.style = "color:red";
+                        return value;
+                    }
+                },
+                {
+                    text: '类型',
+                    align: 'center',
+                    dataIndex: 'type',
+                    width: 70,
+                    locked: true,
+                    renderer: function (value, metaData) {
+                        if (value == 'update')
+                            metaData.style = "color:blue";
+                        return value;
+                    }
+                }
+            ],
+            listeners: {
+                render: function (dom) {
+                    dom.getSelectionModel().selectAll();
+                    Ext.getCmp('main-content').unmask();
+                }
+            }
+        },
+        buttonAlign: 'center',
+        buttons: [
+            {
+                text: '生成', handler: function () {
+                    const win = require('electron').remote.getCurrentWindow();
+                    const {before, after} = this.up('window').getViewModel().getData();
+                    Ext.getCmp('main-content').mask('执行中...');
+                    closeNodeWin();
+                    const grid = this.up('window').down('grid');
+                    const selected = grid.getSelectionModel().getSelection();
+                    this.up('window').close();
+                    let operationId = null;
+                    setTimeout(() => {
+                        if (before) {
+                            nodeRun('(function(){' + execute('geFileData', 'getBeforeShell', [pId]) + '})();').then(d => {
+                                showToast('[info] 创建前JS脚本执行成功');
+                                win.setProgressBar(0.2);
+                                selected.map((row, i) => {
+                                    const f = row.data;
+                                    if (f.type == 'add') {
+                                        try {
+                                            const tplPre = swig.compile(f.content);
+                                            f.preview = tplPre(allModuleData);
+                                        } catch (e) {
+                                            console.error(e);
+                                            showError(f.file + ':模板错误');
+                                            Ext.getCmp('main-content').unmask();
+                                            throw e;
+                                        }
+                                    } else {
+                                        const filePath = f.name.replace(/\\/g, '\/');
+                                        try {
+                                            f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
+                                        } catch (e) {
+                                            console.error(e);
+                                            showError(e);
+                                            Ext.getCmp('main-content').unmask();
+                                            throw e;
+                                        }
+                                    }
+                                    const oldContent = utils.readFile(f.name);
+                                    utils.createFile(f.name, f.preview);
+                                    operationId = execute('operation', 'setOperation', [{
+                                        id: operationId,
+                                        date: utils.getNowTime(),
+                                        pId: pId,
+                                        name: `[${execute('parentData', 'getById', [pId]).text}]`
+                                    }, {
+                                        pId: operationId,
+                                        date: utils.getNowTime(),
+                                        type: f.type,
+                                        file: f.name,
+                                        tempId: f.id,
+                                        content: f.preview,
+                                        oldContent: oldContent
+                                    }]);
+                                    showToast('[info] ' + f.name + ' 生成成功!');
+                                    if (after) {
+                                        win.setProgressBar((0.6 / selected.length) * (i + 1) + 0.2);
+                                    } else {
+                                        win.setProgressBar((0.8 / selected.length) * (i + 1) + 0.2);
+                                    }
+                                });
+                                showToast('[info] 文件创建完成');
+                                if (after) {
+                                    nodeRun('(function(){' + execute('geFileData', 'getShell', [pId]) + '})();').then(d => {
+                                        showToast('[info] 创建后JS脚本执行成功');
+                                        Ext.getCmp('main-content').unmask();
+                                        win.setProgressBar(1);
+                                        setTimeout(() => {
+                                            win.setProgressBar(-1);
+                                            new Notification('代码创建成功', {
+                                                body: `[${title}]代码创建成功`,
+                                                icon: 'images/success.png'
+                                            });
+                                        }, 200);
+                                    }).catch(e => {
+                                        console.error(e);
+                                        showError(e);
+                                        showErrorFlag();
+                                        Ext.getCmp('main-content').unmask();
+                                        win.setProgressBar(-1);
+                                        new Notification('代码创建失败', {
+                                            body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                            icon: 'images/error.png'
+                                        });
+                                    });
+                                } else {
+                                    Ext.getCmp('main-content').unmask();
+                                    win.setProgressBar(-1);
+                                    new Notification('代码创建成功', {
+                                        body: `[${title}]代码创建成功`,
+                                        icon: 'images/success.png'
+                                    });
+                                }
+                            }).catch(e => {
+                                console.error(e);
+                                showError(e);
+                                showErrorFlag();
+                                Ext.getCmp('main-content').unmask();
+                                win.setProgressBar(-1);
+                                new Notification('代码创建失败', {
+                                    body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                    icon: 'images/error.png'
+                                });
+                            });
+                        } else {
+                            selected.map((row, i) => {
+                                const f = row.data;
+                                if (f.type == 'add') {
+                                    try {
+                                        const tplPre = swig.compile(f.content);
+                                        f.preview = tplPre(allModuleData);
+                                    } catch (e) {
+                                        console.error(e);
+                                        showError(f.file + ':模板错误');
+                                        Ext.getCmp('main-content').unmask();
+                                        win.setProgressBar(-1);
+                                        new Notification('代码创建失败', {
+                                            body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                            icon: 'images/error.png'
+                                        });
+                                        throw e;
+                                    }
+                                } else {
+                                    const filePath = f.name.replace(/\\/g, '\/');
+                                    try {
+                                        f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
+                                    } catch (e) {
+                                        console.error(e);
+                                        showError(e);
+                                        Ext.getCmp('main-content').unmask();
+                                        win.setProgressBar(-1);
+                                        new Notification('代码创建失败', {
+                                            body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                            icon: 'images/error.png'
+                                        });
+                                        throw e;
+                                    }
+                                }
+                                const oldContent = utils.readFile(f.name);
+                                utils.createFile(f.name, f.preview);
+                                operationId = execute('operation', 'setOperation', [{
+                                    id: operationId,
+                                    date: utils.getNowTime(),
+                                    pId: pId,
+                                    name: `[${execute('parentData', 'getById', [pId]).text}]`
+                                }, {
+                                    pId: operationId,
+                                    date: utils.getNowTime(),
+                                    type: f.type,
+                                    file: f.name,
+                                    tempId: f.id,
+                                    content: f.preview,
+                                    oldContent: oldContent
+                                }]);
+                                showToast('[info] ' + f.name + ' 生成成功!');
+                                if (after) {
+                                    win.setProgressBar((0.8 / selected.length) * (i + 1));
+                                } else {
+                                    win.setProgressBar((1 / selected.length) * (i + 1));
+                                }
+                            });
+                            showToast('[info] 文件创建完成');
+                            if (after) {
+                                nodeRun('(function(){' + execute('geFileData', 'getShell', [pId]) + '})();').then(d => {
+                                    showToast('[info] 创建后JS脚本执行成功');
+                                    Ext.getCmp('main-content').unmask();
+                                    win.setProgressBar(1);
+                                    setTimeout(() => {
+                                        win.setProgressBar(-1);
+                                        new Notification('代码创建成功', {
+                                            body: `[${title}]代码创建成功`,
+                                            icon: 'images/success.png'
+                                        });
+                                    }, 200);
+                                }).catch(e => {
+                                    console.error(e);
+                                    showError(e);
+                                    showErrorFlag();
+                                    Ext.getCmp('main-content').unmask();
+                                    win.setProgressBar(-1);
+                                    new Notification('代码创建失败', {
+                                        body: `[${title}]代码创建失败, 错误信息:${e}`,
+                                        icon: 'images/error.png'
+                                    });
+                                });
+                            } else {
+                                Ext.getCmp('main-content').unmask();
+                                win.setProgressBar(-1);
+                                new Notification('代码创建成功', {
+                                    body: `[${title}]代码创建成功`,
+                                    icon: 'images/success.png'
+                                });
+                            }
+                        }
+                    }, 500);
+                }
+            },
+            {
+                text: '取消', handler: function () {
+                    this.up('window').close();
+                }
+            }
+        ]
+    }).show().focus();
+}
+
+document.onkeydown = function () {
+    const oEvent = window.event;
+    if (oEvent.keyCode == 116 && Ext.getCmp('generate-win') === undefined) {
+        createFile();
+    }
+    if (oEvent.keyCode == 122) {
+        const win = require('electron').remote.getCurrentWindow();
+        win.setMenuBarVisibility(!win.isMenuBarVisible());
+        win.setFullScreen(!win.isFullScreen());
+    }
+};

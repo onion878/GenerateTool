@@ -29,6 +29,7 @@ class GeFile {
 
     setDataEdit(id, pId, content) {
         const v = this.getOneData(id);
+        console.log(v);
         if (v != undefined) {
             gdb.get('data').find({
                 id: id, pId: help.getPid()

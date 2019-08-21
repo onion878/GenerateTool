@@ -203,6 +203,7 @@ class Utils {
 
     downloadFile(file, f) {
         return new Promise((resolve, reject) => {
+            const userConfig = require('../dao/user');
             const url = userConfig.getUrl() + '/download/' + file;
             const r = request(url);
             const help = require('./help');

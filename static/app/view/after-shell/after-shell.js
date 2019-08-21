@@ -12,13 +12,13 @@ Ext.define('OnionSpace.view.after-shell.after-shell', {
             const that = this;
             that.codeEditor = Ext.create({
                 language: 'javascript',
-                value: geFileData.getShell(that.pId),
+                value: execute('geFileData', 'getShell', [that.pId]),
                 xtype: 'minicode',
                 minimap: true
             });
             that.codeEditor.changeValue = function () {
                 const val = that.codeEditor.codeEditor.getValue();
-                geFileData.setShell(that.pId, val);
+                execute('geFileData', 'setShell', [that.pId, val]);
             };
             that.add(that.codeEditor);
         }

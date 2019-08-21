@@ -10,13 +10,13 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
             const that = this;
             that.codeEditor = Ext.create({
                 language: 'javascript',
-                value: geFileData.getSwig(that.pId),
+                value: execute('geFileData', 'getSwig', [that.pId]),
                 xtype: 'minicode',
                 minimap: true
             });
             that.codeEditor.changeValue = function () {
                 const val = that.codeEditor.codeEditor.getValue();
-                geFileData.setSwig(that.pId, val);
+                execute('geFileData', 'setSwig', [that.pId, val]);
             };
             that.add(that.codeEditor);
         }
@@ -33,6 +33,9 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
                     const val = that.codeEditor.codeEditor.getValue();
                     try {
                         eval(val);
+                        if(runWin != null) {
+                            nodeRun(val);
+                        }
                         showToast('[info] swig模板应用成功!');
                     } catch (e) {
                         console.log(e);

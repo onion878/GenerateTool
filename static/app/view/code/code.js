@@ -28,7 +28,7 @@ Ext.define('OnionSpace.view.code.code', {
         if (this.filePath != undefined && this.filePath != null && this.filePath != '') {
             const val = this.codeEditor.getValue();
             jsC.writeFile(this.filePath, val);
-            history.setCode({id: this.id, fileContent: val});
+            execute('history', 'setCode', [{id: this.id, fileContent: val}]);
         }
     },
     initComponent: function () {

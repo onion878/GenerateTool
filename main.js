@@ -75,6 +75,7 @@ function createMainWindow() {
         width: data.width,
         height: data.height,
         show: false,
+        frame: true,
         title: '代码构建工具',
         icon: icon
     });
@@ -223,6 +224,26 @@ function createMainWindow() {
             loading = null;
         }
         msgIndex = -1;
+    });
+
+    const services = {
+        data: './service/dao/modeData',
+        parentData: './service/dao/mode',
+        history: './service/dao/history',
+        jsCode: './service/utils/JscodeUtil',
+        systemConfig: './service/dao/system',
+        userConfig: './service/dao/user',
+        packageConfig: './service/dao/package',
+        controlData: './service/dao/controls',
+        fileData: './service/dao/file',
+        geFileData: './service/dao/gefile',
+        operation: './service/dao/operation',
+        utils: './service/utils/utils',
+        command: './service/utils/commands'
+    };
+
+    ipcMain.on('run', async (event, {key, method, args}) => {
+        event.returnValue = await need(services[key])[method](...args);
     });
 
     // Emitted when the window is closed.

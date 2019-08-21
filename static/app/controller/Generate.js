@@ -1,7 +1,7 @@
 Ext.define('OnionSpace.controller.Generate', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.Generate',
-    type: 'edit',
+    editType: 'edit',
     init: function () {
         this.control({
             'generate': {
@@ -19,15 +19,15 @@ Ext.define('OnionSpace.controller.Generate', {
         const that = this;
         dom.codeEditor.changeValue = function () {
             const val = dom.codeEditor.codeEditor.getValue();
-            if (that.type == "edit") {
-                geFileData.setDataEdit(dom.params.fileId, dom.pId, val);
+            if (that.editType == "edit") {
+                execute('geFileData', 'setDataEdit', [dom.params.fileId, dom.pId, val]);
             } else {
-                geFileData.setDataPreview(dom.params.fileId, dom.pId, val);
+                execute('geFileData', 'setDataPreview', [dom.params.fileId, dom.pId, val]);
             }
         };
     },
     editFile: function (btn) {
-        this.type = 'edit';
+        this.editType = 'edit';
         const vsCode = btn.up('generate').down('minicode');
         const code = vsCode.codeEditor;
         code.setValue(this.getContent(btn.up('generate')));
@@ -37,7 +37,7 @@ Ext.define('OnionSpace.controller.Generate', {
     },
     preview: function (btn) {
         const that = this;
-        that.type = 'view';
+        that.editType = 'view';
         const dom = btn.up('generate');
         const params = dom.params;
         const vsCode = dom.down('minicode');
@@ -57,7 +57,7 @@ Ext.define('OnionSpace.controller.Generate', {
                 showError(e);
             });
         } else {
-            const {file} = geFileData.getOneData(params.fileId);
+            const {file} = execute('geFileData', 'getOneData', [params.fileId]);
             if (file.trim().length == 0) {
                 that.editFile(btn);
                 showError('Error 未设置修改文件,无法预览!');
@@ -65,7 +65,7 @@ Ext.define('OnionSpace.controller.Generate', {
             }
             try {
                 const tplFile = swig.compile(file);
-                const f = tplFile(controlData.getModuleData(btn.up('generate').pId)).replace(/\\/g, '\/');
+                const f = tplFile(execute('controlData', 'getModuleData', [btn.up('generate').pId])).replace(/\\/g, '\/');
                 const d = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(f, 'utf8').replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + code.getValue());
                 if (d instanceof Promise) {
                     d.then(v => {
@@ -92,9 +92,9 @@ Ext.define('OnionSpace.controller.Generate', {
         }
     },
     getContent: function (that) {
-        const val = geFileData.getOneData(that.params.fileId);
+        const val = execute('geFileData', 'getOneData', [that.params.fileId]);
         let content = '';
-        if (val != undefined) {
+        if (val != null) {
             content = val.content;
         }
         return content;

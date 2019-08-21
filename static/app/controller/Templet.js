@@ -19,7 +19,7 @@ Ext.define('OnionSpace.controller.Templet', {
     },
     refreshGrid: function (dom) {
         const grid = dom.up('templet');
-        grid.getStore().setData(parentData.getAll());
+        grid.getStore().setData(execute('parentData', 'getAll'));
     },
     importModule: function (dom) {
         const remote = require('electron').remote;
@@ -34,7 +34,7 @@ Ext.define('OnionSpace.controller.Templet', {
                 jsCode.importModule(file[0]).then(msg => {
                     el.unmask();
                     showToast('[info] ' + msg);
-                    dom.up('templet').getStore().setData(parentData.getAll());
+                    dom.up('templet').getStore().setData(execute('parentData', 'getAll'));
 
                 }).catch(e => {
                     console.error(e);
@@ -72,7 +72,7 @@ Ext.define('OnionSpace.controller.Templet', {
                         labelWidth: 60,
                         store: {
                             fields: ['id', 'text'],
-                            data: parentData.getAll()
+                            data: execute('parentData', 'getAll')
                         },
                         name: 'oldName',
                         queryMode: 'local',
@@ -114,7 +114,7 @@ Ext.define('OnionSpace.controller.Templet', {
                             jsCode.importModule(file, data.text).then(() => {
                                 jsCode.deleteFile(file);
                                 el.unmask();
-                                dom.up('templet').getStore().setData(parentData.getAll());
+                                dom.up('templet').getStore().setData(execute('parentData', 'getAll'));
                                 showToast('复制成功,你可以通过[选择模板]来选择');
                             }).catch(err => {
                                 console.error(err);

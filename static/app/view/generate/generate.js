@@ -15,14 +15,14 @@ Ext.define('OnionSpace.view.generate.generate', {
             that.fileName = that.title;
             let language = getFileLanguage(that.fileName);
             if (language == undefined) {
-                language = systemConfig.getCode(that.fileName);
+                language = execute('systemConfig', 'getCode', [that.fileName]);
             }
-            let val = geFileData.getOneData(that.params.fileId);
+            let val = execute('geFileData', 'getOneData', [that.params.fileId]);
             let content = '';
-            if (val != undefined) {
+            if (val != null) {
                 content = val.content;
             }
-            if (language == undefined) {
+            if (language == undefined || language == null) {
                 language = 'html';
                 Ext.create('Ext.window.Window', {
                     title: that.fileName,
@@ -63,7 +63,7 @@ Ext.define('OnionSpace.view.generate.generate', {
                                 const form = this.up('window').down('form').getForm();
                                 if (form.isValid()) {
                                     const {language} = form.getValues();
-                                    systemConfig.setCode(that.fileName, language);
+                                    execute('systemConfig', 'setCode', [that.fileName, language])
                                     that.codeEditor.updateLanguage(content, language);
                                     this.up('window').close();
                                 }

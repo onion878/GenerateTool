@@ -49,13 +49,13 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                             showConfirm(`是否下载[${data.Name}]?`, function (text) {
                                 Ext.getCmp('main-content').mask('下载中, 请稍等...');
                                 Ext.Ajax.request({
-                                    url: userConfig.getUrl() + '/getNewest/' + data.Id,
+                                    url: execute('userConfig', 'getUrl') + '/getNewest/' + data.Id,
                                     method: 'POST',
                                     success: function (response) {
                                         const jsonResp = Ext.util.JSON.decode(response.responseText);
-                                        const local = parentData.getByServeId(jsonResp.Pid);
+                                        const local = execute('parentData', 'getByServeId', [jsonResp.Pid]);
                                         utils.downloadFile(jsonResp.User + '/' + jsonResp.Id + '.zip', jsonResp.Id + '.zip').then(d => {
-                                            if (local === undefined) {
+                                            if (local === null) {
                                                 jsCode.importModule(d, "", data.Id, jsonResp.Id).then(({msg, pId}) => {
                                                     showToast('[info] [' + data.Name + ']下载成功!');
                                                     jsCode.deleteFile(d);
@@ -75,7 +75,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                                 jsCode.updateTemplate(d, local, jsonResp).then(msg => {
                                                     showToast('[info] [' + data.Name + ']下载成功!');
                                                     jsCode.deleteFile(d);
-                                                    if (history.getMode() == local.id) {
+                                                    if (execute('history', 'getMode') == local.id) {
                                                         changeTemplate(local.id, true);
                                                         return;
                                                     }
@@ -108,7 +108,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                         });
                                     }
                                 });
-                            }, this, Ext.MessageBox.QUESTION);
+                            }, undefined, Ext.MessageBox.QUESTION);
                         }
                     },
                     {
