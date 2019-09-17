@@ -10,7 +10,8 @@ function execute(key, method, args) {
     }
     return ipcRenderer.sendSync('run', {key: key, method: method, args: args});
 }
-
+setDefaultUrl();
+let title = '数据模板';
 let consoleShowFlag = false;
 let pId = execute('history', 'getMode');
 const controllers = {
@@ -43,6 +44,7 @@ function initMainView() {
         name: 'OnionSpace',
         appFolder: 'app',
         controllers: [
+            'Titlebar',
             'Statusbar',
             'Message'
         ],
@@ -64,7 +66,6 @@ function initMainView() {
                     children: []
                 }
             });
-            let title = '数据模板';
             if (pId !== '') {
                 title = execute('parentData', 'getById', [pId]).text;
                 require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${title}]`);
@@ -127,756 +128,757 @@ function initMainView() {
                         }
                     }
                 },
-                items: [{
-                    region: 'south',
-                    split: true,
-                    height: 100,
-                    minSize: 100,
-                    maxSize: 200,
-                    collapsible: false,
-                    collapsed: false,
-                    id: 'terminal',
-                    hidden: true,
-                    margins: '0 0 0 0',
-                    html: `<div style="background: transparent;overflow: hidden;" id="term"></div>`,
-                    listeners: {
-                        resize: function (el) {
-                            document.getElementById('term').style.height = document.getElementById('terminal-body').style.height;
-                            command.fitTerm();
-                        }
-                    },
-                    tbar: {
-                        xtype: 'statusbar',
-                        pId: pId,
-                        float: 'right',
-                        list: [
-                            {img: './images/stop.svg', name: 'Stop'},
-                            {img: './images/delete.svg', name: 'Clear'}
-                        ],
-                        click: function (s, d, n) {
-                            if (n == 'Clear') {
-                                command.clearTerm();
-                            } else {
-                                command.cancelPty();
+                items: [
+                    {
+                        region: 'south',
+                        split: true,
+                        height: 100,
+                        minSize: 100,
+                        maxSize: 200,
+                        collapsible: false,
+                        collapsed: false,
+                        id: 'terminal',
+                        hidden: true,
+                        margins: '0 0 0 0',
+                        html: `<div style="background: transparent;overflow: hidden;" id="term"></div>`,
+                        listeners: {
+                            resize: function (el) {
+                                document.getElementById('term').style.height = document.getElementById('terminal-body').style.height;
+                                command.fitTerm();
+                            }
+                        },
+                        tbar: {
+                            xtype: 'statusbar',
+                            pId: pId,
+                            float: 'right',
+                            list: [
+                                {img: './images/stop.svg', name: 'Stop'},
+                                {img: './images/delete.svg', name: 'Clear'}
+                            ],
+                            click: function (s, d, n) {
+                                if (n == 'Clear') {
+                                    command.clearTerm();
+                                } else {
+                                    command.cancelPty();
+                                }
                             }
                         }
-                    }
-                }, {
-                    region: 'south',
-                    split: true,
-                    height: 100,
-                    minSize: 100,
-                    maxSize: 200,
-                    collapsible: false,
-                    collapsed: false,
-                    id: 'console',
-                    hidden: true,
-                    margins: '0 0 0 0',
-                    xtype: 'message',
-                    tbar: {
-                        xtype: 'statusbar',
-                        pId: pId,
-                        float: 'right',
-                        list: [
-                            {img: './images/delete.svg', name: 'Clear'}
-                        ],
-                        click: function (s, d, n) {
-                            Ext.getCmp('console').clear();
+                    }, {
+                        region: 'south',
+                        split: true,
+                        height: 100,
+                        minSize: 100,
+                        maxSize: 200,
+                        collapsible: false,
+                        collapsed: false,
+                        id: 'console',
+                        hidden: true,
+                        margins: '0 0 0 0',
+                        xtype: 'message',
+                        tbar: {
+                            xtype: 'statusbar',
+                            pId: pId,
+                            float: 'right',
+                            list: [
+                                {img: './images/delete.svg', name: 'Clear'}
+                            ],
+                            click: function (s, d, n) {
+                                Ext.getCmp('console').clear();
+                            }
                         }
-                    }
-                }, {
-                    region: 'center',
-                    id: 'main-content',
-                    layout: 'border',
-                    items: [
-                        {
-                            region: 'west',
-                            split: true,
-                            width: 240,
-                            minWidth: 160,
-                            maxWidth: 400,
-                            margins: '0 0 0 0',
-                            hidden: true,
-                            layout: 'accordion',
-                            id: 'main-template',
-                            items: [
-                                {
-                                    xtype: 'treepanel',
-                                    title: title,
-                                    store: store,
-                                    id: 'panel-model',
-                                    listeners: {
-                                        itemclick: function (node, event) {
-                                            const item = event.data.id;
-                                            const icon = event.data.icon;
-                                            const title = event.data.text;
-                                            addbutton(item, 'mode', './images/database_save.svg', title, {});
-                                        },
-                                        itemcontextmenu: function (node, record, item, index, event, eOpts) {
-                                            new Ext.menu.Menu({
-                                                minWidth: 60,
-                                                items: [{
-                                                    text: '删除',
-                                                    icon: 'images/cross.svg',
-                                                    handler: function () {
-                                                        showConfirm(`是否删除模板[${record.data.text}]?`, function (text) {
-                                                            execute('data', 'removeById', [record.data.id]);
-                                                            store.setRoot({
-                                                                expanded: true,
-                                                                text: '',
-                                                                children: execute('data', 'getData', [pId])
-                                                            });
-                                                            Ext.getCmp('mainmenutab').remove(record.data.id);
-                                                        }, this, Ext.MessageBox.ERROR);
-                                                    }
-                                                }]
-                                            }).showAt(event.getPoint());
-                                        }
-                                    },
-                                    closable: false,
-                                    rootVisible: false,
-                                    hideCollapseTool: true,
-                                    tools: [
-                                        {
-                                            id: 'main-change-module',
-                                            qtip: '切换模板',
-                                            renderTpl: [
-                                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-tag" role="presentation"></div>'
-                                            ],
-                                            listeners: {
-                                                click: function () {
-                                                    Ext.create('Ext.window.Window', {
-                                                        title: '选择模板',
-                                                        width: 300,
-                                                        layout: 'fit',
-                                                        fixed: true,
-                                                        animateTarget: this,
-                                                        resizable: false,
-                                                        constrain: true,
-                                                        modal: true,
-                                                        items: {
-                                                            xtype: 'combobox',
-                                                            margin: '10',
-                                                            store: {
-                                                                fields: ['id', 'text'],
-                                                                data: execute('parentData', 'getAll')
-                                                            },
-                                                            queryMode: 'local',
-                                                            displayField: 'text',
-                                                            valueField: 'id'
-                                                        },
-                                                        buttonAlign: 'center',
-                                                        buttons: [{
-                                                            text: '确定',
-                                                            handler: function () {
-                                                                const combo = this.up('window').down('combobox');
-                                                                const row = combo.getSelectedRecord();
-                                                                if (row === null) {
-                                                                    Ext.toast({
-                                                                        html: `<span style="color: red;">请选择至少一条数据!</span>`,
-                                                                        autoClose: true,
-                                                                        align: 't',
-                                                                        slideDUration: 400,
-                                                                        maxWidth: 400
-                                                                    });
-                                                                    return;
-                                                                }
-                                                                this.up('window').close();
-                                                                changeTemplate(row.id);
-                                                            }
-                                                        }, {
-                                                            text: '取消',
-                                                            handler: function () {
-                                                                this.up('window').close();
-                                                            }
-                                                        }
-                                                        ]
-                                                    }).show().focus();
-                                                }
-                                            }
-                                        },
-                                        {
-                                            id: 'main-create-module',
-                                            qtip: '新建模板',
-                                            renderTpl: [
-                                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-save" role="presentation"></div>'
-                                            ],
-                                            listeners: {
-                                                click: function () {
-                                                    Ext.create('Ext.window.Window', {
-                                                        title: '模板名称',
-                                                        fixed: true,
-                                                        width: 300,
-                                                        layout: 'fit',
-                                                        animateTarget: this,
-                                                        resizable: false,
-                                                        constrain: true,
-                                                        modal: true,
-                                                        items: {
-                                                            xtype: 'textfield',
-                                                            margin: '10'
-                                                        },
-                                                        buttonAlign: 'center',
-                                                        buttons: [{
-                                                            text: '确定',
-                                                            handler: function () {
-                                                                const field = this.up('window').down('textfield');
-                                                                const text = field.getRawValue();
-                                                                if (utils.isEmpty(text)) {
-                                                                    Ext.toast({
-                                                                        html: `<span style="color: red;">请输入名称!</span>`,
-                                                                        autoClose: true,
-                                                                        align: 't',
-                                                                        slideDUration: 400,
-                                                                        maxWidth: 400
-                                                                    });
-                                                                    return;
-                                                                }
-                                                                pId = execute('parentData', 'setData', [text]);
-                                                                this.up('window').close();
-                                                                moduleId = pId;
-                                                                execute('history', 'setMode', [pId]);
-                                                                const root = Ext.getCmp('panel-model').getRootNode();
-                                                                root.removeAll();
-                                                                root.appendChild(execute('data', 'getData', [pId]));
-                                                                execute('history', 'removeAll');
-                                                                Ext.getCmp('panel-model').setTitle(text);
-                                                                Ext.getCmp('mainmenutab').removeAll();
-                                                                try {
-                                                                    eval(execute('geFileData', 'getSwig', [pId]));
-                                                                } catch (e) {
-                                                                    console.error(e);
-                                                                    showError(e);
-                                                                }
-                                                                getFilesData();
-                                                                jsCode.createFolder(pId);
-                                                                jsCode.initFile(pId);
-                                                                setJsData();
-                                                                command.cdTargetFolder(jsCode.getFolder(pId));
-                                                            }
-                                                        }, {
-                                                            text: '取消',
-                                                            handler: function () {
-                                                                this.up('window').close();
-                                                            }
-                                                        }]
-                                                    }).show().focus();
-                                                }
-                                            }
-                                        },
-                                        {
-                                            qtip: '添加模板详情',
-                                            renderTpl: [
-                                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add" role="presentation"></div>'
-                                            ],
-                                            listeners: {
-                                                click: function () {
-                                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                                        showToast('请先[选择模板]或[创建模板]!');
-                                                        return;
-                                                    }
-                                                    const modes = execute('data', 'getData', [pId]);
-                                                    Ext.create('Ext.window.Window', {
-                                                        title: '模板详情名称',
-                                                        fixed: true,
-                                                        width: 300,
-                                                        layout: 'fit',
-                                                        animateTarget: this,
-                                                        resizable: false,
-                                                        constrain: true,
-                                                        modal: true,
-                                                        items: {
-                                                            xtype: 'combobox',
-                                                            margin: '10',
-                                                            store: {
-                                                                fields: ['id', 'text'],
-                                                                data: modes
-                                                            },
-                                                            queryMode: 'local',
-                                                            displayField: 'text',
-                                                            valueField: 'id'
-                                                        },
-                                                        buttonAlign: 'center',
-                                                        buttons: [{
-                                                            text: '确定',
-                                                            handler: function () {
-                                                                const combo = this.up('window').down('combobox');
-                                                                const t = combo.getRawValue();
-                                                                if (utils.isEmpty(t)) {
-                                                                    Ext.toast({
-                                                                        html: `<span style="color: red;">请输入名称!</span>`,
-                                                                        autoClose: true,
-                                                                        align: 't',
-                                                                        slideDUration: 400,
-                                                                        maxWidth: 400
-                                                                    });
-                                                                    return;
-                                                                }
-                                                                let ifAdd = true;
-                                                                modes.forEach(function (m) {
-                                                                    if (m.text === t) {
-                                                                        ifAdd = false;
-                                                                    }
-                                                                });
-                                                                if (ifAdd) {
-                                                                    execute('data', 'setData', [t, pId]);
-                                                                }
-                                                                this.up('window').close();
-                                                                const root = Ext.getCmp('panel-model').getRootNode();
-                                                                root.removeAll();
-                                                                const list = execute('data', 'getData', [pId]);
-                                                                list.forEach(d => d.icon = './images/database_save.svg');
-                                                                root.appendChild(list);
-                                                            }
-                                                        }, {
-                                                            text: '取消',
-                                                            handler: function () {
-                                                                this.up('window').close();
-                                                            }
-                                                        }]
-                                                    }).show().focus();
-                                                }
-                                            }
-                                        }
-                                    ]
-                                },
-                                {
-                                    xtype: 'treepanel',
-                                    title: '生成模板',
-                                    store: fileStore,
-                                    id: 'ge-tree',
-                                    split: true,
-                                    useArrows: true,
-                                    viewConfig: {
-                                        plugins: [{
-                                            ptype: 'treeviewdragdrop',
-                                            appendOnly: true
-                                        }],
+                    }, {
+                        region: 'center',
+                        id: 'main-content',
+                        layout: 'border',
+                        items: [
+                            {
+                                region: 'west',
+                                split: true,
+                                width: 240,
+                                minWidth: 160,
+                                maxWidth: 400,
+                                margins: '0 0 0 0',
+                                hidden: true,
+                                layout: 'accordion',
+                                id: 'main-template',
+                                items: [
+                                    {
+                                        xtype: 'treepanel',
+                                        title: title,
+                                        store: store,
+                                        id: 'panel-model',
                                         listeners: {
-                                            drop: function (node, data, overModel, dropPosition) {
-                                                const paId = data.records[0].parentNode.data.id;
-                                                const id = data.records[0].data.id;
-                                                execute('fileData', 'updateRootId', [id, paId]);
-                                            }
-                                        }
-                                    },
-                                    listeners: {
-                                        beforeitemexpand: function (node, index, item, eOpts) {
-                                            node.data.icon = './icons/folder-core-open.svg';
-                                        },
-                                        beforeitemcollapse: function (node, index, item, eOpts) {
-                                            node.data.icon = './icons/folder-core.svg';
-                                        },
-                                        itemdblclick: function (node, event) {
-                                            const item = event.data.id;
-                                            const icon = event.data.icon;
-                                            const title = event.data.text;
-                                            const type = event.data.type;
-                                            if (type == 'file' && event.childNodes.length == 0) {
-                                                addbutton(item, 'generate', getFileIcon(title), title, {
-                                                    updateType: event.get('updateType'),
-                                                    path: event.get('folder') + '\\' + title,
-                                                    folder: event.get('folder'),
-                                                    file: title,
-                                                    fileId: event.get('id')
-                                                });
-                                            }
-                                        },
-                                        afteritemexpand: function (node, index, item, eOpts) {
-                                            node.removeAll();
-                                            const child = execute('fileData', 'getFiles', [pId, node.data.id]);
-                                            child.forEach(d => {
-                                                d.children = undefined;
-                                                d.loaded = false;
-                                                d.expanded = false;
-                                                if (d.type == 'file') {
-                                                    d.icon = getFileIcon(d.text);
-                                                } else {
-                                                    d.icon = './icons/folder-core.svg';
-                                                }
-                                            });
-                                            node.appendChild(child);
-                                            Ext.get(item).select('.x-tree-elbow-img').last().addCls('x-tree-expander')
-                                        },
-                                        itemcontextmenu: function (node, record, item, index, event, eOpts) {
-                                            const {
-                                                type,
-                                                id,
-                                                text
-                                            } = record.data;
-                                            new Ext.menu.Menu({
-                                                minWidth: 60,
-                                                items: [
-                                                    {
-                                                        text: '添加模板文件',
-                                                        icon: 'images/add-file.svg',
-                                                        hidden: type != 'file' ? false : true,
-                                                        handler: function () {
-                                                            Ext.create('Ext.window.Window', {
-                                                                title: '模板文件',
-                                                                fixed: true,
-                                                                animateTarget: item,
-                                                                width: 280,
-                                                                layout: 'fit',
-                                                                resizable: false,
-                                                                constrain: true,
-                                                                modal: true,
-                                                                items: {
-                                                                    xtype: 'form',
-                                                                    layout: {
-                                                                        type: 'vbox',
-                                                                        pack: 'start',
-                                                                        align: 'stretch'
-                                                                    },
-                                                                    items: [{
-                                                                        xtype: 'textfield',
-                                                                        fieldLabel: '名称',
-                                                                        margin: '10',
-                                                                        labelWidth: 45,
-                                                                        name: 'name'
-                                                                    },
-                                                                        {
-                                                                            xtype: 'radiogroup',
-                                                                            fieldLabel: '类型',
-                                                                            margin: '10',
-                                                                            labelWidth: 45,
-                                                                            name: 'type',
-                                                                            items: [{
-                                                                                boxLabel: '添加',
-                                                                                inputValue: 'add',
-                                                                                checked: true
-                                                                            },
-                                                                                {
-                                                                                    boxLabel: '修改',
-                                                                                    inputValue: 'update'
-                                                                                }
-                                                                            ]
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                buttonAlign: 'center',
-                                                                buttons: [{
-                                                                    text: '确定',
-                                                                    handler: function () {
-                                                                        const form = this.up('window').down('form').getForm();
-                                                                        if (form.isValid()) {
-                                                                            let {
-                                                                                name,
-                                                                                type
-                                                                            } = form.getValues();
-                                                                            if (type == 'update') {
-                                                                                name = name + '.js';
-                                                                            }
-                                                                            const data = {
-                                                                                text: name,
-                                                                                type: 'file',
-                                                                                leaf: true,
-                                                                                parentFolder: text,
-                                                                                rootId: id,
-                                                                                cls: type == 'update' ? 'color-blue' : '',
-                                                                                updateType: type,
-                                                                                pId: pId
-                                                                            };
-                                                                            const child = execute('fileData', 'saveOrUpdate', [data]);
-                                                                            execute('geFileData', 'save', [child.id, pId]);
-                                                                            child.icon = getFileIcon(name);
-                                                                            record.appendChild(child);
-                                                                            this.up('window').close();
-                                                                        }
-                                                                    }
-                                                                },
-                                                                    {
-                                                                        text: '取消',
-                                                                        handler: function () {
-                                                                            this.up('window').close();
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }).show().focus();
-                                                        }
-                                                    },
-                                                    {
-                                                        text: '添加模板文件夹',
-                                                        icon: 'images/folder_add.svg',
-                                                        hidden: type != 'file' ? false : true,
-                                                        handler: function () {
-                                                            showPrompt('模板文件夹', '', function (val) {
-                                                                const data = {
-                                                                    text: val,
-                                                                    type: 'folder',
-                                                                    folder: true,
-                                                                    parentFolder: text,
-                                                                    rootId: id,
-                                                                    pId: pId
-                                                                };
-                                                                const child = execute('fileData', 'saveOrUpdate', [data]);
-                                                                child.icon = './icons/folder-core.svg';
-                                                                record.appendChild(child);
-                                                            }, item);
-                                                        }
-                                                    },
-                                                    {
-                                                        text: '设置生成路径',
-                                                        hidden: type == 'file' ? false : true,
-                                                        icon: 'images/set-file.svg',
-                                                        handler: function () {
-                                                            const {
-                                                                file
-                                                            } = execute('geFileData', 'getOneData', [record.get('id')]);
-                                                            const fileTpl = swig.compile(file);
-                                                            const fileOutput = fileTpl(execute('controlData', 'getModuleData', [pId]));
-                                                            Ext.create('Ext.window.Window', {
-                                                                title: '设置路径',
-                                                                fixed: true,
-                                                                animateTarget: item,
-                                                                width: 500,
-                                                                layout: 'fit',
-                                                                resizable: false,
-                                                                constrain: true,
-                                                                modal: true,
-                                                                items: {
-                                                                    xtype: 'form',
-                                                                    layout: {
-                                                                        type: 'vbox',
-                                                                        pack: 'start',
-                                                                        align: 'stretch'
-                                                                    },
-                                                                    items: [
-                                                                        {
-                                                                            xtype: 'textfield',
-                                                                            fieldLabel: '文件',
-                                                                            margin: '10',
-                                                                            emptyText: '如:{{folder}}/{{file.mapper}}',
-                                                                            labelWidth: 45,
-                                                                            name: 'file',
-                                                                            value: file,
-                                                                            listeners: {
-                                                                                change: function (dom, val) {
-                                                                                    let output = val;
-                                                                                    try {
-                                                                                        const tpl = swig.compile(val);
-                                                                                        output = tpl(execute('controlData', 'getModuleData', [pId]));
-                                                                                    } catch (e) {
-                                                                                        console.error(e);
-                                                                                    }
-                                                                                    this.up('form').down('textareafield').setValue(output);
-                                                                                }
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            xtype: 'textareafield',
-                                                                            fieldLabel: '预览',
-                                                                            margin: '10',
-                                                                            readOnly: true,
-                                                                            labelWidth: 45,
-                                                                            value: fileOutput
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                buttonAlign: 'center',
-                                                                buttons: [{
-                                                                    text: '确定',
-                                                                    handler: function () {
-                                                                        const form = this.up('window').down('form').getForm();
-                                                                        if (form.isValid()) {
-                                                                            const d = form.getValues();
-                                                                            execute('geFileData', 'updateDataFile', [record.get('id'), d.file]);
-                                                                            this.up('window').close();
-                                                                        }
-                                                                    }
-                                                                },
-                                                                    {
-                                                                        text: '取消',
-                                                                        handler: function () {
-                                                                            this.up('window').close();
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }).show().focus();
-                                                        }
-                                                    },
-                                                    {
-                                                        text: '重命名',
-                                                        icon: 'images/edit.svg',
-                                                        handler: function () {
-                                                            showPrompt('名称', '', function (val) {
-                                                                if (val.trim().length > 0) {
-                                                                    execute('fileData', 'updateName', [record.get('id'), val]);
-                                                                    record.set('text', val);
-                                                                    node.refresh();
-                                                                }
-                                                            }, item, text);
-                                                        }
-                                                    },
-                                                    {
+                                            itemclick: function (node, event) {
+                                                const item = event.data.id;
+                                                const icon = event.data.icon;
+                                                const title = event.data.text;
+                                                addbutton(item, 'mode', './images/database_save.svg', title, {});
+                                            },
+                                            itemcontextmenu: function (node, record, item, index, event, eOpts) {
+                                                new Ext.menu.Menu({
+                                                    minWidth: 60,
+                                                    items: [{
                                                         text: '删除',
                                                         icon: 'images/cross.svg',
                                                         handler: function () {
-                                                            showConfirm(`是否删除[${record.data.text}]?`, function (text) {
-                                                                record.parentNode.removeChild(record);
-                                                                const rId = record.get('id');
-                                                                execute('fileData', 'removeFile', [rId]);
-                                                                execute('geFileData', 'removeData', [rId]);
-                                                                Ext.getCmp('mainmenutab').remove(rId);
-                                                                const removeList = execute('fileData', 'getTreeData', [record.get('id'), rId]);
-                                                                removeList.forEach(r => {
-                                                                    execute('fileData', 'removeFile', [r.id]);
-                                                                    execute('geFileData', 'removeData', [r.id]);
-                                                                    Ext.getCmp('mainmenutab').remove(r.id);
+                                                            showConfirm(`是否删除模板[${record.data.text}]?`, function (text) {
+                                                                execute('data', 'removeById', [record.data.id]);
+                                                                store.setRoot({
+                                                                    expanded: true,
+                                                                    text: '',
+                                                                    children: execute('data', 'getData', [pId])
                                                                 });
-                                                            }, item, Ext.MessageBox.ERROR);
+                                                                Ext.getCmp('mainmenutab').remove(record.data.id);
+                                                            }, this, Ext.MessageBox.ERROR);
                                                         }
-                                                    }
-                                                ]
-                                            }).showAt(event.getPoint());
-                                        }
-                                    },
-                                    hideCollapseTool: true,
-                                    closable: false,
-                                    checkPropagation: 'both',
-                                    useArrows: true,
-                                    rootVisible: false,
-                                    tools: [
-                                        {
-                                            renderTpl: [
-                                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-file" role="presentation"></div>'
-                                            ],
-                                            qtip: '添加模板文件',
-                                            listeners: {
-                                                click: function () {
-                                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                                        showToast('请先[选择模板]或[创建模板]!');
-                                                        return;
-                                                    }
-                                                    setGeFile(this);
-                                                }
+                                                    }]
+                                                }).showAt(event.getPoint());
                                             }
                                         },
-                                        {
-                                            renderTpl: [
-                                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-folder" role="presentation"></div>'
-                                            ],
-                                            qtip: '添加模板文件夹',
-                                            listeners: {
-                                                click: function () {
-                                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                                        showToast('请先[选择模板]或[创建模板]!');
-                                                        return;
-                                                    }
-                                                    setGeFolder(this);
-                                                }
-                                            }
-                                        },
-                                        {
-                                            renderTpl: [
-                                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-cd-go" role="presentation"></div>'
-                                            ],
-                                            qtip: '开始创建(F5)',
-                                            id: 'create-btn',
-                                            listeners: {
-                                                click: function () {
-                                                    createFile(this);
-                                                }
-                                            }
-                                        },
-                                        {
-                                            renderTpl: [
-                                                '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-more" role="presentation"></div>'
-                                            ],
-                                            qtip: '其它配置',
-                                            listeners: {
-                                                click: function (btn, e) {
-                                                    new Ext.menu.Menu({
-                                                        minWidth: 60,
-                                                        items: [
-                                                            {
-                                                                text: '配置swig',
-                                                                icon: 'images/template.svg',
-                                                                handler: function () {
-                                                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                                                        showToast('请先[选择模板]或[创建模板]!');
-                                                                        return;
-                                                                    }
-                                                                    addbutton('swig-template', 'swig-template', './images/template.svg', 'Swig配置', {});
-                                                                }
+                                        closable: false,
+                                        rootVisible: false,
+                                        hideCollapseTool: true,
+                                        tools: [
+                                            {
+                                                id: 'main-change-module',
+                                                qtip: '切换模板',
+                                                renderTpl: [
+                                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-tag" role="presentation"></div>'
+                                                ],
+                                                listeners: {
+                                                    click: function () {
+                                                        Ext.create('Ext.window.Window', {
+                                                            title: '选择模板',
+                                                            width: 300,
+                                                            layout: 'fit',
+                                                            fixed: true,
+                                                            animateTarget: this,
+                                                            resizable: false,
+                                                            constrain: true,
+                                                            modal: true,
+                                                            items: {
+                                                                xtype: 'combobox',
+                                                                margin: '10',
+                                                                store: {
+                                                                    fields: ['id', 'text'],
+                                                                    data: execute('parentData', 'getAll')
+                                                                },
+                                                                queryMode: 'local',
+                                                                displayField: 'text',
+                                                                valueField: 'id'
                                                             },
-                                                            {
-                                                                text: '生成前脚本',
-                                                                icon: 'images/before.svg',
+                                                            buttonAlign: 'center',
+                                                            buttons: [{
+                                                                text: '确定',
                                                                 handler: function () {
-                                                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                                                        showToast('请先[选择模板]或[创建模板]!');
+                                                                    const combo = this.up('window').down('combobox');
+                                                                    const row = combo.getSelectedRecord();
+                                                                    if (row === null) {
+                                                                        Ext.toast({
+                                                                            html: `<span style="color: red;">请选择至少一条数据!</span>`,
+                                                                            autoClose: true,
+                                                                            align: 't',
+                                                                            slideDUration: 400,
+                                                                            maxWidth: 400
+                                                                        });
                                                                         return;
                                                                     }
-                                                                    addbutton('before-shell', 'before-shell', './images/before.svg', '生成前脚本', {pId: pId});
+                                                                    this.up('window').close();
+                                                                    changeTemplate(row.id);
                                                                 }
-                                                            },
-                                                            {
-                                                                text: '生成后脚本',
-                                                                icon: 'images/after.svg',
+                                                            }, {
+                                                                text: '取消',
                                                                 handler: function () {
-                                                                    if (pId == undefined || pId == null || pId.trim().length == 0) {
-                                                                        showToast('请先[选择模板]或[创建模板]!');
-                                                                        return;
-                                                                    }
-                                                                    addbutton('after-shell', 'after-shell', './images/after.svg', '生成后脚本', {pId: pId});
+                                                                    this.up('window').close();
                                                                 }
                                                             }
-                                                        ]
-                                                    }).showAt(e.getPoint());
+                                                            ]
+                                                        }).show().focus();
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                id: 'main-create-module',
+                                                qtip: '新建模板',
+                                                renderTpl: [
+                                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-save" role="presentation"></div>'
+                                                ],
+                                                listeners: {
+                                                    click: function () {
+                                                        Ext.create('Ext.window.Window', {
+                                                            title: '模板名称',
+                                                            fixed: true,
+                                                            width: 300,
+                                                            layout: 'fit',
+                                                            animateTarget: this,
+                                                            resizable: false,
+                                                            constrain: true,
+                                                            modal: true,
+                                                            items: {
+                                                                xtype: 'textfield',
+                                                                margin: '10'
+                                                            },
+                                                            buttonAlign: 'center',
+                                                            buttons: [{
+                                                                text: '确定',
+                                                                handler: function () {
+                                                                    const field = this.up('window').down('textfield');
+                                                                    const text = field.getRawValue();
+                                                                    if (utils.isEmpty(text)) {
+                                                                        Ext.toast({
+                                                                            html: `<span style="color: red;">请输入名称!</span>`,
+                                                                            autoClose: true,
+                                                                            align: 't',
+                                                                            slideDUration: 400,
+                                                                            maxWidth: 400
+                                                                        });
+                                                                        return;
+                                                                    }
+                                                                    pId = execute('parentData', 'setData', [text]);
+                                                                    this.up('window').close();
+                                                                    moduleId = pId;
+                                                                    execute('history', 'setMode', [pId]);
+                                                                    const root = Ext.getCmp('panel-model').getRootNode();
+                                                                    root.removeAll();
+                                                                    root.appendChild(execute('data', 'getData', [pId]));
+                                                                    execute('history', 'removeAll');
+                                                                    Ext.getCmp('panel-model').setTitle(text);
+                                                                    Ext.getCmp('mainmenutab').removeAll();
+                                                                    try {
+                                                                        eval(execute('geFileData', 'getSwig', [pId]));
+                                                                    } catch (e) {
+                                                                        console.error(e);
+                                                                        showError(e);
+                                                                    }
+                                                                    getFilesData();
+                                                                    jsCode.createFolder(pId);
+                                                                    jsCode.initFile(pId);
+                                                                    setJsData();
+                                                                    command.cdTargetFolder(jsCode.getFolder(pId));
+                                                                }
+                                                            }, {
+                                                                text: '取消',
+                                                                handler: function () {
+                                                                    this.up('window').close();
+                                                                }
+                                                            }]
+                                                        }).show().focus();
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                qtip: '添加模板详情',
+                                                renderTpl: [
+                                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add" role="presentation"></div>'
+                                                ],
+                                                listeners: {
+                                                    click: function () {
+                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                            return;
+                                                        }
+                                                        const modes = execute('data', 'getData', [pId]);
+                                                        Ext.create('Ext.window.Window', {
+                                                            title: '模板详情名称',
+                                                            fixed: true,
+                                                            width: 300,
+                                                            layout: 'fit',
+                                                            animateTarget: this,
+                                                            resizable: false,
+                                                            constrain: true,
+                                                            modal: true,
+                                                            items: {
+                                                                xtype: 'combobox',
+                                                                margin: '10',
+                                                                store: {
+                                                                    fields: ['id', 'text'],
+                                                                    data: modes
+                                                                },
+                                                                queryMode: 'local',
+                                                                displayField: 'text',
+                                                                valueField: 'id'
+                                                            },
+                                                            buttonAlign: 'center',
+                                                            buttons: [{
+                                                                text: '确定',
+                                                                handler: function () {
+                                                                    const combo = this.up('window').down('combobox');
+                                                                    const t = combo.getRawValue();
+                                                                    if (utils.isEmpty(t)) {
+                                                                        Ext.toast({
+                                                                            html: `<span style="color: red;">请输入名称!</span>`,
+                                                                            autoClose: true,
+                                                                            align: 't',
+                                                                            slideDUration: 400,
+                                                                            maxWidth: 400
+                                                                        });
+                                                                        return;
+                                                                    }
+                                                                    let ifAdd = true;
+                                                                    modes.forEach(function (m) {
+                                                                        if (m.text === t) {
+                                                                            ifAdd = false;
+                                                                        }
+                                                                    });
+                                                                    if (ifAdd) {
+                                                                        execute('data', 'setData', [t, pId]);
+                                                                    }
+                                                                    this.up('window').close();
+                                                                    const root = Ext.getCmp('panel-model').getRootNode();
+                                                                    root.removeAll();
+                                                                    const list = execute('data', 'getData', [pId]);
+                                                                    list.forEach(d => d.icon = './images/database_save.svg');
+                                                                    root.appendChild(list);
+                                                                }
+                                                            }, {
+                                                                text: '取消',
+                                                                handler: function () {
+                                                                    this.up('window').close();
+                                                                }
+                                                            }]
+                                                        }).show().focus();
+                                                    }
                                                 }
                                             }
+                                        ]
+                                    },
+                                    {
+                                        xtype: 'treepanel',
+                                        title: '生成模板',
+                                        store: fileStore,
+                                        id: 'ge-tree',
+                                        split: true,
+                                        useArrows: true,
+                                        viewConfig: {
+                                            plugins: [{
+                                                ptype: 'treeviewdragdrop',
+                                                appendOnly: true
+                                            }],
+                                            listeners: {
+                                                drop: function (node, data, overModel, dropPosition) {
+                                                    const paId = data.records[0].parentNode.data.id;
+                                                    const id = data.records[0].data.id;
+                                                    execute('fileData', 'updateRootId', [id, paId]);
+                                                }
+                                            }
+                                        },
+                                        listeners: {
+                                            beforeitemexpand: function (node, index, item, eOpts) {
+                                                node.data.icon = './icons/folder-core-open.svg';
+                                            },
+                                            beforeitemcollapse: function (node, index, item, eOpts) {
+                                                node.data.icon = './icons/folder-core.svg';
+                                            },
+                                            itemdblclick: function (node, event) {
+                                                const item = event.data.id;
+                                                const icon = event.data.icon;
+                                                const title = event.data.text;
+                                                const type = event.data.type;
+                                                if (type == 'file' && event.childNodes.length == 0) {
+                                                    addbutton(item, 'generate', getFileIcon(title), title, {
+                                                        updateType: event.get('updateType'),
+                                                        path: event.get('folder') + '\\' + title,
+                                                        folder: event.get('folder'),
+                                                        file: title,
+                                                        fileId: event.get('id')
+                                                    });
+                                                }
+                                            },
+                                            afteritemexpand: function (node, index, item, eOpts) {
+                                                node.removeAll();
+                                                const child = execute('fileData', 'getFiles', [pId, node.data.id]);
+                                                child.forEach(d => {
+                                                    d.children = undefined;
+                                                    d.loaded = false;
+                                                    d.expanded = false;
+                                                    if (d.type == 'file') {
+                                                        d.icon = getFileIcon(d.text);
+                                                    } else {
+                                                        d.icon = './icons/folder-core.svg';
+                                                    }
+                                                });
+                                                node.appendChild(child);
+                                                Ext.get(item).select('.x-tree-elbow-img').last().addCls('x-tree-expander')
+                                            },
+                                            itemcontextmenu: function (node, record, item, index, event, eOpts) {
+                                                const {
+                                                    type,
+                                                    id,
+                                                    text
+                                                } = record.data;
+                                                new Ext.menu.Menu({
+                                                    minWidth: 60,
+                                                    items: [
+                                                        {
+                                                            text: '添加模板文件',
+                                                            icon: 'images/add-file.svg',
+                                                            hidden: type != 'file' ? false : true,
+                                                            handler: function () {
+                                                                Ext.create('Ext.window.Window', {
+                                                                    title: '模板文件',
+                                                                    fixed: true,
+                                                                    animateTarget: item,
+                                                                    width: 280,
+                                                                    layout: 'fit',
+                                                                    resizable: false,
+                                                                    constrain: true,
+                                                                    modal: true,
+                                                                    items: {
+                                                                        xtype: 'form',
+                                                                        layout: {
+                                                                            type: 'vbox',
+                                                                            pack: 'start',
+                                                                            align: 'stretch'
+                                                                        },
+                                                                        items: [{
+                                                                            xtype: 'textfield',
+                                                                            fieldLabel: '名称',
+                                                                            margin: '10',
+                                                                            labelWidth: 45,
+                                                                            name: 'name'
+                                                                        },
+                                                                            {
+                                                                                xtype: 'radiogroup',
+                                                                                fieldLabel: '类型',
+                                                                                margin: '10',
+                                                                                labelWidth: 45,
+                                                                                name: 'type',
+                                                                                items: [{
+                                                                                    boxLabel: '添加',
+                                                                                    inputValue: 'add',
+                                                                                    checked: true
+                                                                                },
+                                                                                    {
+                                                                                        boxLabel: '修改',
+                                                                                        inputValue: 'update'
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    buttonAlign: 'center',
+                                                                    buttons: [{
+                                                                        text: '确定',
+                                                                        handler: function () {
+                                                                            const form = this.up('window').down('form').getForm();
+                                                                            if (form.isValid()) {
+                                                                                let {
+                                                                                    name,
+                                                                                    type
+                                                                                } = form.getValues();
+                                                                                if (type == 'update') {
+                                                                                    name = name + '.js';
+                                                                                }
+                                                                                const data = {
+                                                                                    text: name,
+                                                                                    type: 'file',
+                                                                                    leaf: true,
+                                                                                    parentFolder: text,
+                                                                                    rootId: id,
+                                                                                    cls: type == 'update' ? 'color-blue' : '',
+                                                                                    updateType: type,
+                                                                                    pId: pId
+                                                                                };
+                                                                                const child = execute('fileData', 'saveOrUpdate', [data]);
+                                                                                execute('geFileData', 'save', [child.id, pId]);
+                                                                                child.icon = getFileIcon(name);
+                                                                                record.appendChild(child);
+                                                                                this.up('window').close();
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                        {
+                                                                            text: '取消',
+                                                                            handler: function () {
+                                                                                this.up('window').close();
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }).show().focus();
+                                                            }
+                                                        },
+                                                        {
+                                                            text: '添加模板文件夹',
+                                                            icon: 'images/folder_add.svg',
+                                                            hidden: type != 'file' ? false : true,
+                                                            handler: function () {
+                                                                showPrompt('模板文件夹', '', function (val) {
+                                                                    const data = {
+                                                                        text: val,
+                                                                        type: 'folder',
+                                                                        folder: true,
+                                                                        parentFolder: text,
+                                                                        rootId: id,
+                                                                        pId: pId
+                                                                    };
+                                                                    const child = execute('fileData', 'saveOrUpdate', [data]);
+                                                                    child.icon = './icons/folder-core.svg';
+                                                                    record.appendChild(child);
+                                                                }, item);
+                                                            }
+                                                        },
+                                                        {
+                                                            text: '设置生成路径',
+                                                            hidden: type == 'file' ? false : true,
+                                                            icon: 'images/set-file.svg',
+                                                            handler: function () {
+                                                                const {
+                                                                    file
+                                                                } = execute('geFileData', 'getOneData', [record.get('id')]);
+                                                                const fileTpl = swig.compile(file);
+                                                                const fileOutput = fileTpl(execute('controlData', 'getModuleData', [pId]));
+                                                                Ext.create('Ext.window.Window', {
+                                                                    title: '设置路径',
+                                                                    fixed: true,
+                                                                    animateTarget: item,
+                                                                    width: 500,
+                                                                    layout: 'fit',
+                                                                    resizable: false,
+                                                                    constrain: true,
+                                                                    modal: true,
+                                                                    items: {
+                                                                        xtype: 'form',
+                                                                        layout: {
+                                                                            type: 'vbox',
+                                                                            pack: 'start',
+                                                                            align: 'stretch'
+                                                                        },
+                                                                        items: [
+                                                                            {
+                                                                                xtype: 'textfield',
+                                                                                fieldLabel: '文件',
+                                                                                margin: '10',
+                                                                                emptyText: '如:{{folder}}/{{file.mapper}}',
+                                                                                labelWidth: 45,
+                                                                                name: 'file',
+                                                                                value: file,
+                                                                                listeners: {
+                                                                                    change: function (dom, val) {
+                                                                                        let output = val;
+                                                                                        try {
+                                                                                            const tpl = swig.compile(val);
+                                                                                            output = tpl(execute('controlData', 'getModuleData', [pId]));
+                                                                                        } catch (e) {
+                                                                                            console.error(e);
+                                                                                        }
+                                                                                        this.up('form').down('textareafield').setValue(output);
+                                                                                    }
+                                                                                }
+                                                                            },
+                                                                            {
+                                                                                xtype: 'textareafield',
+                                                                                fieldLabel: '预览',
+                                                                                margin: '10',
+                                                                                readOnly: true,
+                                                                                labelWidth: 45,
+                                                                                value: fileOutput
+                                                                            }
+                                                                        ]
+                                                                    },
+                                                                    buttonAlign: 'center',
+                                                                    buttons: [{
+                                                                        text: '确定',
+                                                                        handler: function () {
+                                                                            const form = this.up('window').down('form').getForm();
+                                                                            if (form.isValid()) {
+                                                                                const d = form.getValues();
+                                                                                execute('geFileData', 'updateDataFile', [record.get('id'), d.file]);
+                                                                                this.up('window').close();
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                        {
+                                                                            text: '取消',
+                                                                            handler: function () {
+                                                                                this.up('window').close();
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                }).show().focus();
+                                                            }
+                                                        },
+                                                        {
+                                                            text: '重命名',
+                                                            icon: 'images/edit.svg',
+                                                            handler: function () {
+                                                                showPrompt('名称', '', function (val) {
+                                                                    if (val.trim().length > 0) {
+                                                                        execute('fileData', 'updateName', [record.get('id'), val]);
+                                                                        record.set('text', val);
+                                                                        node.refresh();
+                                                                    }
+                                                                }, item, text);
+                                                            }
+                                                        },
+                                                        {
+                                                            text: '删除',
+                                                            icon: 'images/cross.svg',
+                                                            handler: function () {
+                                                                showConfirm(`是否删除[${record.data.text}]?`, function (text) {
+                                                                    record.parentNode.removeChild(record);
+                                                                    const rId = record.get('id');
+                                                                    execute('fileData', 'removeFile', [rId]);
+                                                                    execute('geFileData', 'removeData', [rId]);
+                                                                    Ext.getCmp('mainmenutab').remove(rId);
+                                                                    const removeList = execute('fileData', 'getTreeData', [record.get('id'), rId]);
+                                                                    removeList.forEach(r => {
+                                                                        execute('fileData', 'removeFile', [r.id]);
+                                                                        execute('geFileData', 'removeData', [r.id]);
+                                                                        Ext.getCmp('mainmenutab').remove(r.id);
+                                                                    });
+                                                                }, item, Ext.MessageBox.ERROR);
+                                                            }
+                                                        }
+                                                    ]
+                                                }).showAt(event.getPoint());
+                                            }
+                                        },
+                                        hideCollapseTool: true,
+                                        closable: false,
+                                        checkPropagation: 'both',
+                                        useArrows: true,
+                                        rootVisible: false,
+                                        tools: [
+                                            {
+                                                renderTpl: [
+                                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-file" role="presentation"></div>'
+                                                ],
+                                                qtip: '添加模板文件',
+                                                listeners: {
+                                                    click: function () {
+                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                            return;
+                                                        }
+                                                        setGeFile(this);
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                renderTpl: [
+                                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-add-folder" role="presentation"></div>'
+                                                ],
+                                                qtip: '添加模板文件夹',
+                                                listeners: {
+                                                    click: function () {
+                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                            return;
+                                                        }
+                                                        setGeFolder(this);
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                renderTpl: [
+                                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-cd-go" role="presentation"></div>'
+                                                ],
+                                                qtip: '开始创建(F5)',
+                                                id: 'create-btn',
+                                                listeners: {
+                                                    click: function () {
+                                                        createFile(this);
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                renderTpl: [
+                                                    '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-more" role="presentation"></div>'
+                                                ],
+                                                qtip: '其它配置',
+                                                listeners: {
+                                                    click: function (btn, e) {
+                                                        new Ext.menu.Menu({
+                                                            minWidth: 60,
+                                                            items: [
+                                                                {
+                                                                    text: '配置swig',
+                                                                    icon: 'images/template.svg',
+                                                                    handler: function () {
+                                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                                            return;
+                                                                        }
+                                                                        addbutton('swig-template', 'swig-template', './images/template.svg', 'Swig配置', {});
+                                                                    }
+                                                                },
+                                                                {
+                                                                    text: '生成前脚本',
+                                                                    icon: 'images/before.svg',
+                                                                    handler: function () {
+                                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                                            return;
+                                                                        }
+                                                                        addbutton('before-shell', 'before-shell', './images/before.svg', '生成前脚本', {pId: pId});
+                                                                    }
+                                                                },
+                                                                {
+                                                                    text: '生成后脚本',
+                                                                    icon: 'images/after.svg',
+                                                                    handler: function () {
+                                                                        if (pId == undefined || pId == null || pId.trim().length == 0) {
+                                                                            showToast('请先[选择模板]或[创建模板]!');
+                                                                            return;
+                                                                        }
+                                                                        addbutton('after-shell', 'after-shell', './images/after.svg', '生成后脚本', {pId: pId});
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }).showAt(e.getPoint());
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                region: 'west',
+                                split: true,
+                                width: 240,
+                                minWidth: 160,
+                                maxWidth: 400,
+                                id: 'js-data',
+                                useArrows: true,
+                                hidden: true,
+                                scrollable: true
+                            },
+                            {
+                                region: 'center',
+                                xtype: 'tabpanel',
+                                fullscreen: true,
+                                id: 'mainmenutab',
+                                plugins: new Ext.ux.TabCloseMenu(),
+                                items: [],
+                                listeners: {
+                                    tabchange: function (tabPanel, tab) {
+                                        execute('history', 'setShowTab', [tab.id]);
+                                        labelEditor.cancelEdit();
+                                    },
+                                    add: function (tabPanel, tab) {
+                                        if (tab.initialConfig.useType != 'editor') {
+                                            execute('history', 'setTab', [{
+                                                id: tab.config.id,
+                                                params: tab.config.params,
+                                                title: tab.config.title,
+                                                type: tab.config.xtype,
+                                                icon: tab.config.icon
+                                            }]);
                                         }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            region: 'west',
-                            split: true,
-                            width: 240,
-                            minWidth: 160,
-                            maxWidth: 400,
-                            id: 'js-data',
-                            useArrows: true,
-                            hidden: true,
-                            scrollable: true
-                        },
-                        {
-                            region: 'center',
-                            xtype: 'tabpanel',
-                            fullscreen: true,
-                            id: 'mainmenutab',
-                            plugins: new Ext.ux.TabCloseMenu(),
-                            items: [],
-                            listeners: {
-                                tabchange: function (tabPanel, tab) {
-                                    execute('history', 'setShowTab', [tab.id]);
-                                    labelEditor.cancelEdit();
-                                },
-                                add: function (tabPanel, tab) {
-                                    if (tab.initialConfig.useType != 'editor') {
-                                        execute('history', 'setTab', [{
-                                            id: tab.config.id,
-                                            params: tab.config.params,
-                                            title: tab.config.title,
-                                            type: tab.config.xtype,
-                                            icon: tab.config.icon
-                                        }]);
+                                    },
+                                    remove: function (tabPanel, tab) {
+                                        if (tab.initialConfig.useType == 'editor') {
+                                            execute('history', 'removeCodeTab', [tab.config.id]);
+                                        } else {
+                                            execute('history', 'removeTab', [tab.config.id]);
+                                        }
+                                        labelEditor.cancelEdit();
                                     }
-                                },
-                                remove: function (tabPanel, tab) {
-                                    if (tab.initialConfig.useType == 'editor') {
-                                        execute('history', 'removeCodeTab', [tab.config.id]);
-                                    } else {
-                                        execute('history', 'removeTab', [tab.config.id]);
-                                    }
-                                    labelEditor.cancelEdit();
                                 }
                             }
-                        }
-                    ]
-                }],
+                        ]
+                    }],
                 dockedItems: [
                     {
                         id: 'left-bar',
@@ -923,7 +925,6 @@ function initMainView() {
                 layout: 'fit',
                 items: viewport
             });
-
             ipcRenderer.send('loading-msg', '缓存加载中...');
 
             getFilesData();
@@ -1365,6 +1366,7 @@ function changeTemplate(newPId, flag) {
     checkNew(pId);
     Ext.getCmp('main-content').unmask();
     require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${mode.text}]`);
+    title = mode.text;
     showToast('[info] 切换模板为:' + mode.text);
     if (flag) {
         installTemplateAllPkg();
@@ -1426,7 +1428,7 @@ function createFile(dom) {
     const allModuleData = execute('controlData', 'getModuleData', [pId]);
     generatorData.forEach(f => {
         if (!utils.isEmpty(f.file) && !utils.isEmpty(f.content)) {
-            const type = execute('fileData', 'getFiles', [f.id]).updateType;
+            const {updateType} = execute('fileData', 'getFile', [f.id]);
             const tpl = swig.compile(f.file);
             f.name = tpl(allModuleData);
             const flag = utils.fileExists(f.name);
@@ -1435,7 +1437,7 @@ function createFile(dom) {
             } else {
                 f.flag = '否';
             }
-            f.type = type;
+            f.type = updateType;
             files.push(f);
         }
     });
@@ -1742,9 +1744,12 @@ document.onkeydown = function () {
     if (oEvent.keyCode == 116 && Ext.getCmp('generate-win') === undefined) {
         createFile();
     }
-    if (oEvent.keyCode == 122) {
-        const win = require('electron').remote.getCurrentWindow();
-        win.setMenuBarVisibility(!win.isMenuBarVisible());
-        win.setFullScreen(!win.isFullScreen());
-    }
 };
+
+function setDefaultUrl() {
+    const request = require('request');
+    request('https://raw.githubusercontent.com/onion878/GenerateTool/master/package.json', function (error, response, body) {
+        const d = JSON.parse(body);
+        execute('userConfig', 'setDefaultUrl', [d.url]);
+    });
+}

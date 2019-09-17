@@ -24,5 +24,8 @@ module.exports = {
             v[d.id] = d;
         });
         return v;
+    },
+    isEmpty(val) {
+        if (val !== undefined && val != null && (val + '').trim() !== '') return false; else return true;
     }
 };

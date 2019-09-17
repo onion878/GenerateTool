@@ -15,7 +15,7 @@ const {getDataPath} = require('./service/utils/help');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false, globalStoreDirPath;
 
-function createWindow() {
+function createWindow(dataId) {
     // 预加载
     loading = new BrowserWindow({
         show: false,
@@ -30,7 +30,7 @@ function createWindow() {
     }));
     loading.webContents.once('dom-ready', () => {
         // 加载正式窗口
-        createMainWindow();
+        createMainWindow(dataId);
         setTimeout(() => {
             if (!loadFlag) {
                 const systemConfig = need('./service/dao/system');
@@ -50,7 +50,7 @@ function createWindow() {
     loading.setResizable(false);
 }
 
-function createMainWindow() {
+function createMainWindow(dataId) {
     globalStoreDirPath = getDataPath();
     if (!fs.existsSync(globalStoreDirPath)) {
         shell.mkdir('-p', globalStoreDirPath);
@@ -90,7 +90,7 @@ function createMainWindow() {
         mainWindow.setPosition(data.x, data.y);
     }
     // Open the DevTools. debug
-    //mainWindow.webContents.openDevTools();
+    // mainWindow.webContents.openDevTools();
     const menu = Menu.buildFromTemplate([
         {
             label: '系统',
@@ -189,15 +189,41 @@ function createMainWindow() {
         },
         {
             label: '帮助',
-            click() {
-                require("open")('https://generate-docs.netlify.com/');
-            }
-        },
-        {
-            label: 'Github',
-            click() {
-                require("open")('https://github.com/onion878/GenerateTool');
-            }
+            submenu: [
+                {
+                    label: 'Github',
+                    click() {
+                        require("open")('https://github.com/onion878/GenerateTool');
+                    }
+                },
+                {
+                    label: '文档',
+                    click() {
+                        require("open")('https://generate-docs.netlify.com');
+                    }
+                },
+                {
+                    label: '关于',
+                    click() {
+                        dialog.showMessageBox(
+                            {
+                                type: "info",
+                                title: "关于",
+                                message: "代码创建工具",
+                                detail: `Version: ${systemConfig.getConfig('version')}\r\tChrome: ${process.versions["chrome"]}\r\tNode: ${
+                                    process.versions["node"]
+                                }\r\tElectron: ${
+                                    process.versions["electron"]
+                                }\r\tAuthor: Onion\r\tEmail: 2419186601@qq.com`
+                            },
+                            response => {
+                                // 被点击按钮的索引.
+                                console.log(response);
+                            }
+                        );
+                    }
+                }
+            ]
         }
     ]);
     Menu.setApplicationMenu(menu);
@@ -305,7 +331,9 @@ if (!gotTheLock) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', function () {
+    createWindow();
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

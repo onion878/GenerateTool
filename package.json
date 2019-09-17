@@ -1,6 +1,6 @@
 {
   "name": "GenerateTool",
-  "version": "1.5.5",
+  "version": "1.5.7",
   "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {
@@ -17,6 +17,7 @@
   ],
   "author": "Onion",
   "license": "CC0-1.0",
+  "url": "http://onion.zhouhongxing.cn/",
   "build": {
     "appId": "onion.app.GenaretorTool",
     "asar": true,
@@ -52,6 +53,7 @@
     "node-pty": "^0.8.1",
     "open": "^6.4.0",
     "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
     "require-uncached": "^2.0.0",
     "shelljs": "^0.8.3",
     "swig": "^1.4.2",

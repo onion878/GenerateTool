@@ -189,8 +189,9 @@ Ext.define('OnionSpace.controller.Mode', {
         } else if (type == 'combobox') {
             content = {
                 xtype: 'combobox',
-                valueField: 'id',
+                queryMode: 'local',
                 displayField: 'text',
+                valueField: 'id',
                 flex: 1
             };
         } else if (type == 'datalist') {
@@ -296,6 +297,15 @@ Ext.define('OnionSpace.controller.Mode', {
             };
             content.value = value;
         } else if (type == 'combobox') {
+            content.tpl = new Ext.XTemplate(
+                '<ul class="x-list-plain">',
+                '<tpl for=".">',
+                '<li class="x-boundlist-item">',
+                '{[values.text.encodeHtml()]}',
+                '</li>',
+                '</tpl>',
+                '</ul>'
+            );
             content.listeners = {
                 change: function (dom, val) {
                     execute('controlData', 'setDataValue', [id, {value: val, data: that.getStoreData(dom.getStore())}]);

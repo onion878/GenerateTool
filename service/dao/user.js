@@ -16,6 +16,7 @@ class User {
             background: '',
             opacity: 1
         }).write();
+        this.udb.defaults({defaultUrl: ''}).write();
     }
 
     setUser(user) {
@@ -32,6 +33,11 @@ class User {
             .write();
     }
 
+    setDefaultUrl(url) {
+        this.udb.set('defaultUrl', url)
+            .write();
+    }
+
     getAuth() {
         return this.udb.get('auth').value();
     }
@@ -42,7 +48,11 @@ class User {
     }
 
     getUrl() {
-        return this.udb.get('url').value();
+        let d = this.udb.get('url').value();
+        if(help.isEmpty(d)) {
+            d = this.udb.get('defaultUrl').value();
+        }
+        return d;
     }
 
     setBg(v) {

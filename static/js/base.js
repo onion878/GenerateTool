@@ -970,6 +970,15 @@ const closeNodeWin = () => {
     runWin = null;
 };
 
+String.prototype.encodeHtml = function () {
+    let html = this;
+    let temp = document.createElement("div");
+    (temp.textContent != null) ? (temp.textContent = html) : (temp.innerText = html);
+    const output = temp.innerHTML;
+    temp = null;
+    return output;
+};
+
 function login(call) {
     const {Password, UserName} = execute('userConfig', 'getUser');
     Ext.create('Ext.window.Window', {
