@@ -43,13 +43,16 @@ class User {
     }
 
     setUrl(v) {
-        this.udb.set('url', v)
-            .write();
+        let d = this.udb.get('defaultUrl').value();
+        if (d != v) {
+            this.udb.set('url', v)
+                .write();
+        }
     }
 
     getUrl() {
         let d = this.udb.get('url').value();
-        if(help.isEmpty(d)) {
+        if (help.isEmpty(d)) {
             d = this.udb.get('defaultUrl').value();
         }
         return d;

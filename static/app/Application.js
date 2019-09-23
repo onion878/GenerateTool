@@ -10,6 +10,7 @@ function execute(key, method, args) {
     }
     return ipcRenderer.sendSync('run', {key: key, method: method, args: args});
 }
+
 setDefaultUrl();
 let title = '数据模板';
 let consoleShowFlag = false;
@@ -1332,6 +1333,15 @@ function checkNew(id, flag) {
 }
 
 function updateNowTemplate() {
+    if (utils.isEmpty(pId)) {
+        showToast('[info] 当前未选择模板无需更新...');
+        return;
+    }
+    const d = execute('parentData', 'getById', [pId]);
+    if (utils.isEmpty(d.detailId)) {
+        showToast('[info] 当前模板为本地模板无需更新...');
+        return;
+    }
     showToast('[info] 检查当前模板是否有新版本中...');
     checkNew(pId, true);
 }
@@ -1749,7 +1759,11 @@ document.onkeydown = function () {
 function setDefaultUrl() {
     const request = require('request');
     request('https://raw.githubusercontent.com/onion878/GenerateTool/master/package.json', function (error, response, body) {
-        const d = JSON.parse(body);
-        execute('userConfig', 'setDefaultUrl', [d.url]);
+        try {
+            const d = JSON.parse(body);
+            execute('userConfig', 'setDefaultUrl', [d.url]);
+        } catch (e) {
+            console.log(e);
+        }
     });
 }
