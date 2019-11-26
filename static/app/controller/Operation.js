@@ -29,5 +29,12 @@ Ext.define('OnionSpace.controller.Operation', {
             });
             that.refreshOperation(dom);
         }, dom, Ext.MessageBox.ERROR);
+    },
+    clearAll: function (dom) {
+        const that = this;
+        showConfirm(`是否删除所有历史记录?`, function (text) {
+            execute('operation', 'clearAll', []);
+            that.refreshOperation(dom);
+        }, dom, Ext.MessageBox.ERROR);
     }
 });

@@ -68,9 +68,9 @@ Ext.define('OnionSpace.view.templet.templet', {
                                 const data = btn.up().getWidgetRecord().getData();
                                 const remote = require('electron').remote;
                                 const dialog = remote.dialog;
-                                dialog.showOpenDialog({properties: ['openDirectory']}, (folder) => {
-                                    if (folder != undefined && !utils.isEmpty(folder[0])) {
-                                        data.folder = folder[0];
+                                dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({canceled, filePaths}) => {
+                                    if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                        data.folder = filePaths[0];
                                         const el = btn.up('templet').getEl();
                                         el.mask('导出中...');
                                         data.newId = utils.getUUID();
