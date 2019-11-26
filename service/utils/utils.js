@@ -1,5 +1,6 @@
 const fs = require('fs');
 const request = require('request');
+const path = require('path');
 const shell = require('shelljs');
 const child = require('child_process').execFile;
 const marked = require('marked');
@@ -208,6 +209,7 @@ class Utils {
             const r = request(url);
             const help = require('./help');
             const p = help.getDataPath();
+            console.log(url);
             r.on('response', function (res) {
                 if (res.statusCode == 200) {
                     const re = res.pipe(fs.createWriteStream(p + '/' + f));
