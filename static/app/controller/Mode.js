@@ -402,68 +402,22 @@ Ext.define('OnionSpace.controller.Mode', {
                 }
             };
         } else if (type == 'file') {
-            content = {
-                xtype: 'container',
-                flex: 1,
-                layout: 'hbox',
-                items: [
-                    {
-                        xtype: 'textfield',
-                        value: value,
-                        flex: 1,
-                        listeners: {
-                            change: function (dom, val) {
-                                execute('controlData', 'setDataValue', [id, val]);
-                            }
-                        }
-                    },
-                    {
-                        xtype: 'button',
-                        text: '选择文件',
-                        handler: function (btn) {
-                            const remote = require('electron').remote;
-                            const dialog = remote.dialog;
-                            dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openFile']}).then(({canceled, filePaths}) => {
-                                if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                    btn.up('container').down('textfield').setRawValue(filePaths[0]);
-                                    execute('controlData', 'setDataValue', [id, filePaths[0]]);
-                                }
-                            });
-                        }
-                    }
-                ]
+            content.listeners = {
+                render: function (dom) {
+                    dom.setRawValue(value);
+                },
+                change: function (dom, val) {
+                    execute('controlData', 'setDataValue', [id, val]);
+                }
             };
         } else if (type == 'folder') {
-            content = {
-                xtype: 'container',
-                flex: 1,
-                layout: 'hbox',
-                items: [
-                    {
-                        xtype: 'textfield',
-                        value: value,
-                        flex: 1,
-                        listeners: {
-                            change: function (dom, val) {
-                                execute('controlData', 'setDataValue', [id, val]);
-                            }
-                        }
-                    },
-                    {
-                        xtype: 'button',
-                        text: '选择文件夹',
-                        handler: function (btn) {
-                            const remote = require('electron').remote;
-                            const dialog = remote.dialog;
-                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({canceled, filePaths}) => {
-                                if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                    btn.up('container').down('textfield').setRawValue(filePaths[0]);
-                                    execute('controlData', 'setDataValue', [id, filePaths[0]]);
-                                }
-                            });
-                        }
-                    }
-                ]
+            content.listeners = {
+                render: function (dom) {
+                    dom.setRawValue(value);
+                },
+                change: function (dom, val) {
+                    execute('controlData', 'setDataValue', [id, val]);
+                }
             };
         } else if (type == 'json') {
             content.source = value;
@@ -487,29 +441,28 @@ Ext.define('OnionSpace.controller.Mode', {
                 right: 10,
                 bottom: 10
             },
-            items: [
-                {
-                    xtype: 'container',
-                    flex: 1,
-                    layout: 'hbox',
-                    items: [{
-                        xtype: 'label',
-                        text: label,
-                        width: 105,
-                        margin: {
-                            top: 3
-                        },
-                        listeners: {
-                            'render': function () {
-                                this.el.on('dblclick', function (e, t) {
-                                    labelEditor.startEdit(t);
-                                    labelEditor.field.focus(50, true);
-                                    editLabelId = id;
-                                });
-                            }
+            items: [{
+                xtype: 'container',
+                flex: 1,
+                layout: 'hbox',
+                items: [{
+                    xtype: 'label',
+                    text: label,
+                    width: 105,
+                    margin: {
+                        top: 3
+                    },
+                    listeners: {
+                        'render': function () {
+                            this.el.on('dblclick', function (e, t) {
+                                labelEditor.startEdit(t);
+                                labelEditor.field.focus(50, true);
+                                editLabelId = id;
+                            });
                         }
-                    }, content]
-                },
+                    }
+                }, content]
+            },
                 {
                     xtype: 'button',
                     icon: 'images/javascript.svg',
@@ -715,7 +668,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     const btn = Ext.getCmp(conData[i].id),
                         type = btn.bType;
                     showToast('[info] 执行结果:' + JSON.stringify(v));
-                    that.setComponentValue(type, btn, v);
+                    that.setComponentValue(type, btn, v, id);
                 });
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
@@ -757,7 +710,7 @@ Ext.define('OnionSpace.controller.Mode', {
             d.then(v => {
                 showToast('[info] 需要执行的脚本:' + valStr);
                 showToast('[info] 执行结果:' + JSON.stringify(v));
-                this.setComponentValue(type, btn, v);
+                this.setComponentValue(type, btn, v, bId);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
@@ -766,11 +719,11 @@ Ext.define('OnionSpace.controller.Mode', {
         } else {
             showToast('[info] 需要执行的脚本:' + valStr);
             showToast('[info] 执行结果:' + JSON.stringify(d));
-            this.setComponentValue(type, btn, d);
+            this.setComponentValue(type, btn, d, bId);
             Ext.getCmp('main-content').unmask();
         }
     },
-    setComponentValue(type, btn, v) {
+    setComponentValue(type, btn, v, bId) {
         if (type == 'text') {
             btn.up('container').down('textfield').setValue(v);
         } else if (type == 'textarea') {
@@ -849,7 +802,7 @@ Ext.define('OnionSpace.controller.Mode', {
             const g = btn.up('container').down('propertygrid');
             g.setSource(v);
             const d = this.getGridJsonData(g.getStore());
-            execute('controlData', 'setDataValue', [btn.bId, d]);
+            execute('controlData', 'setDataValue', [bId, d]);
             const d1 = {};
             for (let k in d) {
                 d1[k] = `JSON: ... -> ${k}`;

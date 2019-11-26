@@ -1,7 +1,7 @@
 const os = require('os');
 const pty = require('node-pty');
 const Terminal = require('xterm').Terminal;
-const FitAddon = require('xterm-addon-fit').FitAddon;
+const fit = require('xterm/lib/addons/fit/fit');
 const {remote} = require('electron');
 const {strip} = require('ansicolor');
 
@@ -12,7 +12,6 @@ class Commands {
         this.nowPty = null;
         this.systemCmd = false;
         this.workFlag = false;
-        this.fitAddon = new FitAddon();
         this.config = require('../dao/system');
         if (this.config.getTheme() == 'aria') {
             this.color1 = '#424242';
@@ -68,6 +67,7 @@ class Commands {
     initXterm(userBash, resolve, element) {
         const that = this;
 
+        Terminal.applyAddon(fit);
         // Initialize xterm.js and attach it to the DOM
         that.term = new Terminal({
             fontFamily: 'Consolas',
@@ -95,8 +95,7 @@ class Commands {
             }
         });
         that.term.open(element);
-        that.term.loadAddon(that.fitAddon);
-        that.fitAddon.fit();
+        that.term.fit();
     }
 
     ColorReverse(OldColorValue) {
@@ -107,7 +106,7 @@ class Commands {
 
     fitTerm() {
         if (this.term != null) {
-            this.fitAddon.fit();
+            this.term.fit();
         }
     }
 

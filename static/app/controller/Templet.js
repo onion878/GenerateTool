@@ -24,17 +24,18 @@ Ext.define('OnionSpace.controller.Templet', {
     importModule: function (dom) {
         const remote = require('electron').remote;
         const dialog = remote.dialog;
-        dialog.showOpenDialog(remote.getCurrentWindow(),{
+        dialog.showOpenDialog({
             properties: ['openFile'],
             filters: [{name: '模板压缩文件', extensions: ['zip']}]
-        }).then(({canceled, filePaths}) => {
-            if (!canceled && filePaths.length > 0) {
+        }, (file) => {
+            if (file != undefined) {
                 const el = dom.up('templet').getEl();
                 el.mask('导入中...');
-                jsCode.importModule(filePaths[0]).then(({msg}) => {
+                jsCode.importModule(file[0]).then(msg => {
                     el.unmask();
                     showToast('[info] ' + msg);
                     dom.up('templet').getStore().setData(execute('parentData', 'getAll'));
+
                 }).catch(e => {
                     console.error(e);
                     el.unmask();

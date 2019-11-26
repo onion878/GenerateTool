@@ -52,11 +52,6 @@ class Operation {
         this.db.get('details').remove({pId: id})
             .write();
     }
-
-    clearAll() {
-        this.db.set('data', []).write();
-        this.db.set('details', []).write();
-    }
 }
 
 module.exports = new Operation();
