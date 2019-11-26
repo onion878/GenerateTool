@@ -40,6 +40,6 @@ function copyFolderRecursiveSync( source, target ) {
 const source = path.join(__dirname, 'node_modules/monaco-editor/min/vs');
 const target = path.join(__dirname, 'static');
 copyFolderRecursiveSync(source, target);
-shell.cp('-R', path.join(__dirname, 'node_modules/xterm/dist/xterm.css'), path.join(__dirname, 'static/css'));
+shell.cp('-R', path.join(__dirname, 'node_modules/xterm/css/xterm.css'), path.join(__dirname, 'static/css'));
 shell.cd('static');
 shell.exec('git clone https://github.com/onion878/Ext.git');

@@ -16,6 +16,11 @@ Ext.define('OnionSpace.view.operation.operation', {
         icon: 'images/cross.svg',
         handler: 'deleteOperation'
     }, {
+        xtype: 'button',
+        text: '清空历史记录',
+        icon: 'images/delete.svg',
+        handler: 'clearAll'
+    }, {
         xtype: 'combobox',
         fieldLabel: '按模板搜索',
         labelWidth: 90,

@@ -26,6 +26,7 @@ function createWindow(dataId) {
     loading.loadURL(url.format({
         pathname: path.join(__dirname, 'static/loading/loading.html'),
         protocol: 'file:',
+        resizable: false,
         slashes: true
     }));
     loading.webContents.once('dom-ready', () => {
@@ -47,7 +48,6 @@ function createWindow(dataId) {
         }, 10000);
     });
     loading.show();
-    loading.setResizable(false);
 }
 
 function createMainWindow(dataId) {
@@ -139,7 +139,7 @@ function createMainWindow(dataId) {
                             defaultId: 1,
                             message: '是否重新启动?',
                             noLink: true
-                        }, function (response) {
+                        }).then(({response}) => {
                             if (response === 1) {
                                 app.relaunch();
                                 app.exit(0);
@@ -215,12 +215,9 @@ function createMainWindow(dataId) {
                                 }\r\tElectron: ${
                                     process.versions["electron"]
                                 }\r\tAuthor: Onion\r\tEmail: 2419186601@qq.com`
-                            },
-                            response => {
-                                // 被点击按钮的索引.
-                                console.log(response);
                             }
-                        );
+                        ).then(() => {
+                        });
                     }
                 }
             ]
@@ -286,7 +283,7 @@ function createMainWindow(dataId) {
                 defaultId: 1,
                 message: '是否退出?',
                 noLink: true
-            }, function (response) {
+            }).then(({response}) => {
                 if (response === 1) {
                     app.showExitPrompt = false;
                     mainWindow.close();
