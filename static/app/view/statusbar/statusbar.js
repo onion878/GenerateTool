@@ -2,6 +2,7 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.statusbar',
     html: '<div class="states-toolbar"></div>',
+    progress: null,
     listeners: {
         render: function (c) {
             const that = this;
@@ -32,7 +33,7 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
             });
             child = child + '</div>';
             if (that.msg) {
-                child = child + '<div class="status-msg" id="status-msg"></div>';
+                child = child + `<div class="status-msg" id="status-msg"></div><div id="progress" class="status-progress" style="float: right;"></div>`;
             }
             const main = c.el.dom.querySelector('.states-toolbar');
             main.innerHTML = child;
@@ -48,9 +49,28 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
             });
         }
     },
+    initProgress: function () {
+        this.progress = Ext.create('Ext.ProgressBar', {
+            renderTo: document.getElementById("progress"),
+            width: 250,
+            height: 23
+        });
+
+    },
+    setProgress: function (text, value) {
+        const that = this;
+        if (that.progress == null) {
+            that.initProgress();
+        }
+        this.progress.show();
+        that.progress.updateProgress(value, text, true);
+    },
+    closeProgress: function () {
+        this.progress.hide();
+    },
     initComponent: function () {
         let style = '';
-        if(this.type == 'vertical' ) {
+        if (this.type == 'vertical') {
             this.width = 20;
             style = `width: ${this.param}px;height: ${this.param}px`;
         }

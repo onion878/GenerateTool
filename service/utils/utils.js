@@ -1,6 +1,5 @@
 const fs = require('fs');
 const request = require('request');
-const path = require('path');
 const shell = require('shelljs');
 const child = require('child_process').execFile;
 const marked = require('marked');
@@ -145,6 +144,15 @@ class Utils {
         });
     }
 
+    runFile(file, args) {
+        child(file, args, {shell: true}, function (err, data) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+        });
+    }
+
     fileExists(path) {
         return fs.existsSync(path);
     }
@@ -203,18 +211,27 @@ class Utils {
     }
 
     downloadFile(file, f) {
+        const that = this;
         return new Promise((resolve, reject) => {
             const userConfig = require('../dao/user');
             const url = userConfig.getUrl() + '/download/' + file;
             const r = request(url);
             const help = require('./help');
             const p = help.getDataPath();
-            console.log(url);
+            let received = 0;
+            let total = 0;
             r.on('response', function (res) {
+                total = parseInt(res.headers['content-length']);
+                if (fs.existsSync(p + '/' + f)) {
+                    if(total == fs.statSync(p + '/' + f).size) {
+                        resolve(p + f);
+                        r.abort();
+                        return;
+                    }
+                }
                 if (res.statusCode == 200) {
                     const re = res.pipe(fs.createWriteStream(p + '/' + f));
                     re.on('finish', () => {
-                        console.log('end');
                         resolve(p + f);
                     });
                     re.on('error', () => {
@@ -223,6 +240,14 @@ class Utils {
                 } else {
                     reject('文件失效!');
                 }
+            });
+            r.on('data', function (chunk) {
+                received += chunk.length;
+                const progressVal = received / total;
+                Ext.getCmp('msg-bar').setProgress(`下载中(${that.formatSizeUnits(received) + ' to ' + that.formatSizeUnits(total)})...`, progressVal);
+            });
+            r.on('end', function () {
+                Ext.getCmp('msg-bar').closeProgress();
             });
         });
     }
@@ -237,6 +262,23 @@ class Utils {
 
     showHelp(file) {
         return marked(this.readFile(require('app-root-path').path + '/help/' + file));
+    }
+
+    formatSizeUnits(bytes) {
+        if (bytes >= 1073741824) {
+            bytes = (bytes / 1073741824).toFixed(2) + " GB";
+        } else if (bytes >= 1048576) {
+            bytes = (bytes / 1048576).toFixed(2) + " MB";
+        } else if (bytes >= 1024) {
+            bytes = (bytes / 1024).toFixed(2) + " KB";
+        } else if (bytes > 1) {
+            bytes = bytes + " bytes";
+        } else if (bytes == 1) {
+            bytes = bytes + " byte";
+        } else {
+            bytes = "0 bytes";
+        }
+        return bytes;
     }
 }
 

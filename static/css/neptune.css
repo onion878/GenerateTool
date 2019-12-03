@@ -105,7 +105,8 @@ body {
 
 .states-toolbar {
     overflow: hidden;
-    width: 100%;
+    display: flex;
+    justify-content: space-between;
     height: 21px;
     background-color: #157fcc;
     border-top: 1px solid #3892d4;
@@ -132,8 +133,9 @@ body {
 }
 
 .states-toolbar .states-content {
-    display: table;
-    margin: 0 auto;
+    width: 150px;
+    min-width: 150px;
+    max-width: 150px;
 }
 
 .states-toolbar .material-icons {
@@ -148,14 +150,17 @@ body {
 }
 
 .states-toolbar .status-msg {
+    width: 100%;
+    margin: 0 5px;
     line-height: 20px;
     color: #300b2a;
-    float: right;
-    margin-right: 10px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: calc(100% - 160px);
+}
+
+.states-toolbar .status-progress {
+    /*width: 250px;*/
 }
 
 .states-toolbar a.active {

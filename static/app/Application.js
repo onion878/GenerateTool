@@ -45,7 +45,6 @@ function initMainView() {
         name: 'OnionSpace',
         appFolder: 'app',
         controllers: [
-            'Titlebar',
             'Statusbar',
             'Message'
         ],
@@ -1599,9 +1598,13 @@ function createFile(dom) {
                                     }]);
                                     showToast('[info] ' + f.name + ' 生成成功!');
                                     if (after) {
-                                        win.setProgressBar((0.6 / selected.length) * (i + 1) + 0.2);
+                                        const progressVal = (0.6 / selected.length) * (i + 1) + 0.2;
+                                        win.setProgressBar(progressVal);
+                                        Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                     } else {
-                                        win.setProgressBar((0.8 / selected.length) * (i + 1) + 0.2);
+                                        const progressVal = (0.8 / selected.length) * (i + 1) + 0.2;
+                                        win.setProgressBar(progressVal);
+                                        Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                     }
                                 });
                                 showToast('[info] 文件创建完成');
@@ -1612,6 +1615,7 @@ function createFile(dom) {
                                         win.setProgressBar(1);
                                         setTimeout(() => {
                                             win.setProgressBar(-1);
+                                            Ext.getCmp('msg-bar').closeProgress();
                                             new Notification('代码创建成功', {
                                                 body: `[${title}]代码创建成功`,
                                                 icon: 'images/success.png'
@@ -1623,6 +1627,7 @@ function createFile(dom) {
                                         showErrorFlag();
                                         Ext.getCmp('main-content').unmask();
                                         win.setProgressBar(-1);
+                                        Ext.getCmp('msg-bar').closeProgress();
                                         new Notification('代码创建失败', {
                                             body: `[${title}]代码创建失败, 错误信息:${e}`,
                                             icon: 'images/error.png'
@@ -1631,6 +1636,7 @@ function createFile(dom) {
                                 } else {
                                     Ext.getCmp('main-content').unmask();
                                     win.setProgressBar(-1);
+                                    Ext.getCmp('msg-bar').closeProgress();
                                     new Notification('代码创建成功', {
                                         body: `[${title}]代码创建成功`,
                                         icon: 'images/success.png'
@@ -1642,6 +1648,7 @@ function createFile(dom) {
                                 showErrorFlag();
                                 Ext.getCmp('main-content').unmask();
                                 win.setProgressBar(-1);
+                                Ext.getCmp('msg-bar').closeProgress();
                                 new Notification('代码创建失败', {
                                     body: `[${title}]代码创建失败, 错误信息:${e}`,
                                     icon: 'images/error.png'
@@ -1659,6 +1666,7 @@ function createFile(dom) {
                                         showError(f.file + ':模板错误');
                                         Ext.getCmp('main-content').unmask();
                                         win.setProgressBar(-1);
+                                        Ext.getCmp('msg-bar').closeProgress();
                                         new Notification('代码创建失败', {
                                             body: `[${title}]代码创建失败, 错误信息:${e}`,
                                             icon: 'images/error.png'
@@ -1674,6 +1682,7 @@ function createFile(dom) {
                                         showError(e);
                                         Ext.getCmp('main-content').unmask();
                                         win.setProgressBar(-1);
+                                        Ext.getCmp('msg-bar').closeProgress();
                                         new Notification('代码创建失败', {
                                             body: `[${title}]代码创建失败, 错误信息:${e}`,
                                             icon: 'images/error.png'
@@ -1699,9 +1708,13 @@ function createFile(dom) {
                                 }]);
                                 showToast('[info] ' + f.name + ' 生成成功!');
                                 if (after) {
-                                    win.setProgressBar((0.8 / selected.length) * (i + 1));
+                                    const progressVal = (0.8 / selected.length) * (i + 1);
+                                    win.setProgressBar(progressVal);
+                                    Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                 } else {
-                                    win.setProgressBar((1 / selected.length) * (i + 1));
+                                    const progressVal = (1 / selected.length) * (i + 1);
+                                    win.setProgressBar(progressVal);
+                                    Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                 }
                             });
                             showToast('[info] 文件创建完成');
@@ -1710,8 +1723,10 @@ function createFile(dom) {
                                     showToast('[info] 创建后JS脚本执行成功');
                                     Ext.getCmp('main-content').unmask();
                                     win.setProgressBar(1);
+                                    Ext.getCmp('msg-bar').setProgress(`生成完成`, 1);
                                     setTimeout(() => {
                                         win.setProgressBar(-1);
+                                        Ext.getCmp('msg-bar').closeProgress();
                                         new Notification('代码创建成功', {
                                             body: `[${title}]代码创建成功`,
                                             icon: 'images/success.png'
@@ -1723,6 +1738,7 @@ function createFile(dom) {
                                     showErrorFlag();
                                     Ext.getCmp('main-content').unmask();
                                     win.setProgressBar(-1);
+                                    Ext.getCmp('msg-bar').closeProgress();
                                     new Notification('代码创建失败', {
                                         body: `[${title}]代码创建失败, 错误信息:${e}`,
                                         icon: 'images/error.png'
@@ -1731,6 +1747,7 @@ function createFile(dom) {
                             } else {
                                 Ext.getCmp('main-content').unmask();
                                 win.setProgressBar(-1);
+                                Ext.getCmp('msg-bar').closeProgress();
                                 new Notification('代码创建成功', {
                                     body: `[${title}]代码创建成功`,
                                     icon: 'images/success.png'
@@ -1762,6 +1779,16 @@ function setDefaultUrl() {
         try {
             const d = JSON.parse(body);
             execute('userConfig', 'setDefaultUrl', [d.url]);
+            const oldVersion = utils.getVersion();
+            if (d.version != oldVersion) {
+                utils.downloadFile(`GenerateTool Setup ${d.version}.exe`, `GenerateTool Setup ${d.version}.exe`).then(d => {
+                    showConfirm(`安装包下载成功是否退出并安装更新?`, function (text) {
+                        utils.runFile(d);
+                        const {app} = require('electron').remote;
+                        app.exit(0);
+                    }, undefined, Ext.MessageBox.ERROR);
+                });
+            }
         } catch (e) {
             console.log(e);
         }
