@@ -262,6 +262,7 @@ function createMainWindow(dataId) {
         geFileData: './service/dao/gefile',
         operation: './service/dao/operation',
         utils: './service/utils/utils',
+        help: './service/utils/help',
         command: './service/utils/commands'
     };
 

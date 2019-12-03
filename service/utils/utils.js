@@ -2,6 +2,7 @@ const fs = require('fs');
 const request = require('request');
 const shell = require('shelljs');
 const child = require('child_process').execFile;
+const childSync = require('child_process').execFileSync;
 const marked = require('marked');
 
 class Utils {
@@ -145,12 +146,7 @@ class Utils {
     }
 
     runFile(file, args) {
-        child(file, args, {shell: true}, function (err, data) {
-            if (err) {
-                console.error(err);
-                return;
-            }
-        });
+        return childSync(file, args, {shell: true});
     }
 
     fileExists(path) {
