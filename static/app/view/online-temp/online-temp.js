@@ -62,7 +62,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                                     setTimeout(() => {
                                                         Ext.getCmp('main-content').unmask();
                                                         showConfirm(`下载成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
-                                                            changeTemplate(pId, true);
+                                                            changeTemplate(pId);
                                                         }, undefined, Ext.MessageBox.QUESTION);
                                                     }, 500);
                                                 }).catch(e => {
@@ -76,13 +76,13 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                                     showToast('[info] [' + data.Name + ']下载成功!');
                                                     jsCode.deleteFile(d);
                                                     if (execute('history', 'getMode') == local.id) {
-                                                        changeTemplate(local.id, true);
+                                                        changeTemplate(local.id);
                                                         return;
                                                     }
                                                     setTimeout(() => {
                                                         Ext.getCmp('main-content').unmask();
                                                         showConfirm(`更新成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
-                                                            changeTemplate(local.id, true);
+                                                            changeTemplate(local.id);
                                                         }, undefined, Ext.MessageBox.QUESTION);
                                                     }, 500);
                                                 }).catch(e => {

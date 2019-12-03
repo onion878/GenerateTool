@@ -183,38 +183,14 @@ class JscodeUtil {
             archive.on('error', function (err) {
                 reject(err);
             });
-
-            if (fs.existsSync(`${path}/jscode/${id}/node_modules`)) {
-                const dir = `${path}/jscode/${id}_lib`;
-                if (!fs.existsSync(dir)) {
-                    fs.mkdirSync(dir);
-                }
-
-                fs.rename(`${path}/jscode/${id}/node_modules`, `${dir}/node_modules`, (err) => {
-                    if (err) throw err;
-                    archive.pipe(output);
-                    archive.append(that.getAllExportData(id, newId), {name: 'data.json'});
-                    if (newId) {
-                        archive.directory(`${path}jscode/${id}/`, newId);
-                    } else {
-                        archive.directory(`${path}jscode/${id}/`, id);
-                    }
-                    archive.finalize();
-                    fs.rename(`${dir}/node_modules`, `${path}/jscode/${id}/node_modules`, (err) => {
-                        if (err) throw err;
-                        del([dir], {force: true});
-                    });
-                });
+            archive.pipe(output);
+            archive.append(that.getAllExportData(id, newId), {name: 'data.json'});
+            if (newId) {
+                archive.directory(`${path}jscode/${id}/`, newId);
             } else {
-                archive.pipe(output);
-                archive.append(that.getAllExportData(id, newId), {name: 'data.json'});
-                if (newId) {
-                    archive.directory(`${path}jscode/${id}/`, newId);
-                } else {
-                    archive.directory(`${path}jscode/${id}/`, id);
-                }
-                archive.finalize();
+                archive.directory(`${path}jscode/${id}/`, id);
             }
+            archive.finalize();
         });
     }
 

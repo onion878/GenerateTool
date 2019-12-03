@@ -17,6 +17,7 @@ class User {
             opacity: 1
         }).write();
         this.udb.defaults({defaultUrl: ''}).write();
+        this.udb.defaults({afterShell: true, beforeShell: true}).write();
     }
 
     setUser(user) {
@@ -74,6 +75,15 @@ class User {
 
     getOpacity() {
         return this.udb.get('opacity').value();
+    }
+
+    setConfig(key, val) {
+        this.udb.set(key, val)
+            .write();
+    }
+
+    getConfig(key) {
+        return this.udb.get(key).value();
     }
 }
 

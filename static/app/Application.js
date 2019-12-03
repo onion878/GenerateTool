@@ -1297,7 +1297,7 @@ function checkNew(id, flag) {
                                     showToast('[info] 更新成功!');
                                     jsCode.deleteFile(d);
                                     if (execute('history', 'getMode') == local.id) {
-                                        changeTemplate(local.id, true);
+                                        changeTemplate(local.id);
                                         return;
                                     }
                                 }).catch(e => {
@@ -1345,7 +1345,7 @@ function updateNowTemplate() {
     checkNew(pId, true);
 }
 
-function changeTemplate(newPId, flag) {
+function changeTemplate(newPId) {
     closeNodeWin();
     pId = newPId;
     moduleId = pId;
@@ -1377,9 +1377,6 @@ function changeTemplate(newPId, flag) {
     require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${mode.text}]`);
     title = mode.text;
     showToast('[info] 切换模板为:' + mode.text);
-    if (flag) {
-        installTemplateAllPkg();
-    }
 }
 
 function installTemplateAllPkg() {
@@ -1463,8 +1460,8 @@ function createFile(dom) {
         modal: true,
         viewModel: {
             data: {
-                after: true,
-                before: true,
+                after: execute('userConfig', 'getConfig', ['afterShell']),
+                before: execute('userConfig', 'getConfig', ['beforeShell']),
             }
         },
         tbar: [
@@ -1474,7 +1471,12 @@ function createFile(dom) {
                 fieldLabel: '执行创建前脚本',
                 inputValue: 'before',
                 labelWidth: 110,
-                boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`
+                boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`,
+                onChange: function (v, o) {
+                    if (v != o) {
+                        execute('userConfig', 'setConfig', ['beforeShell', v]);
+                    }
+                }
             }, '-',
             {
                 xtype: 'checkbox',
@@ -1482,7 +1484,12 @@ function createFile(dom) {
                 fieldLabel: '执行创建后脚本',
                 name: 'after',
                 labelWidth: 110,
-                boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`
+                boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`,
+                onChange: function (v, o) {
+                    if (v != o) {
+                        execute('userConfig', 'setConfig', ['afterShell', v]);
+                    }
+                }
             }
         ],
         items: {
