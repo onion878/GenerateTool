@@ -1789,12 +1789,14 @@ function setDefaultUrl() {
             const oldVersion = utils.getVersion();
             if (d.version != oldVersion) {
                 showToast(`检测到新版本(${d.version}),开始下载安装包...`);
-                utils.downloadFile(`GenerateTool Setup ${d.version}.exe`, `GenerateTool Setup ${d.version}.exe`).then(d => {
+                utils.downloadFile(`GenerateTool-Setup-v${d.version}.exe`, `GenerateTool-Setup-v${d.version}.exe`).then(d => {
                     showConfirm(`安装包下载成功是否退出并安装更新?`, function (text) {
                         try {
                             utils.runFile(d);
-                            const {app} = require('electron').remote;
-                            app.exit(0);
+                            setTimeout(() => {
+                                const {app} = require('electron').remote;
+                                app.exit(0);
+                            }, 1000);
                         } catch (e) {
                             showErrorFlag();
                             showError('[error] 安装失败,请使用管理员打开或直接在文件夹安装,更新包路径为:' + d);
@@ -1803,7 +1805,7 @@ function setDefaultUrl() {
                 });
             } else {
                 const p = execute('help', 'getDataPath');
-                jsCode.deleteFile(p + `/GenerateTool Setup ${oldVersion}.exe`);
+                jsCode.deleteFile(p + `/GenerateTool-Setup-v${oldVersion}.exe`);
             }
         } catch (e) {
             console.log(e);

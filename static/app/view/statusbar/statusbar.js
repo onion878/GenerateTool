@@ -66,7 +66,9 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
         that.progress.updateProgress(value, text, true);
     },
     closeProgress: function () {
-        this.progress.hide();
+        if (this.progress != null) {
+            this.progress.hide();
+        }
     },
     initComponent: function () {
         let style = '';

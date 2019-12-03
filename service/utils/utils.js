@@ -218,15 +218,15 @@ class Utils {
             let total = 0;
             r.on('response', function (res) {
                 total = parseInt(res.headers['content-length']);
-                if (fs.existsSync(p + '/' + f)) {
-                    if(total == fs.statSync(p + '/' + f).size) {
+                if (fs.existsSync(p + f)) {
+                    if (total == fs.statSync(p + f).size) {
                         resolve(p + f);
                         r.abort();
                         return;
                     }
                 }
                 if (res.statusCode == 200) {
-                    const re = res.pipe(fs.createWriteStream(p + '/' + f));
+                    const re = res.pipe(fs.createWriteStream(p + f));
                     re.on('finish', () => {
                         resolve(p + f);
                     });
