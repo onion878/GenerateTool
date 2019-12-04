@@ -61,11 +61,11 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                 utils.downloadFile(data.User + '/' + data.Id + '.zip', data.Id + '.zip').then(d => {
                                     if (local === null) {
                                         jsCode.importModule(d, "", data.Pid, data.Id).then(({msg, pId}) => {
-                                            showToast('[info] [' + data.Name + ']下载成功!');
+                                            showToast('[success] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);
                                             setTimeout(() => {
                                                 Ext.getCmp('main-content').unmask();
-                                                showConfirm(`下载成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
+                                                showConfirm(`下载成功,是否切换到[${data.Name}]模板?`, function (text) {
                                                     changeTemplate(pId, true);
                                                 }, undefined, Ext.MessageBox.QUESTION);
                                             }, 500);
@@ -77,7 +77,7 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                         });
                                     } else {
                                         jsCode.updateTemplate(d, local, data).then(msg => {
-                                            showToast('[info] [' + data.Name + ']下载成功!');
+                                            showToast('[success] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);
                                             if (execute('history', 'getMode') == local.id) {
                                                 changeTemplate(local.id, true);
@@ -85,7 +85,7 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                             }
                                             setTimeout(() => {
                                                 Ext.getCmp('main-content').unmask();
-                                                showConfirm(`更新成功,是否切换到[${data.Name}]模板,并安装Lib?`, function (text) {
+                                                showConfirm(`更新成功,是否切换到[${data.Name}]模板?`, function (text) {
                                                     changeTemplate(local.id, true);
                                                 }, view, Ext.MessageBox.QUESTION);
                                             }, 500);

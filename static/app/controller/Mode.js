@@ -714,7 +714,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 values.forEach((v, i) => {
                     const btn = Ext.getCmp(conData[i].id),
                         type = btn.bType;
-                    showToast('[info] 执行结果:' + JSON.stringify(v));
+                    showToast('[success] 执行结果:' + JSON.stringify(v));
                     that.setComponentValue(type, btn, v);
                 });
                 Ext.getCmp('main-content').unmask();
@@ -726,7 +726,7 @@ Ext.define('OnionSpace.controller.Mode', {
         }, btn, Ext.MessageBox.QUESTION);
     },
     getCodeValue(valStr, bId, cId) {
-        if (valStr.trim().length == 0) {
+        if (utils.isEmpty(valStr)) {
             execute('controlData', 'removeCode', [bId]);
             return;
         }
@@ -734,8 +734,7 @@ Ext.define('OnionSpace.controller.Mode', {
         return nodeRun(valStr);
     },
     getCodeData(valStr, bId, cId) {
-        if (valStr.trim().length == 0) {
-            showToast('[warn] 没有执行的脚本!');
+        if (utils.isEmpty(valStr)) {
             execute('controlData', 'removeCode', [bId]);
             return;
         }
@@ -756,7 +755,7 @@ Ext.define('OnionSpace.controller.Mode', {
         if (d instanceof Promise) {
             d.then(v => {
                 showToast('[info] 需要执行的脚本:' + valStr);
-                showToast('[info] 执行结果:' + JSON.stringify(v));
+                showToast('[success] 执行结果:' + JSON.stringify(v));
                 this.setComponentValue(type, btn, v);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
@@ -765,7 +764,7 @@ Ext.define('OnionSpace.controller.Mode', {
             });
         } else {
             showToast('[info] 需要执行的脚本:' + valStr);
-            showToast('[info] 执行结果:' + JSON.stringify(d));
+            showToast('[success] 执行结果:' + JSON.stringify(d));
             this.setComponentValue(type, btn, d);
             Ext.getCmp('main-content').unmask();
         }
@@ -844,7 +843,7 @@ Ext.define('OnionSpace.controller.Mode', {
         } else if (type == 'file') {
             btn.up('container').down('filefield').setRawValue(v);
         } else if (type == 'folder') {
-            btn.up('container').down('filefield').setRawValue(v);
+            btn.up('container').down('textfield').setRawValue(v);
         } else if (type == 'json') {
             const g = btn.up('container').down('propertygrid');
             g.setSource(v);

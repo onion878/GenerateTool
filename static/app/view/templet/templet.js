@@ -141,7 +141,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                         const file = data.folder + data.text + '.zip';
                                                         const param = {info: v, name: d.text};
                                                         utils.uploadFile(file, file, param, token).then(c => {
-                                                            showToast(c.message);
+                                                            showToast('[success] ' + data.text + ' ' + c.message);
                                                             if (c.serveId) {
                                                                 execute('parentData', 'updateTemplate', [d.id, c.serveId, c.detailId]);
                                                             }
@@ -199,7 +199,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                             app.exit(0);
                                         } else {
                                             el.unmask();
-                                            showToast(`[info] 模板[${data.text}]删除成功!`);
+                                            showToast(`[success] 模板[${data.text}]删除成功!`);
                                         }
                                     });
                                 }, this, Ext.MessageBox.ERROR);

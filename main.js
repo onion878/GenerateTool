@@ -205,16 +205,17 @@ function createMainWindow(dataId) {
                 {
                     label: '关于',
                     click() {
-                        dialog.showMessageBox(
+                        const info = `Version: ${systemConfig.getConfig('version')}\r\tChrome: ${process.versions["chrome"]}\r\tNode: ${
+                            process.versions["node"]
+                        }\r\tElectron: ${
+                            process.versions["electron"]
+                        }\r\tAuthor: Onion\r\tEmail: a2214839296a@gmail.com`;
+                        dialog.showMessageBox(mainWindow,
                             {
                                 type: "info",
                                 title: "关于",
                                 message: "代码创建工具",
-                                detail: `Version: ${systemConfig.getConfig('version')}\r\tChrome: ${process.versions["chrome"]}\r\tNode: ${
-                                    process.versions["node"]
-                                }\r\tElectron: ${
-                                    process.versions["electron"]
-                                }\r\tAuthor: Onion\r\tEmail: 2419186601@qq.com`
+                                detail: info
                             }
                         ).then(() => {
                         });

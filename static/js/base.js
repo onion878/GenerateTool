@@ -65,6 +65,8 @@ amdRequire(['vs/editor/editor.main'], function () {
                 [/\[WARN.*/, "custom-warn"],
                 [/\[info.*/, "custom-info"],
                 [/\[INFO.*/, "custom-info"],
+                [/\[success.*/, "custom-success"],
+                [/\[SUCCESS.*/, "custom-success"],
                 [/\[[12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) (0[1-9]|[0-9]\d|3[01]):(0[1-9]|[0-9]\d|3[01]):(0[1-9]|[0-9]\d|3[01])+\]/, "custom-date"]
             ]
         }
@@ -77,6 +79,7 @@ amdRequire(['vs/editor/editor.main'], function () {
         rules: [
             {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},
             {token: 'custom-info', foreground: '26c6da'},
+            {token: 'custom-success', foreground: '2962ff'},
             {token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold'},
             {token: 'custom-warn', foreground: 'FFA500'},
             {token: 'custom-date', foreground: '008800'}

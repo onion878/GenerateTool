@@ -36,7 +36,7 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
                         if(runWin != null) {
                             nodeRun(val);
                         }
-                        showToast('[info] swig模板应用成功!');
+                        showToast('[success] swig模板应用成功!');
                     } catch (e) {
                         console.log(e);
                         showError(e);

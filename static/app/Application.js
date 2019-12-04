@@ -265,7 +265,14 @@ function initMainView() {
                                                                 },
                                                                 queryMode: 'local',
                                                                 displayField: 'text',
-                                                                valueField: 'id'
+                                                                valueField: 'id',
+                                                                listeners: {
+                                                                    afterrender: function(field) {
+                                                                        Ext.defer(function() {
+                                                                            field.focus(true, 100);
+                                                                        }, 1);
+                                                                    }
+                                                                }
                                                             },
                                                             buttonAlign: 'center',
                                                             buttons: [{
@@ -316,7 +323,14 @@ function initMainView() {
                                                             modal: true,
                                                             items: {
                                                                 xtype: 'textfield',
-                                                                margin: '10'
+                                                                margin: '10',
+                                                                listeners: {
+                                                                    afterrender: function(field) {
+                                                                        Ext.defer(function() {
+                                                                            field.focus(true, 100);
+                                                                        }, 1);
+                                                                    }
+                                                                }
                                                             },
                                                             buttonAlign: 'center',
                                                             buttons: [{
@@ -535,7 +549,14 @@ function initMainView() {
                                                                             fieldLabel: '名称',
                                                                             margin: '10',
                                                                             labelWidth: 45,
-                                                                            name: 'name'
+                                                                            name: 'name',
+                                                                            listeners: {
+                                                                                afterrender: function(field) {
+                                                                                    Ext.defer(function() {
+                                                                                        field.focus(true, 100);
+                                                                                    }, 1);
+                                                                                }
+                                                                            }
                                                                         },
                                                                             {
                                                                                 xtype: 'radiogroup',
@@ -701,7 +722,7 @@ function initMainView() {
                                                             text: '重命名',
                                                             icon: 'images/edit.svg',
                                                             handler: function () {
-                                                                showPrompt('名称', '', function (val) {
+                                                                showPrompt('新名称', '', function (val) {
                                                                     if (val.trim().length > 0) {
                                                                         execute('fileData', 'updateName', [record.get('id'), val]);
                                                                         record.set('text', val);
@@ -982,7 +1003,14 @@ function initMainView() {
                                 fieldLabel: '名称',
                                 margin: '10',
                                 labelWidth: 45,
-                                name: 'name'
+                                name: 'name',
+                                listeners: {
+                                    afterrender: function(field) {
+                                        Ext.defer(function() {
+                                            field.focus(true, 100);
+                                        }, 1);
+                                    }
+                                }
                             },
                             {
                                 xtype: 'radiogroup',
@@ -1294,7 +1322,7 @@ function checkNew(id, flag) {
                             utils.downloadFile(jsonResp.User + '/' + jsonResp.Id + '.zip', jsonResp.Id + '.zip').then(d => {
                                 jsCode.updateTemplate(d, local, jsonResp).then(msg => {
                                     Ext.getCmp('main-content').unmask();
-                                    showToast('[info] 更新成功!');
+                                    showToast('[success] 更新成功!');
                                     jsCode.deleteFile(d);
                                     if (execute('history', 'getMode') == local.id) {
                                         changeTemplate(local.id);
@@ -1562,7 +1590,7 @@ function createFile(dom) {
                     setTimeout(() => {
                         if (before) {
                             nodeRun('(function(){' + execute('geFileData', 'getBeforeShell', [pId]) + '})();').then(d => {
-                                showToast('[info] 创建前JS脚本执行成功');
+                                showToast('[success] 创建前JS脚本执行成功');
                                 win.setProgressBar(0.2);
                                 selected.map((row, i) => {
                                     const f = row.data;
@@ -1603,7 +1631,7 @@ function createFile(dom) {
                                         content: f.preview,
                                         oldContent: oldContent
                                     }]);
-                                    showToast('[info] ' + f.name + ' 生成成功!');
+                                    showToast('[success] ' + f.name + ' 生成成功!');
                                     if (after) {
                                         const progressVal = (0.6 / selected.length) * (i + 1) + 0.2;
                                         win.setProgressBar(progressVal);
@@ -1614,10 +1642,10 @@ function createFile(dom) {
                                         Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                     }
                                 });
-                                showToast('[info] 文件创建完成');
+                                showToast('[success] 文件创建完成');
                                 if (after) {
                                     nodeRun('(function(){' + execute('geFileData', 'getShell', [pId]) + '})();').then(d => {
-                                        showToast('[info] 创建后JS脚本执行成功');
+                                        showToast('[success] 创建后JS脚本执行成功');
                                         Ext.getCmp('main-content').unmask();
                                         win.setProgressBar(1);
                                         setTimeout(() => {
@@ -1713,7 +1741,7 @@ function createFile(dom) {
                                     content: f.preview,
                                     oldContent: oldContent
                                 }]);
-                                showToast('[info] ' + f.name + ' 生成成功!');
+                                showToast('[success] ' + f.name + ' 生成成功!');
                                 if (after) {
                                     const progressVal = (0.8 / selected.length) * (i + 1);
                                     win.setProgressBar(progressVal);
@@ -1727,7 +1755,7 @@ function createFile(dom) {
                             showToast('[info] 文件创建完成');
                             if (after) {
                                 nodeRun('(function(){' + execute('geFileData', 'getShell', [pId]) + '})();').then(d => {
-                                    showToast('[info] 创建后JS脚本执行成功');
+                                    showToast('[success] 创建后JS脚本执行成功');
                                     Ext.getCmp('main-content').unmask();
                                     win.setProgressBar(1);
                                     Ext.getCmp('msg-bar').setProgress(`生成完成`, 1);
