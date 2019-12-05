@@ -18,7 +18,7 @@
     "name": "Test",
     "操作": {
       "width": 80,
-      "html": '<i onclick="eval(req('tools').openFile('${file}'))" title="打开" style="cursor: pointer" class="far fa-edit"></i>'
+      "html": `<i onclick="eval(req('tools').openFile('${file}'))" title="打开" style="cursor: pointer" class="far fa-edit"></i>`
     }
   }
 ]
