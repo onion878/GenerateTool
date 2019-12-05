@@ -266,8 +266,8 @@ function initMainView() {
                                                                 displayField: 'text',
                                                                 valueField: 'id',
                                                                 listeners: {
-                                                                    afterrender: function(field) {
-                                                                        Ext.defer(function() {
+                                                                    afterrender: function (field) {
+                                                                        Ext.defer(function () {
                                                                             field.focus(true, 100);
                                                                         }, 1);
                                                                     }
@@ -324,8 +324,8 @@ function initMainView() {
                                                                 xtype: 'textfield',
                                                                 margin: '10',
                                                                 listeners: {
-                                                                    afterrender: function(field) {
-                                                                        Ext.defer(function() {
+                                                                    afterrender: function (field) {
+                                                                        Ext.defer(function () {
                                                                             field.focus(true, 100);
                                                                         }, 1);
                                                                     }
@@ -550,8 +550,8 @@ function initMainView() {
                                                                             labelWidth: 45,
                                                                             name: 'name',
                                                                             listeners: {
-                                                                                afterrender: function(field) {
-                                                                                    Ext.defer(function() {
+                                                                                afterrender: function (field) {
+                                                                                    Ext.defer(function () {
                                                                                         field.focus(true, 100);
                                                                                     }, 1);
                                                                                 }
@@ -1004,8 +1004,8 @@ function initMainView() {
                                 labelWidth: 45,
                                 name: 'name',
                                 listeners: {
-                                    afterrender: function(field) {
-                                        Ext.defer(function() {
+                                    afterrender: function (field) {
+                                        Ext.defer(function () {
                                             field.focus(true, 100);
                                         }, 1);
                                     }
@@ -1816,6 +1816,8 @@ function setDefaultUrl() {
             execute('userConfig', 'setDefaultUrl', [d.url]);
             const oldVersion = utils.getVersion();
             if (d.version != oldVersion) {
+                const platform = process.platform;
+                if (platform != 'win32') return;
                 showToast(`[info] 检测到新版本(${d.version}),开始下载安装包...`);
                 utils.downloadFile(`GenerateTool-Setup-v${d.version}.exe`, `GenerateTool-Setup-v${d.version}.exe`).then(d => {
                     showToast(`[success] 下载成功(路径为:${d})!`);
