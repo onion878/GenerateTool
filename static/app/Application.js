@@ -11,7 +11,6 @@ function execute(key, method, args) {
     return ipcRenderer.sendSync('run', {key: key, method: method, args: args});
 }
 
-setDefaultUrl();
 let title = '数据模板';
 let consoleShowFlag = false;
 let pId = execute('history', 'getMode');
@@ -1119,6 +1118,7 @@ function initMainView() {
             document.body.style.opacity = execute('userConfig', 'getOpacity');
             ipcRenderer.send('loading-success', '加载完成!');
             checkVersion();
+            setDefaultUrl();
         }
     });
 }
@@ -1816,15 +1816,15 @@ function setDefaultUrl() {
             execute('userConfig', 'setDefaultUrl', [d.url]);
             const oldVersion = utils.getVersion();
             if (d.version != oldVersion) {
-                showToast(`检测到新版本(${d.version}),开始下载安装包...`);
+                showToast(`[info] 检测到新版本(${d.version}),开始下载安装包...`);
                 utils.downloadFile(`GenerateTool-Setup-v${d.version}.exe`, `GenerateTool-Setup-v${d.version}.exe`).then(d => {
+                    showToast(`[success] 下载成功(路径为:${d})!`);
                     showConfirm(`安装包下载成功是否退出并安装更新?`, function (text) {
                         try {
+                            const {app} = require('electron').remote;
+                            app.showExitPrompt = false;
+                            app.quit();
                             utils.runFile(d);
-                            setTimeout(() => {
-                                const {app} = require('electron').remote;
-                                app.exit(0);
-                            }, 1000);
                         } catch (e) {
                             showErrorFlag();
                             showError('[error] 安装失败,请使用管理员打开或直接在文件夹安装,更新包路径为:' + d);
