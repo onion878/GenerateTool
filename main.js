@@ -91,7 +91,47 @@ function createMainWindow(dataId) {
     }
     // Open the DevTools. debug
     // mainWindow.webContents.openDevTools();
-    const menu = Menu.buildFromTemplate([
+    const menuItems = [
+        {
+            label: '文件',
+            submenu: [
+                {
+                    id: 'change-mode',
+                    label: '切换模板',
+                    submenu: createFileMenu()
+                },
+                {
+                    label: '新建模板',
+                    click() {
+                        mainWindow.webContents.executeJavaScript('createTemplate();');
+                    }
+                },
+                {type: 'separator'},
+                {
+                    label: '本地模板',
+                    click() {
+                        let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    },
+                },
+                {
+                    label: '在线模板',
+                    click() {
+                        let code = `openSome({id:'online-temp',title:'在线模板',type:'online-temp'})`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                },
+                {
+                    label: '更新模板',
+                    click() {
+                        let code = `updateNowTemplate()`;
+                        mainWindow.webContents.executeJavaScript(code);
+                    }
+                },
+                {type: 'separator'},
+                {label: '退出', role: 'quit'}
+            ]
+        },
         {
             label: '系统',
             submenu: [
@@ -108,6 +148,7 @@ function createMainWindow(dataId) {
                         mainWindow.webContents.openDevTools();
                     }
                 },
+                {type: 'separator'},
                 {
                     label: '系统日志',
                     click() {
@@ -129,6 +170,7 @@ function createMainWindow(dataId) {
                         mainWindow.webContents.executeJavaScript(code);
                     }
                 },
+                {type: 'separator'},
                 {
                     label: '重新启动',
                     click() {
@@ -157,32 +199,6 @@ function createMainWindow(dataId) {
                     label: '停止loading',
                     click() {
                         mainWindow.webContents.executeJavaScript(`Ext.getCmp('main-content').unmask();`);
-                    }
-                }
-            ]
-        },
-        {
-            label: '模板管理',
-            submenu: [
-                {
-                    label: '本地模板',
-                    click() {
-                        let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
-                        mainWindow.webContents.executeJavaScript(code);
-                    },
-                },
-                {
-                    label: '在线模板',
-                    click() {
-                        let code = `openSome({id:'online-temp',title:'在线模板',type:'online-temp'})`;
-                        mainWindow.webContents.executeJavaScript(code);
-                    }
-                },
-                {
-                    label: '更新模板',
-                    click() {
-                        let code = `updateNowTemplate()`;
-                        mainWindow.webContents.executeJavaScript(code);
                     }
                 }
             ]
@@ -223,7 +239,8 @@ function createMainWindow(dataId) {
                 }
             ]
         }
-    ]);
+    ];
+    const menu = Menu.buildFromTemplate(menuItems);
     Menu.setApplicationMenu(menu);
 
     let msgIndex = 0;
@@ -271,6 +288,15 @@ function createMainWindow(dataId) {
         event.returnValue = await need(services[key])[method](...args);
     });
 
+    ipcMain.on('runCode', (event, {type}) => {
+        if (type == 'refreshFile') {
+            menuItems[0].submenu[0].submenu = createFileMenu();
+            const menu = Menu.buildFromTemplate(menuItems);
+            Menu.setApplicationMenu(menu);
+        }
+        event.returnValue = '';
+    });
+
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
         mainWindow = null;
@@ -314,6 +340,29 @@ function createMainWindow(dataId) {
             });
         }
     })
+}
+
+function createFileMenu() {
+    const mode = need('./service/dao/mode'), history = need('./service/dao/history');
+    const files = [], historyId = history.getMode();
+    mode.getAll().forEach(l => {
+        if (l.id == historyId) {
+            files.push({
+                type: 'radio',
+                label: l.text,
+                checked: true,
+                click: () => mainWindow.webContents.executeJavaScript(`changeTemplate('${l.id}');`)
+            });
+        } else {
+            files.push({
+                type: 'radio',
+                label: l.text,
+                checked: false,
+                click: () => mainWindow.webContents.executeJavaScript(`changeTemplate('${l.id}');`)
+            });
+        }
+    });
+    return files;
 }
 
 const gotTheLock = app.requestSingleInstanceLock();

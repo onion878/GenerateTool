@@ -311,71 +311,7 @@ function initMainView() {
                                                 ],
                                                 listeners: {
                                                     click: function () {
-                                                        Ext.create('Ext.window.Window', {
-                                                            title: '模板名称',
-                                                            fixed: true,
-                                                            width: 300,
-                                                            layout: 'fit',
-                                                            animateTarget: this,
-                                                            resizable: false,
-                                                            constrain: true,
-                                                            modal: true,
-                                                            items: {
-                                                                xtype: 'textfield',
-                                                                margin: '10',
-                                                                listeners: {
-                                                                    afterrender: function (field) {
-                                                                        Ext.defer(function () {
-                                                                            field.focus(true, 100);
-                                                                        }, 1);
-                                                                    }
-                                                                }
-                                                            },
-                                                            buttonAlign: 'center',
-                                                            buttons: [{
-                                                                text: '确定',
-                                                                handler: function () {
-                                                                    const field = this.up('window').down('textfield');
-                                                                    const text = field.getRawValue();
-                                                                    if (utils.isEmpty(text)) {
-                                                                        Ext.toast({
-                                                                            html: `<span style="color: red;">请输入名称!</span>`,
-                                                                            autoClose: true,
-                                                                            align: 't',
-                                                                            slideDUration: 400,
-                                                                            maxWidth: 400
-                                                                        });
-                                                                        return;
-                                                                    }
-                                                                    pId = execute('parentData', 'setData', [text]);
-                                                                    this.up('window').close();
-                                                                    moduleId = pId;
-                                                                    execute('history', 'setMode', [pId]);
-                                                                    const root = Ext.getCmp('panel-model').getRootNode();
-                                                                    root.removeAll();
-                                                                    root.appendChild(execute('data', 'getData', [pId]));
-                                                                    execute('history', 'removeAll');
-                                                                    Ext.getCmp('panel-model').setTitle(text);
-                                                                    Ext.getCmp('mainmenutab').removeAll();
-                                                                    try {
-                                                                        eval(execute('geFileData', 'getSwig', [pId]));
-                                                                    } catch (e) {
-                                                                        console.error(e);
-                                                                        showError(e);
-                                                                    }
-                                                                    getFilesData();
-                                                                    jsCode.createFolder(pId);
-                                                                    jsCode.initFile(pId);
-                                                                    setJsData();
-                                                                    command.cdTargetFolder(jsCode.getFolder(pId));
-                                                                }
-                                                            }, {
-                                                                text: '取消',
-                                                                handler: function () {
-                                                                    this.up('window').close();
-                                                                }
-                                                            }]
-                                                        }).show().focus();
+                                                        createTemplate(this);
                                                     }
                                                 }
                                             },
@@ -1281,11 +1217,64 @@ function showConfirm(msg, fn, dom, icon) {
 function doSomeThing(text) {
     switch (text) {
         case '[选择模板]': {
-            Ext.getCmp('main-change-module').getEl().dom.click();
+            Ext.create('Ext.window.Window', {
+                title: '选择模板',
+                width: 300,
+                layout: 'fit',
+                fixed: true,
+                animateTarget: this,
+                resizable: false,
+                constrain: true,
+                modal: true,
+                items: {
+                    xtype: 'combobox',
+                    margin: '10',
+                    store: {
+                        fields: ['id', 'text'],
+                        data: execute('parentData', 'getAll')
+                    },
+                    queryMode: 'local',
+                    displayField: 'text',
+                    valueField: 'id',
+                    listeners: {
+                        afterrender: function (field) {
+                            Ext.defer(function () {
+                                field.focus(true, 100);
+                            }, 1);
+                        }
+                    }
+                },
+                buttonAlign: 'center',
+                buttons: [{
+                    text: '确定',
+                    handler: function () {
+                        const combo = this.up('window').down('combobox');
+                        const row = combo.getSelectedRecord();
+                        if (row === null) {
+                            Ext.toast({
+                                html: `<span style="color: red;">请选择至少一条数据!</span>`,
+                                autoClose: true,
+                                align: 't',
+                                slideDUration: 400,
+                                maxWidth: 400
+                            });
+                            return;
+                        }
+                        this.up('window').close();
+                        changeTemplate(row.id);
+                    }
+                }, {
+                    text: '取消',
+                    handler: function () {
+                        this.up('window').close();
+                    }
+                }
+                ]
+            }).show().focus();
             break;
         }
         case '[创建模板]': {
-            Ext.getCmp('main-create-module').getEl().dom.click();
+            createTemplate();
             break;
         }
         case '[查看详情]': {
@@ -1373,6 +1362,76 @@ function updateNowTemplate() {
     checkNew(pId, true);
 }
 
+function createTemplate(t) {
+    Ext.create('Ext.window.Window', {
+        title: '模板名称',
+        fixed: true,
+        width: 300,
+        layout: 'fit',
+        resizable: false,
+        animateTarget: t,
+        constrain: true,
+        modal: true,
+        items: {
+            xtype: 'textfield',
+            margin: '10',
+            listeners: {
+                afterrender: function (field) {
+                    Ext.defer(function () {
+                        field.focus(true, 100);
+                    }, 1);
+                }
+            }
+        },
+        buttonAlign: 'center',
+        buttons: [{
+            text: '确定',
+            handler: function () {
+                const field = this.up('window').down('textfield');
+                const text = field.getRawValue();
+                if (utils.isEmpty(text)) {
+                    Ext.toast({
+                        html: `<span style="color: red;">请输入名称!</span>`,
+                        autoClose: true,
+                        align: 't',
+                        slideDUration: 400,
+                        maxWidth: 400
+                    });
+                    return;
+                }
+                require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${text}]`);
+                pId = execute('parentData', 'setData', [text]);
+                this.up('window').close();
+                moduleId = pId;
+                execute('history', 'setMode', [pId]);
+                const root = Ext.getCmp('panel-model').getRootNode();
+                root.removeAll();
+                root.appendChild(execute('data', 'getData', [pId]));
+                execute('history', 'removeAll');
+                Ext.getCmp('panel-model').setTitle(text);
+                Ext.getCmp('mainmenutab').removeAll();
+                try {
+                    eval(execute('geFileData', 'getSwig', [pId]));
+                } catch (e) {
+                    console.error(e);
+                    showError(e);
+                }
+                getFilesData();
+                jsCode.createFolder(pId);
+                jsCode.initFile(pId);
+                setJsData();
+                ipcRenderer.send('runCode', {type: 'refreshFile'});
+                command.cdTargetFolder(jsCode.getFolder(pId));
+            }
+        }, {
+            text: '取消',
+            handler: function () {
+                this.up('window').close();
+            }
+        }]
+    }).show().focus();
+}
+
 function changeTemplate(newPId) {
     closeNodeWin();
     pId = newPId;
@@ -1403,6 +1462,7 @@ function changeTemplate(newPId) {
     checkNew(pId);
     Ext.getCmp('main-content').unmask();
     require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${mode.text}]`);
+    ipcRenderer.send('runCode', {type: 'refreshFile'});
     title = mode.text;
     showToast('[info] 切换模板为:' + mode.text);
 }

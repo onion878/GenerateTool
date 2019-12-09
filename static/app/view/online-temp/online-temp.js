@@ -59,6 +59,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                                 jsCode.importModule(d, "", data.Id, jsonResp.Id).then(({msg, pId}) => {
                                                     showToast('[success] [' + data.Name + ']下载成功!');
                                                     jsCode.deleteFile(d);
+                                                    ipcRenderer.send('runCode', {type: 'refreshFile'});
                                                     setTimeout(() => {
                                                         Ext.getCmp('main-content').unmask();
                                                         showConfirm(`下载成功,是否切换到[${data.Name}]模板?`, function (text) {

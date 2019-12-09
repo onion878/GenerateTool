@@ -190,6 +190,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                     el.mask('处理中...');
                                     jsCode.removeModule(data.id).then(() => {
                                         btn.up('templet').getStore().setData(execute('parentData', 'getAll'));
+                                        ipcRenderer.send('runCode', {type: 'refreshFile'});
                                         if (flag) {
                                             execute('history', 'setMode', ['']);
                                             execute('history', 'removeAll');
