@@ -176,7 +176,9 @@ class Utils {
     }
 
     uploadFile(file, name, data, auth) {
+        const that = this;
         return new Promise((resolve, reject) => {
+            const total = fs.lstatSync(file).size;
             data['file'] = {
                 value: fs.createReadStream(file),
                 options: {
@@ -195,22 +197,32 @@ class Utils {
                 },
                 formData: data
             };
-
-            request(options, function (err, res, body) {
+            let q;
+            Ext.getCmp('msg-bar').setProgress(`上传中(${'0 KB to ' + that.formatSizeUnits(total)})...`, 0);
+            const r = request(options, function (err, res, body) {
                 if (err) {
                     console.log(err);
                     reject(err);
                 }
+                clearInterval(q);
+                Ext.getCmp('msg-bar').closeProgress();
                 resolve(JSON.parse(body));
             });
+            q = setInterval(function () {
+                let dispatched = r.req.connection._bytesDispatched;
+                const progressVal = dispatched / total;
+                Ext.getCmp('msg-bar').setProgress(`上传中(${that.formatSizeUnits(dispatched) + ' to ' + that.formatSizeUnits(total)})...`, progressVal);
+            }, 250);
         });
     }
 
-    downloadFile(file, f) {
+    downloadFile(file, f, url) {
         const that = this;
         return new Promise((resolve, reject) => {
-            const userConfig = require('../dao/user');
-            const url = userConfig.getUrl() + '/download/' + file;
+            if (url === undefined) {
+                const userConfig = require('../dao/user');
+                url = userConfig.getUrl() + '/download/' + file;
+            }
             const r = request(url);
             const help = require('./help');
             const p = help.getDataPath();
