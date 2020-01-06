@@ -1930,7 +1930,8 @@ function setDefaultUrl() {
                 const platform = process.platform;
                 if (platform != 'win32') return;
                 showToast(`[info] 检测到新版本(${d.version}),开始下载安装包...`);
-                utils.downloadFile(`GenerateTool-Setup-v${d.version}.exe`, `GenerateTool-Setup-v${d.version}.exe`, d.url + `/download/GenerateTool-Setup-v${d.version}.exe`).then(d => {
+                showToast(`[info] 新版本下载路径为:${d.url}/download/GenerateTool-Setup-v${d.version}.exe`);
+                utils.downloadFile(`GenerateTool-Setup-v${d.version}.exe`, `GenerateTool-Setup-v${d.version}.exe`, `${d.url}/download/GenerateTool-Setup-v${d.version}.exe`).then(d => {
                     showToast(`[success] 下载成功(路径为:${d})!`);
                     showConfirm(`安装包下载成功是否退出并安装更新?`, function () {
                         try {
