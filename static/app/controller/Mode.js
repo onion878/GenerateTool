@@ -668,7 +668,7 @@ Ext.define('OnionSpace.controller.Mode', {
                                     runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
                                         const list = [];
                                         data.forEach(({dataValues}) => {
-                                            dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                            dataValues.detail = JSON.stringify(dataValues.content, null, "\t");
                                             dataValues.content = JSON.stringify(dataValues.content);
                                             list.push(dataValues);
                                         });
@@ -688,7 +688,7 @@ Ext.define('OnionSpace.controller.Mode', {
                                 runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
                                     const list = [];
                                     data.forEach(({dataValues}) => {
-                                        dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                        dataValues.detail = JSON.stringify(dataValues.content, null, "\t");
                                         dataValues.content = JSON.stringify(dataValues.content);
                                         list.push(dataValues);
                                     });
@@ -710,8 +710,8 @@ Ext.define('OnionSpace.controller.Mode', {
                 }),
                 columns: [
                     new Ext.grid.RowNumberer(),
-                    {text: '操作日期', align: 'center', dataIndex: 'date',width: 180},
-                    {text: '操作结果', align: 'center', dataIndex: 'content',  flex: 1},
+                    {text: '操作日期', align: 'center', dataIndex: 'date', width: 180},
+                    {text: '操作结果', align: 'center', dataIndex: 'content', flex: 1},
                     {
                         xtype: 'actioncolumn',
                         width: 60,
@@ -727,7 +727,7 @@ Ext.define('OnionSpace.controller.Mode', {
                                         const list = [];
                                         runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
                                             data.forEach(({dataValues}) => {
-                                                dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                                dataValues.detail = JSON.stringify(dataValues.content, null, "\t");
                                                 dataValues.content = JSON.stringify(dataValues.content);
                                                 list.push(dataValues);
                                             });
@@ -773,7 +773,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
                             const list = [];
                             data.forEach(({dataValues}) => {
-                                dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                dataValues.detail = JSON.stringify(dataValues.content, null, "\t");
                                 dataValues.content = JSON.stringify(dataValues.content);
                                 list.push(dataValues);
                             });
@@ -864,6 +864,9 @@ Ext.define('OnionSpace.controller.Mode', {
                 conData = execute('controlData', 'getAllCode', [id]);
             closeNodeWin();
             conData.forEach(d => {
+                if (d.value === undefined || d.value === null || d.value.toString().trim().length == 0) {
+                    return;
+                }
                 try {
                     reData.push(that.getCodeValue(d.value, d.id, d.cId));
                     showToast('[info] 需要执行的脚本:' + d.value);
@@ -874,6 +877,11 @@ Ext.define('OnionSpace.controller.Mode', {
                     Ext.getCmp('main-content').unmask();
                 }
             });
+            if(reData.length == 0) {
+                showToast('[error] 没有设置可执行的脚本!');
+                Ext.getCmp('main-content').unmask();
+                return;
+            }
             Promise.all(reData).then(values => {
                 const data = {};
                 values.forEach((v, i) => {
@@ -907,7 +915,7 @@ Ext.define('OnionSpace.controller.Mode', {
     },
     getCodeData(valStr, bId, cId) {
         if (utils.isEmpty(valStr)) {
-            execute('controlData', 'removeCode', [bId]);
+            showToast('[error] 没有设置可执行的脚本!');
             return;
         }
         execute('controlData', 'setCode', [bId, valStr, cId]);
@@ -970,7 +978,7 @@ Ext.define('OnionSpace.controller.Mode', {
             const grid = btn.up('container').down('grid');
             const columns = [new Ext.grid.RowNumberer()],
                 fields = [];
-            if (v.length > 0) {
+            if (v && v.length > 0) {
                 const col = v[0];
                 for (let key in col) {
                     if (key != null && key == '操作') {
@@ -1005,7 +1013,7 @@ Ext.define('OnionSpace.controller.Mode', {
             store.setFields(fields);
             store.setData(v);
             grid.reconfigure(store, columns);
-            if (v.length > 0) {
+            if (v && v.length > 0) {
                 const d = {};
                 for (let k in v[0]) {
                     d[k] = `ArrayJSON: ... -> ${k}`;
