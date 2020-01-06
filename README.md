@@ -25,6 +25,8 @@ git clone https://github.com/onion878/GenerateTool.git
 npm install --global windows-build-tools
 # 进入项目
 cd GenerateTool 
+# 安装sqlite3依赖
+npm install sqlite3 --build-from-source --runtime=electron --target=7.1.2 --dist-url=https://atom.io/download/electron
 # 安装依赖
 npm install
 # 启动项目

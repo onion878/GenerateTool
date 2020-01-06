@@ -2,6 +2,7 @@ const fs = require('fs');
 const help = require('./help');
 const utils = require('./utils');
 const pack = require('../dao/package');
+const need = require('require-uncached');
 const controls = require('../dao/controls');
 const del = require('del');
 const archiver = require('archiver');
@@ -196,22 +197,22 @@ class JscodeUtil {
 
     getAllExportData(id, newId) {
         const data = {controls: {}, file: {}, gefile: {}, mode: {}, modeData: {}, package: {}};
-        const controls = require('../dao/controls.js');
+        const controls = need('../dao/controls.js');
         const controlsData = controls.getExtByPid(id);
         data.controls['ext'] = controlsData;
         data.controls['code'] = controls.getCodeByPid(id);
-        const file = require('../dao/file.js');
+        const file = need('../dao/file.js');
         data.file['data'] = file.getExportData(id);
-        const gefile = require('../dao/gefile.js');
+        const gefile = need('../dao/gefile.js');
         data.gefile['data'] = gefile.getFileData(id);
         data.gefile['swig'] = gefile.getFileSwig(id);
         data.gefile['shell'] = gefile.getFileShell(id);
         data.gefile['beforeShell'] = gefile.getFilBeforeShell(id);
-        const mode = require('../dao/mode.js');
+        const mode = need('../dao/mode.js');
         data.mode['data'] = [mode.getById(id)];
-        const modeData = require('../dao/modeData.js');
+        const modeData = need('../dao/modeData.js');
         data.modeData['data'] = modeData.getData(id);
-        const pack = require('../dao/package.js');
+        const pack = need('../dao/package.js');
         data.package['data'] = pack.getAll(id);
         if (newId) {
             delete data.mode['data'][0].serveId;
@@ -273,12 +274,12 @@ class JscodeUtil {
                             mode['data'].forEach(e => e.detailId = detailId);
                         }
                         pack['data'].forEach(e => e.pId = pId);
-                        require('../dao/controls.js').addAllData(controls);
-                        require('../dao/file.js').addAllData(file);
-                        require('../dao/gefile.js').addAllData(gefile);
-                        require('../dao/mode.js').addAllData(mode);
-                        require('../dao/modeData.js').addAllData(modeData);
-                        require('../dao/package.js').addAllData(pack);
+                        need('../dao/controls.js').addAllData(controls);
+                        need('../dao/file.js').addAllData(file);
+                        need('../dao/gefile.js').addAllData(gefile);
+                        need('../dao/mode.js').addAllData(mode);
+                        need('../dao/modeData.js').addAllData(modeData);
+                        need('../dao/package.js').addAllData(pack);
                         del([dir], {force: true});
                         resolve({msg: `[${mode.data[0].text}]导入成功!`, pId: pId});
                     } else {
@@ -316,12 +317,12 @@ class JscodeUtil {
                                 mode['data'].forEach(e => e.detailId = detailId);
                             }
                             pack['data'].forEach(e => e.pId = pId);
-                            require('../dao/controls.js').addAllData(controls);
-                            require('../dao/file.js').addAllData(file);
-                            require('../dao/gefile.js').addAllData(gefile);
-                            require('../dao/mode.js').addAllData(mode);
-                            require('../dao/modeData.js').addAllData(modeData);
-                            require('../dao/package.js').addAllData(pack);
+                            need('../dao/controls.js').addAllData(controls);
+                            need('../dao/file.js').addAllData(file);
+                            need('../dao/gefile.js').addAllData(gefile);
+                            need('../dao/mode.js').addAllData(mode);
+                            need('../dao/modeData.js').addAllData(modeData);
+                            need('../dao/package.js').addAllData(pack);
                             del([dir], {force: true});
                             resolve({msg: `[${mode.data[0].text}]导入成功!`, pId: pId});
                         });
@@ -343,12 +344,12 @@ class JscodeUtil {
                     const data = JSON.parse(utils.readFile(`${dir}/data.json`));
                     const controls = data['controls'], file = data['file'], gefile = data['gefile'],
                         modeData = data['modeData'], pack = data['package'];
-                    require('../dao/controls.js').updateAll({...controls, pId: local.id});
-                    require('../dao/file.js').updateAll({...file, pId: local.id});
-                    require('../dao/gefile.js').updateAll({...gefile, pId: local.id});
-                    require('../dao/mode.js').updateTemplate(local.id, local.serveId, tempData.Id);
-                    require('../dao/modeData.js').updateAll({...modeData, pId: local.id});
-                    require('../dao/package.js').updateAll({...pack, pId: local.id});
+                    need('../dao/controls.js').updateAll({...controls, pId: local.id});
+                    need('../dao/file.js').updateAll({...file, pId: local.id});
+                    need('../dao/gefile.js').updateAll({...gefile, pId: local.id});
+                    need('../dao/mode.js').updateTemplate(local.id, local.serveId, tempData.Id);
+                    need('../dao/modeData.js').updateAll({...modeData, pId: local.id});
+                    need('../dao/package.js').updateAll({...pack, pId: local.id});
                     if (fs.existsSync(dir + '/' + local.id)) {
                         that.copyDir(dir + '/' + local.id, codeFolder, function (err) {
                             if (err) {
@@ -459,12 +460,12 @@ class JscodeUtil {
     }
 
     removeModule(pId) {
-        require('../dao/controls.js').removeAll(pId);
-        require('../dao/file.js').removeAll(pId);
-        require('../dao/gefile.js').removeAll(pId);
-        require('../dao/mode.js').removeAll(pId);
-        require('../dao/modeData.js').removeAll(pId);
-        require('../dao/package.js').removeAll(pId);
+        need('../dao/controls.js').removeAll(pId);
+        need('../dao/file.js').removeAll(pId);
+        need('../dao/gefile.js').removeAll(pId);
+        need('../dao/mode.js').removeAll(pId);
+        need('../dao/modeData.js').removeAll(pId);
+        need('../dao/package.js').removeAll(pId);
         const path = help.getDataPath();
         return new Promise((resolve, reject) => {
             del([`${path}jscode/${pId}`], {force: true}).then((p) => {

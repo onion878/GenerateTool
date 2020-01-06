@@ -3,12 +3,31 @@ const jsCode = require('../service/utils/JscodeUtil');
 const swig = require('swig');
 const utils = require('../service/utils/utils');
 const command = require('../service/utils/commands');
+let threadIndex = 0;
 
 function execute(key, method, args) {
     if (args === undefined) {
         args = [];
     }
     return ipcRenderer.sendSync('run', {key: key, method: method, args: args});
+}
+
+function runMethod(key, method, args) {
+    threadIndex++;
+    if (args === undefined) {
+        args = [];
+    }
+    ipcRenderer.send('runServe', {thread: 'method-' + threadIndex, key: key, method: method, args: args});
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once('method-' + threadIndex + '-reply', (event, data) => {
+            ipcRenderer.removeAllListeners('method-' + threadIndex + '-reply');
+            if (data.success) {
+                resolve(data.data);
+            } else {
+                reject(data.data);
+            }
+        });
+    })
 }
 
 let title = '数据模板';
@@ -1646,8 +1665,13 @@ function createFile(dom) {
                     const grid = this.up('window').down('grid');
                     const selected = grid.getSelectionModel().getSelection();
                     this.up('window').close();
-                    let operationId = null;
-                    setTimeout(() => {
+                    runMethod('operation', 'create', [{
+                        pId: pId,
+                        name: `[${execute('parentData', 'getById', [pId]).text}]`,
+                        success: true,
+                        date: utils.getNowTime()
+                    }]).then(({dataValues}) => {
+                        const operationId = dataValues.id;
                         if (before) {
                             nodeRun('(function(){' + execute('geFileData', 'getBeforeShell', [pId]) + '})();').then(d => {
                                 showToast('[success] 创建前JS脚本执行成功');
@@ -1662,6 +1686,11 @@ function createFile(dom) {
                                             console.error(e);
                                             showError(f.file + ':模板错误');
                                             Ext.getCmp('main-content').unmask();
+                                            runMethod('operation', 'update', [{
+                                                id: operationId,
+                                                success: false,
+                                                errMsg: e.toString()
+                                            }]);
                                             throw e;
                                         }
                                     } else {
@@ -1671,25 +1700,26 @@ function createFile(dom) {
                                         } catch (e) {
                                             console.error(e);
                                             showError(e);
+                                            runMethod('operation', 'update', [{
+                                                id: operationId,
+                                                success: false,
+                                                errMsg: e.toString()
+                                            }]);
                                             Ext.getCmp('main-content').unmask();
                                             throw e;
                                         }
                                     }
-                                    const oldContent = utils.readFile(f.name);
+                                    const oldContent = f.flag == '是' ? utils.readFile(f.name) : null;
                                     utils.createFile(f.name, f.preview);
-                                    operationId = execute('operation', 'setOperation', [{
-                                        id: operationId,
-                                        date: utils.getNowTime(),
-                                        pId: pId,
-                                        name: `[${execute('parentData', 'getById', [pId]).text}]`
-                                    }, {
+                                    runMethod('operationDetail', 'create', [{
                                         pId: operationId,
                                         date: utils.getNowTime(),
                                         type: f.type,
                                         file: f.name,
                                         tempId: f.id,
                                         content: f.preview,
-                                        oldContent: oldContent
+                                        oldContent: oldContent,
+                                        flag: f.flag == '是'
                                     }]);
                                     showToast('[success] ' + f.name + ' 生成成功!');
                                     if (after) {
@@ -1723,6 +1753,11 @@ function createFile(dom) {
                                         Ext.getCmp('main-content').unmask();
                                         win.setProgressBar(-1);
                                         Ext.getCmp('msg-bar').closeProgress();
+                                        runMethod('operation', 'update', [{
+                                            id: operationId,
+                                            success: false,
+                                            errMsg: e.toString()
+                                        }]);
                                         new Notification('代码创建失败', {
                                             body: `[${title}]代码创建失败, 错误信息:${e}`,
                                             icon: 'images/error.png'
@@ -1744,6 +1779,11 @@ function createFile(dom) {
                                 Ext.getCmp('main-content').unmask();
                                 win.setProgressBar(-1);
                                 Ext.getCmp('msg-bar').closeProgress();
+                                runMethod('operation', 'update', [{
+                                    id: operationId,
+                                    success: false,
+                                    errMsg: e.toString()
+                                }]);
                                 new Notification('代码创建失败', {
                                     body: `[${title}]代码创建失败, 错误信息:${e}`,
                                     icon: 'images/error.png'
@@ -1762,6 +1802,11 @@ function createFile(dom) {
                                         Ext.getCmp('main-content').unmask();
                                         win.setProgressBar(-1);
                                         Ext.getCmp('msg-bar').closeProgress();
+                                        runMethod('operation', 'update', [{
+                                            id: operationId,
+                                            success: false,
+                                            errMsg: e.toString()
+                                        }]);
                                         new Notification('代码创建失败', {
                                             body: `[${title}]代码创建失败, 错误信息:${e}`,
                                             icon: 'images/error.png'
@@ -1778,6 +1823,11 @@ function createFile(dom) {
                                         Ext.getCmp('main-content').unmask();
                                         win.setProgressBar(-1);
                                         Ext.getCmp('msg-bar').closeProgress();
+                                        runMethod('operation', 'update', [{
+                                            id: operationId,
+                                            success: false,
+                                            errMsg: e.toString()
+                                        }]);
                                         new Notification('代码创建失败', {
                                             body: `[${title}]代码创建失败, 错误信息:${e}`,
                                             icon: 'images/error.png'
@@ -1785,21 +1835,17 @@ function createFile(dom) {
                                         throw e;
                                     }
                                 }
-                                const oldContent = utils.readFile(f.name);
+                                const oldContent = f.flag == '是' ? utils.readFile(f.name) : null;
                                 utils.createFile(f.name, f.preview);
-                                operationId = execute('operation', 'setOperation', [{
-                                    id: operationId,
-                                    date: utils.getNowTime(),
-                                    pId: pId,
-                                    name: `[${execute('parentData', 'getById', [pId]).text}]`
-                                }, {
+                                runMethod('operationDetail', 'create', [{
                                     pId: operationId,
                                     date: utils.getNowTime(),
                                     type: f.type,
                                     file: f.name,
                                     tempId: f.id,
                                     content: f.preview,
-                                    oldContent: oldContent
+                                    oldContent: oldContent,
+                                    flag: f.flag == '是'
                                 }]);
                                 showToast('[success] ' + f.name + ' 生成成功!');
                                 if (after) {
@@ -1834,6 +1880,11 @@ function createFile(dom) {
                                     Ext.getCmp('main-content').unmask();
                                     win.setProgressBar(-1);
                                     Ext.getCmp('msg-bar').closeProgress();
+                                    runMethod('operation', 'update', [{
+                                        id: operationId,
+                                        success: false,
+                                        errMsg: e.toString()
+                                    }]);
                                     new Notification('代码创建失败', {
                                         body: `[${title}]代码创建失败, 错误信息:${e}`,
                                         icon: 'images/error.png'
@@ -1849,7 +1900,7 @@ function createFile(dom) {
                                 });
                             }
                         }
-                    }, 500);
+                    });
                 }
             },
             {

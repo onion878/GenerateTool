@@ -109,7 +109,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                         });
                                     }
                                 });
-                            }, undefined, Ext.MessageBox.QUESTION);
+                            }, e.target, Ext.MessageBox.QUESTION);
                         }
                     },
                     {
@@ -123,9 +123,14 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                 p.unmask();
                                 Ext.create('Ext.window.Window', {
                                     title: '模板说明',
-                                    width: '80%',
+                                    width: '75%',
+                                    height: '75%',
                                     layout: 'fit',
+                                    resizable: true,
                                     maximizable: true,
+                                    constrain: true,
+                                    modal: true,
+                                    animateTarget: e.target,
                                     items: [{
                                         xtype: 'detail-temp',
                                         dataId: data.Id

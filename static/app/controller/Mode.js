@@ -15,6 +15,9 @@ Ext.define('OnionSpace.controller.Mode', {
             },
             'toolbar button[action=sort]': {
                 click: this.sort
+            },
+            'toolbar button[action=showHistory]': {
+                click: this.showHistory
             }
         });
     },
@@ -423,7 +426,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         handler: function (btn) {
                             const remote = require('electron').remote;
                             const dialog = remote.dialog;
-                            dialog.showOpenDialog(remote.getCurrentWindow(),{properties: ['openFile']}).then(({canceled, filePaths}) => {
+                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']}).then(({canceled, filePaths}) => {
                                 if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
                                     btn.up('container').down('textfield').setRawValue(filePaths[0]);
                                     execute('controlData', 'setDataValue', [id, filePaths[0]]);
@@ -627,6 +630,167 @@ Ext.define('OnionSpace.controller.Mode', {
         });
         return list;
     },
+    showHistory(btn) {
+        const that = this,
+            id = btn.up('mode').id;
+        Ext.create('Ext.window.Window', {
+            title: '历史数据',
+            width: '85%',
+            height: '85%',
+            layout: 'fit',
+            resizable: true,
+            maximizable: true,
+            constrain: true,
+            animateTarget: btn,
+            modal: true,
+            tbar: [
+                {
+                    xtype: 'button',
+                    text: '删除',
+                    icon: 'images/cross.svg',
+                    handler: function (b) {
+                        const grid = b.up('window').down('grid');
+                        const sm = grid.getSelectionModel().getSelection();
+                        if (sm.length == 0) {
+                            Ext.toast({
+                                html: `<span style="color: red;">请选择至少一条数据!</span>`,
+                                closable: true,
+                                autoClose: false,
+                                align: 't',
+                                slideDUration: 400,
+                                maxWidth: 400
+                            });
+                            return;
+                        }
+                        showConfirm(`是否删除${sm.length}条历史数据?`, function (text) {
+                            sm.map(d => {
+                                runMethod('modeDataDao', 'deleteById', [d.data.id]).then(() => {
+                                    runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
+                                        const list = [];
+                                        data.forEach(({dataValues}) => {
+                                            dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                            dataValues.content = JSON.stringify(dataValues.content);
+                                            list.push(dataValues);
+                                        });
+                                        b.up('window').down('grid').store.setData(list);
+                                    });
+                                });
+                            });
+                        }, b, Ext.MessageBox.ERROR);
+                    }
+                }, {
+                    xtype: 'button',
+                    text: '清空历史数据',
+                    icon: 'images/delete.svg',
+                    handler: function (b) {
+                        showConfirm(`是否删除(包括其它模板)所有历史数据?`, function () {
+                            runMethod('modeDataDao', 'clearAll').then(() => {
+                                runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
+                                    const list = [];
+                                    data.forEach(({dataValues}) => {
+                                        dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                        dataValues.content = JSON.stringify(dataValues.content);
+                                        list.push(dataValues);
+                                    });
+                                    b.up('window').down('grid').store.setData(list);
+                                });
+                            });
+                        }, b, Ext.MessageBox.ERROR);
+                    }
+                }
+            ],
+            items: {
+                xtype: 'grid',
+                layout: 'fit',
+                selType: 'checkboxmodel',
+                columnLines: true,
+                maxHeight: 600,
+                store: Ext.create('Ext.data.Store', {
+                    data: []
+                }),
+                columns: [
+                    new Ext.grid.RowNumberer(),
+                    {text: '操作日期', align: 'center', dataIndex: 'date',width: 180},
+                    {text: '操作结果', align: 'center', dataIndex: 'content',  flex: 1},
+                    {
+                        xtype: 'actioncolumn',
+                        width: 60,
+                        text: '操作',
+                        sortable: false,
+                        align: 'center',
+                        items: [{
+                            icon: 'images/cross.svg',
+                            tooltip: '删除',
+                            handler: function (grid, recIndex, cellIndex, item, e, {data}) {
+                                showConfirm(`是否删除${data.date},历史记录?`, function (text) {
+                                    runMethod('modeDataDao', 'deleteById', [data.id]).then(() => {
+                                        const list = [];
+                                        runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
+                                            data.forEach(({dataValues}) => {
+                                                dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                                dataValues.content = JSON.stringify(dataValues.content);
+                                                list.push(dataValues);
+                                            });
+                                            grid.store.setData(list);
+                                        });
+                                    });
+                                }, e.target, Ext.MessageBox.ERROR);
+                            }
+                        }, {
+                            icon: 'images/view.svg',
+                            tooltip: '查看详情',
+                            handler: function (view, recIndex, cellIndex, item, e, {data}) {
+                                Ext.create('Ext.window.Window', {
+                                    title: '数据详情',
+                                    width: '75%',
+                                    height: '75%',
+                                    layout: 'fit',
+                                    resizable: true,
+                                    maximizable: true,
+                                    constrain: true,
+                                    animateTarget: e.target,
+                                    modal: true,
+                                    items: {
+                                        language: 'json',
+                                        xtype: 'minicode',
+                                        minimap: true,
+                                        value: data.detail
+                                    },
+                                    buttons: [
+                                        {
+                                            text: '关闭', handler: function () {
+                                                this.up('window').close();
+                                            }
+                                        }
+                                    ]
+                                }).show().focus();
+                            }
+                        }]
+                    }
+                ],
+                listeners: {
+                    render: function (grid) {
+                        runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
+                            const list = [];
+                            data.forEach(({dataValues}) => {
+                                dataValues.detail = JSON.stringify(dataValues.content,null,"\t");
+                                dataValues.content = JSON.stringify(dataValues.content);
+                                list.push(dataValues);
+                            });
+                            grid.getStore().setData(list);
+                        });
+                    }
+                }
+            },
+            buttons: [
+                {
+                    text: '关闭', handler: function () {
+                        this.up('window').close();
+                    }
+                }
+            ]
+        }).show().focus();
+    },
     sort(btn) {
         const that = this;
         const id = btn.up('mode').id;
@@ -711,12 +875,20 @@ Ext.define('OnionSpace.controller.Mode', {
                 }
             });
             Promise.all(reData).then(values => {
+                const data = {};
                 values.forEach((v, i) => {
                     const btn = Ext.getCmp(conData[i].id),
                         type = btn.bType;
+                    data[btn.up('container').down('label').text] = v;
                     showToast('[success] 执行结果:' + JSON.stringify(v));
                     that.setComponentValue(type, btn, v);
                 });
+                runMethod('modeDataDao', 'create', [{
+                    pId: that.pId,
+                    content: data,
+                    modeId: id,
+                    date: utils.getNowTime()
+                }]);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);

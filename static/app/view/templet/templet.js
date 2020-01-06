@@ -124,9 +124,14 @@ Ext.define('OnionSpace.view.templet.templet', {
                                     data.folder = require('../service/utils/help').getDataPath();
                                     Ext.create('Ext.window.Window', {
                                         title: '模板说明',
-                                        width: 450,
+                                        width: '85%',
+                                        height: '85%',
                                         layout: 'fit',
+                                        resizable: true,
                                         maximizable: true,
+                                        constrain: true,
+                                        animateTarget: btn,
+                                        modal: true,
                                         items: [{
                                             xtype: 'htmleditor'
                                         }],

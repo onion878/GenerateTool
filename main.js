@@ -255,6 +255,7 @@ function createMainWindow(dataId) {
 
     ipcMain.on('loading-success', (event, arg) => {
         loadFlag = true;
+        require('./service/utils/pool');
         if (data.maximal) {
             mainWindow.maximize();
         }
@@ -278,7 +279,9 @@ function createMainWindow(dataId) {
         controlData: './service/dao/controls',
         fileData: './service/dao/file',
         geFileData: './service/dao/gefile',
-        operation: './service/dao/operation',
+        operation: './service/dao/HistoryDao',
+        modeDataDao: './service/dao/ModeDataDao',
+        operationDetail: './service/dao/HistoryDetailDao',
         utils: './service/utils/utils',
         help: './service/utils/help',
         command: './service/utils/commands'
@@ -286,6 +289,13 @@ function createMainWindow(dataId) {
 
     ipcMain.on('run', async (event, {key, method, args}) => {
         event.returnValue = await need(services[key])[method](...args);
+    });
+
+    ipcMain.on('runServe', (event, {thread, key, method, args}) => {
+        require(services[key])[method](...args).then(d => event.reply(thread + '-reply', {
+            data: d,
+            success: true
+        })).catch(e => event.reply(thread + '-reply', {data: e, success: false}));
     });
 
     ipcMain.on('runCode', (event, {type}) => {

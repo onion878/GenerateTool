@@ -954,6 +954,7 @@ const nodeRun = (content) => {
             webPreferences: {
                 nodeIntegration: true
             },
+            title: 'Thread-runCode',
             parent: getCurrentWindow(),
             show: false,
             width: 200,

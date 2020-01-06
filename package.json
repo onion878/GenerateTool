@@ -1,6 +1,6 @@
 {
   "name": "GenerateTool",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {
@@ -56,7 +56,9 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "require-uncached": "^2.0.0",
+    "sequelize": "^5.21.3",
     "shelljs": "^0.8.3",
+    "sqlite3": "^4.1.1",
     "swig": "^1.4.2",
     "xterm": "^4.2.0-vscode1",
     "xterm-addon-fit": "^0.3.0"
