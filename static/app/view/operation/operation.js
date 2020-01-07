@@ -215,7 +215,7 @@ Ext.define('OnionSpace.view.operation.operation', {
                                         utils.createFile(data.file, data.oldContent);
                                     }
                                     toast('撤销成功!');
-                                }, this, Ext.MessageBox.ERROR);
+                                }, e.target, Ext.MessageBox.ERROR);
                             }
                         }]
                     }

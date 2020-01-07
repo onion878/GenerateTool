@@ -102,7 +102,7 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                     Ext.getCmp('main-content').unmask();
                                     showError('[error] ' + err);
                                 });
-                            }, this, Ext.MessageBox.QUESTION);
+                            }, e.target, Ext.MessageBox.QUESTION);
                         }
                     }
                 ]

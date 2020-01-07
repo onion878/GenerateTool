@@ -208,7 +208,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                             showToast(`[success] 模板[${data.text}]删除成功!`);
                                         }
                                     });
-                                }, this, Ext.MessageBox.ERROR);
+                                }, null, Ext.MessageBox.ERROR);
                             }
                         }
                     ]

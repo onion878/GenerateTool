@@ -50,7 +50,7 @@ Ext.define('OnionSpace.view.unpkg.unpkg', {
                                 grid.getStore().setData(execute('packageConfig', 'getAll', [grid.pId]));
                             });
                             that.runCommand('uninstall', pId, data.name);
-                        }, this, Ext.MessageBox.ERROR);
+                        }, e.target, Ext.MessageBox.ERROR);
                     }
                 }, {
                     icon: 'images/data-add.svg',
