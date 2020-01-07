@@ -861,7 +861,7 @@ Ext.define('OnionSpace.controller.Mode', {
         showConfirm('是否重新获取数据?', function () {
             Ext.getCmp('main-content').mask('执行中...');
             const reData = [],
-                conData = execute('controlData', 'getAllCode', [id]);
+                conData = execute('controlData', 'getAllCode', [id]), list = [];
             closeNodeWin();
             conData.forEach(d => {
                 if (d.value === undefined || d.value === null || d.value.toString().trim().length == 0) {
@@ -869,6 +869,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 }
                 try {
                     reData.push(that.getCodeValue(d.value, d.id, d.cId));
+                    list.push(d);
                     showToast('[info] 需要执行的脚本:' + d.value);
                 } catch (e) {
                     console.error(e);
@@ -885,10 +886,10 @@ Ext.define('OnionSpace.controller.Mode', {
             Promise.all(reData).then(values => {
                 const data = {};
                 values.forEach((v, i) => {
-                    const btn = Ext.getCmp(conData[i].id),
+                    const btn = Ext.getCmp(list[i].id),
                         type = btn.bType;
                     data[btn.up('container').down('label').text] = v;
-                    showToast('[success] 执行结果:' + JSON.stringify(v));
+                    showToast(`[success] 执行结果[${list[i].label}]:` + JSON.stringify(v));
                     that.setComponentValue(type, btn, v);
                 });
                 runMethod('modeDataDao', 'create', [{

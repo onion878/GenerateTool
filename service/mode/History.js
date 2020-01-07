@@ -11,7 +11,7 @@ History.init({
     date: Sequelize.STRING,
     pId: Sequelize.STRING,
     success: Sequelize.BOOLEAN,
-    errMsg: Sequelize.TEXT,
+    errMsg: Sequelize.TEXT
 }, {sequelize, modelName: 'history'});
 History.sync({ force: false });
 module.exports = History;
