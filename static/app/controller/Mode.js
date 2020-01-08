@@ -870,7 +870,8 @@ Ext.define('OnionSpace.controller.Mode', {
                 try {
                     reData.push(that.getCodeValue(d.value, d.id, d.cId));
                     list.push(d);
-                    showToast('[info] 需要执行的脚本:' + d.value);
+                    const label = Ext.getCmp(d.id).up('container').down('label').text;
+                    showToast(`[info] 需要执行的脚本(${label}):` + d.value);
                 } catch (e) {
                     console.error(e);
                     showError('[error] ' + e);
@@ -887,9 +888,9 @@ Ext.define('OnionSpace.controller.Mode', {
                 const data = {};
                 values.forEach((v, i) => {
                     const btn = Ext.getCmp(list[i].id),
-                        type = btn.bType;
-                    data[btn.up('container').down('label').text] = v;
-                    showToast(`[success] 执行结果[${list[i].label}]:` + JSON.stringify(v));
+                        type = btn.bType, label = btn.up('container').down('label').text;
+                    data[label] = v;
+                    showToast(`[success] 执行结果(${label}):` + JSON.stringify(v));
                     that.setComponentValue(type, btn, v);
                 });
                 runMethod('modeDataDao', 'create', [{
