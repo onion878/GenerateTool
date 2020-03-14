@@ -396,6 +396,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     }
                 }
             });
+            content.selType = 'checkboxmodel';
             content.columns = columns;
             content.plugins.listeners = {
                 edit: function (editor, e, eOpts) {
@@ -403,6 +404,43 @@ Ext.define('OnionSpace.controller.Mode', {
                     execute('controlData', 'setDataValue', [id, that.getGridData(editor.grid.getStore())]);
                 }
             };
+            content.tbar = [
+                {
+                    xtype: 'button',
+                    text: '添加',
+                    icon: 'images/add.svg',
+                    handler: function (btn) {
+                        const s = btn.up('grid').getStore();
+                        if (s.config.fields.length == 0) {
+                            showToast('[ERROR] 请先定义数据脚本!');
+                            return;
+                        }
+                        const d = {};
+                        s.config.fields.forEach(function (f) {
+                            d[f] = null
+                        });
+                        s.add(d);
+                        s.commitChanges();
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: '删除',
+                    icon: 'images/cross.svg',
+                    handler: function (btn) {
+                        const grid = btn.up('grid');
+                        showConfirm('是否删除选择数据?', function () {
+                            const selection = grid.getSelectionModel().getSelection();
+                            if (selection.length > 0) {
+                                for (let i = 0; i < selection.length; i++) {
+                                    grid.store.remove(selection[i]);
+                                }
+                                grid.store.sync();
+                            }
+                        }, btn, Ext.MessageBox['QUESTION']);
+                    }
+                }
+            ]
         } else if (type == 'file') {
             content = {
                 xtype: 'container',
@@ -499,7 +537,7 @@ Ext.define('OnionSpace.controller.Mode', {
                                 value: e.up('panel').codeEditor.getValue()
                             },
                             listeners: {
-                                close:function(w){
+                                close: function (w) {
                                     const val = w.down('minicode').codeEditor.getValue();
                                     const mCode = e.up('panel');
                                     mCode.updateLanguage(val, mCode.language);
