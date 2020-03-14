@@ -1542,8 +1542,9 @@ function createFile(dom) {
     generatorData.forEach(f => {
         if (!utils.isEmpty(f.file) && !utils.isEmpty(f.content)) {
             const {updateType} = execute('fileData', 'getFile', [f.id]);
+            f.file = f.file.replace(/\\/g, '\/');
             const tpl = swig.compile(f.file);
-            f.name = tpl(allModuleData);
+            f.name = tpl(allModuleData).replace(/\\/g, '\/');
             const flag = utils.fileExists(f.name);
             if (flag) {
                 f.flag = '是';

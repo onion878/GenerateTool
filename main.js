@@ -21,7 +21,8 @@ function createWindow(dataId) {
         show: false,
         frame: false,
         width: 200,
-        height: 200
+        height: 200,
+        opacity: 0.8
     });
     loading.loadURL(url.format({
         pathname: path.join(__dirname, 'static/loading/loading.html'),
@@ -76,6 +77,8 @@ function createMainWindow(dataId) {
         height: data.height,
         show: false,
         frame: true,
+        opacity: 0.9,
+        backgroundColor: 'black',
         title: '代码构建工具',
         icon: icon
     });
@@ -91,7 +94,7 @@ function createMainWindow(dataId) {
     }
     // Open the DevTools. debug
     // mainWindow.webContents.openDevTools();
-    const menuItems = [
+    let menuItems = [
         {
             label: '文件',
             submenu: [
@@ -131,8 +134,7 @@ function createMainWindow(dataId) {
                 {type: 'separator'},
                 {label: '退出', role: 'quit'}
             ]
-        },
-        {
+        }, {
             label: '系统',
             submenu: [
                 {
@@ -202,8 +204,7 @@ function createMainWindow(dataId) {
                     }
                 }
             ]
-        },
-        {
+        }, {
             label: '帮助',
             submenu: [
                 {
@@ -240,6 +241,177 @@ function createMainWindow(dataId) {
             ]
         }
     ];
+    if (process.platform === 'darwin') {
+        menuItems = [
+            {
+                label: "Application",
+                submenu: [
+                    {label: "关于应用", selector: "orderFrontStandardAboutPanel:"},
+                    {type: "separator"},
+                    {
+                        label: "退出", accelerator: "Command+Q", click: function () {
+                            app.quit();
+                        }
+                    }
+                ]
+            }, {
+                label: '文件',
+                submenu: [
+                    {
+                        id: 'change-mode',
+                        label: '切换模板',
+                        submenu: createFileMenu()
+                    },
+                    {
+                        label: '新建模板',
+                        click() {
+                            mainWindow.webContents.executeJavaScript('createTemplate();');
+                        }
+                    },
+                    {type: 'separator'},
+                    {
+                        label: '本地模板',
+                        click() {
+                            let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
+                            mainWindow.webContents.executeJavaScript(code);
+                        },
+                    },
+                    {
+                        label: '在线模板',
+                        click() {
+                            let code = `openSome({id:'online-temp',title:'在线模板',type:'online-temp'})`;
+                            mainWindow.webContents.executeJavaScript(code);
+                        }
+                    },
+                    {
+                        label: '更新模板',
+                        click() {
+                            let code = `updateNowTemplate()`;
+                            mainWindow.webContents.executeJavaScript(code);
+                        }
+                    },
+                    {type: 'separator'},
+                    {label: '退出', role: 'quit'}
+                ]
+            }, {
+                label: "编辑",
+                submenu: [
+                    {label: "撤销", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
+                    {label: "重做", accelerator: "Shift+CmdOrCtrl+Z", selector: "redo:"},
+                    {type: "separator"},
+                    {label: "剪切", accelerator: "CmdOrCtrl+X", selector: "cut:"},
+                    {label: "拷贝", accelerator: "CmdOrCtrl+C", selector: "copy:"},
+                    {label: "粘贴", accelerator: "CmdOrCtrl+V", selector: "paste:"},
+                    {label: "选择所有", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
+                ]
+            }, {
+                label: '系统',
+                submenu: [
+                    {
+                        label: '设置',
+                        click() {
+                            let code = `openSome({id:'setting',title:'设置',type:'setting', icon: './images/set.svg'})`;
+                            mainWindow.webContents.executeJavaScript(code);
+                        }
+                    },
+                    {
+                        label: '控制台',
+                        click() {
+                            mainWindow.webContents.openDevTools();
+                        }
+                    },
+                    {type: 'separator'},
+                    {
+                        label: '系统日志',
+                        click() {
+                            const code = `openSome({id:'logger',title:'系统日志',type:'logger', icon: './images/system-log.svg'})`;
+                            mainWindow.webContents.executeJavaScript(code);
+                        }
+                    },
+                    {
+                        label: '操作历史',
+                        click() {
+                            const code = `openSome({id:'operation',title:'操作历史',type:'operation', icon: './images/history.svg'})`;
+                            mainWindow.webContents.executeJavaScript(code);
+                        }
+                    },
+                    {
+                        label: '更新日志',
+                        click() {
+                            const code = `openSome({id:'welcome',title:'更新日志',type:'welcome', icon: './images/readme.svg'})`;
+                            mainWindow.webContents.executeJavaScript(code);
+                        }
+                    },
+                    {type: 'separator'},
+                    {
+                        label: '重新启动',
+                        click() {
+                            dialog.showMessageBox(mainWindow, {
+                                type: 'question',
+                                buttons: ['否', '是'],
+                                title: '提示',
+                                defaultId: 1,
+                                message: '是否重新启动?',
+                                noLink: true
+                            }).then(({response}) => {
+                                if (response === 1) {
+                                    app.relaunch();
+                                    app.exit(0);
+                                }
+                            });
+                        }
+                    },
+                    {
+                        label: '重新登录',
+                        click() {
+                            mainWindow.webContents.executeJavaScript('login()');
+                        }
+                    },
+                    {
+                        label: '停止loading',
+                        click() {
+                            mainWindow.webContents.executeJavaScript(`Ext.getCmp('main-content').unmask();`);
+                        }
+                    }
+                ]
+            }, {
+                label: '帮助',
+                submenu: [
+                    {
+                        label: 'Github',
+                        click() {
+                            require("open")('https://github.com/onion878/GenerateTool');
+                        }
+                    },
+                    {
+                        label: '文档',
+                        click() {
+                            require("open")('https://generate-docs.netlify.com');
+                        }
+                    },
+                    {
+                        label: '关于',
+                        click() {
+                            const info = `Version: ${systemConfig.getConfig('version')}\r\tChrome: ${process.versions["chrome"]}\r\tNode: ${
+                                process.versions["node"]
+                            }\r\tElectron: ${
+                                process.versions["electron"]
+                            }\r\tAuthor: Onion\r\tEmail: a2214839296a@gmail.com`;
+                            dialog.showMessageBox(mainWindow,
+                                {
+                                    type: "info",
+                                    title: "关于",
+                                    message: "代码创建工具",
+                                    detail: info
+                                }
+                            ).then(() => {
+                            });
+                        }
+                    }
+                ]
+            }
+        ];
+    }
     const menu = Menu.buildFromTemplate(menuItems);
     Menu.setApplicationMenu(menu);
 

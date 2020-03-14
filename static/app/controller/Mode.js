@@ -260,7 +260,6 @@ Ext.define('OnionSpace.controller.Mode', {
             content = {
                 xtype: 'panel',
                 flex: 1,
-                height: 100,
                 layout: 'fit',
                 style: {
                     border: '1px solid #c2c2c2'
@@ -476,10 +475,48 @@ Ext.define('OnionSpace.controller.Mode', {
                 }
             };
         } else {
+            content.height = 150;
             content.items.changeValue = function () {
                 execute('controlData', 'setDataValue', [id, this.codeEditor.getValue()]);
             };
             content.items.value = value;
+            content.items.tbar = [
+                {
+                    xtypt: 'button', text: '全屏', handler: function (e) {
+                        Ext.create('Ext.window.Window', {
+                            title: label,
+                            width: '100%',
+                            height: '100%',
+                            layout: 'fit',
+                            resizable: true,
+                            maximizable: true,
+                            constrain: true,
+                            modal: true,
+                            items: {
+                                xtype: 'minicode',
+                                minimap: true,
+                                language: content.items.language,
+                                value: e.up('panel').codeEditor.getValue()
+                            },
+                            listeners: {
+                                close:function(w){
+                                    const val = w.down('minicode').codeEditor.getValue();
+                                    const mCode = e.up('panel');
+                                    mCode.updateLanguage(val, mCode.language);
+                                    execute('controlData', 'setDataValue', [id, val]);
+                                }
+                            },
+                            buttons: [
+                                {
+                                    text: '关闭', handler: function () {
+                                        this.up('window').close();
+                                    }
+                                }
+                            ]
+                        }).show().focus();
+                    }
+                }
+            ];
         }
         return {
             xtype: 'container',
@@ -879,7 +916,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     Ext.getCmp('main-content').unmask();
                 }
             });
-            if(reData.length == 0) {
+            if (reData.length == 0) {
                 showToast('[error] 没有设置可执行的脚本!');
                 Ext.getCmp('main-content').unmask();
                 return;
@@ -1037,7 +1074,8 @@ Ext.define('OnionSpace.controller.Mode', {
             }
             registerSingleData(d1);
         } else {
-
+            const code = btn.up('container').down('minicode');
+            code.updateLanguage(v, code.language)
         }
     }
 });
