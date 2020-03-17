@@ -1924,7 +1924,7 @@ document.onkeydown = function () {
 
 function setDefaultUrl() {
     const request = require('request');
-    request('https://cdn.jsdelivr.net/gh/onion878/GenerateTool@latest/package.json', function (error, response, body) {
+    request('https://cdn.jsdelivr.net/gh/onion878/GenerateTool/package.json', function (error, response, body) {
         try {
             const d = JSON.parse(body);
             execute('userConfig', 'setDefaultUrl', [d.url]);
