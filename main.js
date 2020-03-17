@@ -15,7 +15,7 @@ const {getDataPath} = require('./service/utils/help');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false, globalStoreDirPath;
 
-function createWindow(dataId) {
+function createWindow() {
     // 预加载
     loading = new BrowserWindow({
         show: false,
@@ -32,7 +32,7 @@ function createWindow(dataId) {
     }));
     loading.webContents.once('dom-ready', () => {
         // 加载正式窗口
-        createMainWindow(dataId);
+        createMainWindow();
         setTimeout(() => {
             if (!loadFlag) {
                 const systemConfig = need('./service/dao/system');
@@ -51,7 +51,7 @@ function createWindow(dataId) {
     loading.show();
 }
 
-function createMainWindow(dataId) {
+function createMainWindow() {
     globalStoreDirPath = getDataPath();
     if (!fs.existsSync(globalStoreDirPath)) {
         shell.mkdir('-p', globalStoreDirPath);
@@ -82,12 +82,20 @@ function createMainWindow(dataId) {
         title: '代码构建工具',
         icon: icon
     });
+    let flag = 'true';
+    process.argv.forEach(function (val, index, array) {
+        if(val.concat('--')) {
+            if(val.indexOf('--flag')!=-1){
+                flag = val.replace(/-/g, '').split('=')[1];
+            }
+        }
+    });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, `static/${systemConfig.getTheme()}.html`),
         protocol: 'file:',
         slashes: true
-    }));
+    }) + '?' + flag);
 
     if (data.id == 'system') {
         mainWindow.setPosition(data.x, data.y);
@@ -107,6 +115,13 @@ function createMainWindow(dataId) {
                     label: '新建模板',
                     click() {
                         mainWindow.webContents.executeJavaScript('createTemplate();');
+                    }
+                },
+                {
+                    label: '新建窗口',
+                    click() {
+                        const utils = require('./service/utils/utils');
+                        utils.openCodeFolder(process.execPath, '--flag=false');
                     }
                 },
                 {type: 'separator'},
@@ -255,45 +270,6 @@ function createMainWindow(dataId) {
                     }
                 ]
             }, {
-                label: '文件',
-                submenu: [
-                    {
-                        id: 'change-mode',
-                        label: '切换模板',
-                        submenu: createFileMenu()
-                    },
-                    {
-                        label: '新建模板',
-                        click() {
-                            mainWindow.webContents.executeJavaScript('createTemplate();');
-                        }
-                    },
-                    {type: 'separator'},
-                    {
-                        label: '本地模板',
-                        click() {
-                            let code = `openSome({id:'templet',title:'本地模板',type:'templet'})`;
-                            mainWindow.webContents.executeJavaScript(code);
-                        },
-                    },
-                    {
-                        label: '在线模板',
-                        click() {
-                            let code = `openSome({id:'online-temp',title:'在线模板',type:'online-temp'})`;
-                            mainWindow.webContents.executeJavaScript(code);
-                        }
-                    },
-                    {
-                        label: '更新模板',
-                        click() {
-                            let code = `updateNowTemplate()`;
-                            mainWindow.webContents.executeJavaScript(code);
-                        }
-                    },
-                    {type: 'separator'},
-                    {label: '退出', role: 'quit'}
-                ]
-            }, {
                 label: "编辑",
                 submenu: [
                     {label: "撤销", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
@@ -304,113 +280,8 @@ function createMainWindow(dataId) {
                     {label: "粘贴", accelerator: "CmdOrCtrl+V", selector: "paste:"},
                     {label: "选择所有", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
                 ]
-            }, {
-                label: '系统',
-                submenu: [
-                    {
-                        label: '设置',
-                        click() {
-                            let code = `openSome({id:'setting',title:'设置',type:'setting', icon: './images/set.svg'})`;
-                            mainWindow.webContents.executeJavaScript(code);
-                        }
-                    },
-                    {
-                        label: '控制台',
-                        click() {
-                            mainWindow.webContents.openDevTools();
-                        }
-                    },
-                    {type: 'separator'},
-                    {
-                        label: '系统日志',
-                        click() {
-                            const code = `openSome({id:'logger',title:'系统日志',type:'logger', icon: './images/system-log.svg'})`;
-                            mainWindow.webContents.executeJavaScript(code);
-                        }
-                    },
-                    {
-                        label: '操作历史',
-                        click() {
-                            const code = `openSome({id:'operation',title:'操作历史',type:'operation', icon: './images/history.svg'})`;
-                            mainWindow.webContents.executeJavaScript(code);
-                        }
-                    },
-                    {
-                        label: '更新日志',
-                        click() {
-                            const code = `openSome({id:'welcome',title:'更新日志',type:'welcome', icon: './images/readme.svg'})`;
-                            mainWindow.webContents.executeJavaScript(code);
-                        }
-                    },
-                    {type: 'separator'},
-                    {
-                        label: '重新启动',
-                        click() {
-                            dialog.showMessageBox(mainWindow, {
-                                type: 'question',
-                                buttons: ['否', '是'],
-                                title: '提示',
-                                defaultId: 1,
-                                message: '是否重新启动?',
-                                noLink: true
-                            }).then(({response}) => {
-                                if (response === 1) {
-                                    app.relaunch();
-                                    app.exit(0);
-                                }
-                            });
-                        }
-                    },
-                    {
-                        label: '重新登录',
-                        click() {
-                            mainWindow.webContents.executeJavaScript('login()');
-                        }
-                    },
-                    {
-                        label: '停止loading',
-                        click() {
-                            mainWindow.webContents.executeJavaScript(`Ext.getCmp('main-content').unmask();`);
-                        }
-                    }
-                ]
-            }, {
-                label: '帮助',
-                submenu: [
-                    {
-                        label: 'Github',
-                        click() {
-                            require("open")('https://github.com/onion878/GenerateTool');
-                        }
-                    },
-                    {
-                        label: '文档',
-                        click() {
-                            require("open")('https://generate-docs.netlify.com');
-                        }
-                    },
-                    {
-                        label: '关于',
-                        click() {
-                            const info = `Version: ${systemConfig.getConfig('version')}\r\tChrome: ${process.versions["chrome"]}\r\tNode: ${
-                                process.versions["node"]
-                            }\r\tElectron: ${
-                                process.versions["electron"]
-                            }\r\tAuthor: Onion\r\tEmail: a2214839296a@gmail.com`;
-                            dialog.showMessageBox(mainWindow,
-                                {
-                                    type: "info",
-                                    title: "关于",
-                                    message: "代码创建工具",
-                                    detail: info
-                                }
-                            ).then(() => {
-                            });
-                        }
-                    }
-                ]
             }
-        ];
+        ].concat(menuItems);
     }
     const menu = Menu.buildFromTemplate(menuItems);
     Menu.setApplicationMenu(menu);
@@ -547,16 +418,16 @@ function createFileMenu() {
     return files;
 }
 
-const gotTheLock = app.requestSingleInstanceLock();
-
-if (!gotTheLock) {
-    app.quit();
-} else {
-    if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        mainWindow.focus();
-    }
-}
+// const gotTheLock = app.requestSingleInstanceLock();
+//
+// if (!gotTheLock) {
+//     app.quit();
+// } else {
+//     if (mainWindow) {
+//         if (mainWindow.isMinimized()) mainWindow.restore();
+//         mainWindow.focus();
+//     }
+// }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

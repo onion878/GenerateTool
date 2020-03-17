@@ -32,7 +32,7 @@ function runMethod(key, method, args) {
 
 let title = '数据模板';
 let consoleShowFlag = false;
-let pId = execute('history', 'getMode');
+let pId = window.location.search.substring(1) == 'true' ? execute('history', 'getMode') : '';
 const controllers = {
     'mode': ['OnionSpace.view.minicode.minicode', 'OnionSpace.view.mode.mode'],
     'editor': ['OnionSpace.controller.Editor'],
@@ -1050,18 +1050,20 @@ function initMainView() {
             const tabData = execute('history', 'getTab');
             const tabCode = execute('history', 'getCode');
             const showTab = execute('history', 'getShowTab');
-            for (let i = 0; i < tabData.length; i++) {
-                if (tabData[i].id == showTab) {
-                    openSome(tabData[i]);
-                } else {
-                    openSome(tabData[i], true);
+            if(pId !== '') {
+                for (let i = 0; i < tabData.length; i++) {
+                    if (tabData[i].id == showTab) {
+                        openSome(tabData[i]);
+                    } else {
+                        openSome(tabData[i], true);
+                    }
                 }
-            }
-            for (let i = 0; i < tabCode.length; i++) {
-                if (tabCode[i].id == showTab) {
-                    openCode(tabCode[i]);
-                } else {
-                    openCode(tabCode[i], false);
+                for (let i = 0; i < tabCode.length; i++) {
+                    if (tabCode[i].id == showTab) {
+                        openCode(tabCode[i]);
+                    } else {
+                        openCode(tabCode[i], false);
+                    }
                 }
             }
             registerAllSuggestion();
@@ -1132,7 +1134,7 @@ function openSome({id, title, type, params, icon}, flag) {
             const tab = tabPanel.add({
                 id: id,
                 title: title,
-                pId: execute('history', 'getMode'),
+                pId: pId,
                 closable: true,
                 icon: icon,
                 params: params,
@@ -1332,7 +1334,7 @@ function checkNew(id, flag) {
                                     Ext.getCmp('main-content').unmask();
                                     showToast('[success] 更新成功!');
                                     jsCode.deleteFile(d);
-                                    if (execute('history', 'getMode') == local.id) {
+                                    if (pId == local.id) {
                                         changeTemplate(local.id);
                                         return;
                                     }

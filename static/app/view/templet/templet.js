@@ -186,7 +186,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                             handler: function (btn) {
                                 const data = btn.up().getWidgetRecord().getData();
                                 let msg = `是否删除模板[${data.text}]?`, flag = false;
-                                if (data.id == execute('history', 'getMode')) {
+                                if (data.id == pId) {
                                     flag = true;
                                     msg = `删除当前模板[${data.text}]系统会重新启动,是否继续?`;
                                 }

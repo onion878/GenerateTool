@@ -26,6 +26,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
         displayInfo: true
     },
     initComponent: function () {
+        const pId = this.pId;
         this.columns = [
             new Ext.grid.RowNumberer(),
             {text: '名称', align: 'center', dataIndex: 'Name', flex: 1},
@@ -76,7 +77,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                                 jsCode.updateTemplate(d, local, jsonResp).then(msg => {
                                                     showToast('[success] [' + data.Name + ']下载成功!');
                                                     jsCode.deleteFile(d);
-                                                    if (execute('history', 'getMode') == local.id) {
+                                                    if (pId == local.id) {
                                                         changeTemplate(local.id);
                                                         return;
                                                     }
@@ -133,7 +134,8 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                     animateTarget: e.target,
                                     items: [{
                                         xtype: 'detail-temp',
-                                        dataId: data.Id
+                                        dataId: data.Id,
+                                        pId: pId
                                     }],
                                     buttons: [
                                         {

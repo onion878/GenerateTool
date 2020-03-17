@@ -411,13 +411,9 @@ Ext.define('OnionSpace.controller.Mode', {
                     icon: 'images/add.svg',
                     handler: function (btn) {
                         const s = btn.up('grid').getStore();
-                        if (s.config.fields.length == 0) {
-                            showToast('[ERROR] 请先定义数据脚本!');
-                            return;
-                        }
                         const d = {};
                         s.config.fields.forEach(function (f) {
-                            d[f] = null
+                            d[f] = null;
                         });
                         s.add(d);
                         s.commitChanges();
