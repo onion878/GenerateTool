@@ -82,20 +82,12 @@ function createMainWindow() {
         title: '代码构建工具',
         icon: icon
     });
-    let flag = 'true';
-    process.argv.forEach(function (val, index, array) {
-        if(val.concat('--')) {
-            if(val.indexOf('--flag')!=-1){
-                flag = val.replace(/-/g, '').split('=')[1];
-            }
-        }
-    });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, `static/${systemConfig.getTheme()}.html`),
         protocol: 'file:',
         slashes: true
-    }) + '?' + flag);
+    }));
 
     if (data.id == 'system') {
         mainWindow.setPosition(data.x, data.y);
@@ -115,13 +107,6 @@ function createMainWindow() {
                     label: '新建模板',
                     click() {
                         mainWindow.webContents.executeJavaScript('createTemplate();');
-                    }
-                },
-                {
-                    label: '新建窗口',
-                    click() {
-                        const utils = require('./service/utils/utils');
-                        utils.openCodeFolder(process.execPath, '--flag=false');
                     }
                 },
                 {type: 'separator'},
@@ -418,16 +403,16 @@ function createFileMenu() {
     return files;
 }
 
-// const gotTheLock = app.requestSingleInstanceLock();
-//
-// if (!gotTheLock) {
-//     app.quit();
-// } else {
-//     if (mainWindow) {
-//         if (mainWindow.isMinimized()) mainWindow.restore();
-//         mainWindow.focus();
-//     }
-// }
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+    app.quit();
+} else {
+    if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+    }
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

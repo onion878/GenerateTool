@@ -983,12 +983,12 @@ Ext.define('OnionSpace.controller.Mode', {
             execute('controlData', 'removeCode', [bId]);
             return;
         }
-        execute('controlData', 'setCode', [bId, valStr, cId]);
         return nodeRun(valStr);
     },
     getCodeData(valStr, bId, cId) {
         if (utils.isEmpty(valStr)) {
-            showToast('[error] 没有设置可执行的脚本!');
+            showToast('[info] 删除脚本设置!');
+            execute('controlData', 'setCode', [bId, '', cId]);
             return;
         }
         execute('controlData', 'setCode', [bId, valStr, cId]);

@@ -32,7 +32,7 @@ function runMethod(key, method, args) {
 
 let title = '数据模板';
 let consoleShowFlag = false;
-let pId = window.location.search.substring(1) == 'true' ? execute('history', 'getMode') : '';
+let pId = execute('history', 'getMode');
 const controllers = {
     'mode': ['OnionSpace.view.minicode.minicode', 'OnionSpace.view.mode.mode'],
     'editor': ['OnionSpace.controller.Editor'],
