@@ -148,7 +148,7 @@ class Controls {
             .write();
 
         con.set('ext', con.get('ext').value().concat(ext))
-            .set('code', con.get('ext').value().concat(code))
+            .set('code', con.get('code').value().concat(code))
             .write();
     }
 
