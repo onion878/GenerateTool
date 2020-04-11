@@ -136,7 +136,7 @@ Ext.define('OnionSpace.view.setting.setting', {
             },
             {
                 xtype: 'slider',
-                fieldLabel: '透明度',
+                fieldLabel: '背景透明度',
                 increment: 1,
                 id: 'setting-opacity',
                 minValue: 20,
@@ -154,11 +154,32 @@ Ext.define('OnionSpace.view.setting.setting', {
                         document.body.style.opacity = v / 100;
                     }
                 }
+            },
+            {
+                xtype: 'slider',
+                fieldLabel: '窗体透明度',
+                increment: 1,
+                id: 'window-opacity',
+                minValue: 20,
+                maxValue: 100,
+                tipText: function (thumb) {
+                    return Ext.String.format('<b>{0}% 不透明</b>', thumb.value);
+                },
+                listeners: {
+                    render: function (dom) {
+                        Ext.getCmp('window-opacity').setValue(execute('systemConfig', 'getConfig', ['win-opacity']) * 100);
+                    },
+                    dragend: function (dom) {
+                        const v = dom.getValue();
+                        execute('systemConfig', 'setConfig', ['win-opacity', v / 100]);
+                        const {remote} = require('electron');
+                        remote.getCurrentWindow().setOpacity(v / 100);
+                    }
+                }
             }
         ]
     }],
     initComponent: function () {
-        const pId = this.pId, that = this;
         this.callParent(arguments);
     }
 });

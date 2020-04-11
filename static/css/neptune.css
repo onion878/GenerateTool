@@ -100,7 +100,7 @@ body {
 }
 
 #left-bar-outerCt {
-    background-color: #157fcc;
+    background-color: #0084e3;
 }
 
 .states-toolbar {
@@ -108,7 +108,7 @@ body {
     display: flex;
     justify-content: space-between;
     height: 21px;
-    background-color: #157fcc;
+    background-color: #0084e3;
     border-top: 1px solid #3892d4;
     border-bottom: 1px solid #3892d4;
     box-sizing: initial;

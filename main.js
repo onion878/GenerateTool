@@ -67,6 +67,11 @@ function createMainWindow() {
     if (data.id == undefined) {
         data = {id: '', width: 800, height: 600, maximal: false, x: 100, y: 100};
     }
+    let opacity = systemConfig.getConfig('win-opacity');
+    if(opacity == null) {
+        systemConfig.setConfig('win-opacity', 1);
+        opacity = 1;
+    }
     const icon = path.join(__dirname, 'static/images/code.png');
     // Create the browser window.
     mainWindow = new BrowserWindow({
@@ -77,7 +82,7 @@ function createMainWindow() {
         height: data.height,
         show: false,
         frame: true,
-        opacity: 0.9,
+        opacity: opacity,
         backgroundColor: 'black',
         title: '代码构建工具',
         icon: icon
