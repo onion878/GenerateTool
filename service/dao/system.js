@@ -33,6 +33,22 @@ class System {
         return this.sdb.get('code.' + name).value();
     }
 
+    removeCode(name) {
+        return this.sdb.unset('code.' + name).write();
+    }
+
+    updateCode(name, language) {
+        return this.sdb.set('code.' + name, language).write();
+    }
+
+    findCode(name) {
+        return this.sdb.get('code.' + name).value();
+    }
+
+    getAllCode() {
+        return this.sdb.get('code').value();
+    }
+
     setZoom(val) {
         this.sdb.set('zoom', val).write();
     }

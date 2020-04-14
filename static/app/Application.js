@@ -678,9 +678,12 @@ function initMainView() {
                                                             handler: function () {
                                                                 showPrompt('新名称', '', function (val) {
                                                                     if (val.trim().length > 0) {
+                                                                        const child = {...record.data};
+                                                                        Ext.getCmp('mainmenutab').remove(record.get('id'));
                                                                         execute('fileData', 'updateName', [record.get('id'), val]);
-                                                                        record.set('text', val);
-                                                                        node.refresh();
+                                                                        child.text = val;
+                                                                        child.icon = getFileIcon(val);
+                                                                        record.parentNode.replaceChild(child, record);
                                                                     }
                                                                 }, item, text);
                                                             }
@@ -695,7 +698,7 @@ function initMainView() {
                                                                     execute('fileData', 'removeFile', [rId]);
                                                                     execute('geFileData', 'removeData', [rId]);
                                                                     Ext.getCmp('mainmenutab').remove(rId);
-                                                                    const removeList = execute('fileData', 'getTreeData', [record.get('id'), rId]);
+                                                                    const removeList = execute('fileData', 'getTreeData', [rId, pId]);
                                                                     removeList.forEach(r => {
                                                                         execute('fileData', 'removeFile', [r.id]);
                                                                         execute('geFileData', 'removeData', [r.id]);

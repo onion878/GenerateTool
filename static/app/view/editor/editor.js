@@ -261,12 +261,15 @@ Ext.define('OnionSpace.view.editor.editor', {
                                         animateTarget: item,
                                         fn: function (btn, text) {
                                             if (btn === 'ok') {
+                                                const child = {...record.data};
                                                 Ext.getCmp('mainmenutab').remove(record.data.parentFolder);
                                                 jsCode.reName(pId, record.data.text, text, record.parentNode.data.parentFolder);
-                                                record.set('text', text);
+                                                child.text = text;
                                                 let parentFolder = record.parentNode.data.parentFolder;
                                                 if (parentFolder == undefined) parentFolder = '';
-                                                record.set('parentFolder', parentFolder + '/' + text);
+                                                child.parentFolder = parentFolder + '/' + text;
+                                                child.icon = getFileIcon(text);
+                                                record.parentNode.replaceChild(child, record);
                                                 if (record.data.type == 'folder') {
                                                     that.collapseNode(record);
                                                     that.expandNode(record);

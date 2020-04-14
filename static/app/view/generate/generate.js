@@ -13,9 +13,9 @@ Ext.define('OnionSpace.view.generate.generate', {
         render: function (c) {
             const that = this;
             that.fileName = that.title;
-            let language = getFileLanguage(that.fileName);
+            let language = execute('systemConfig', 'getCode', [that.fileName]);
             if (language == undefined) {
-                language = execute('systemConfig', 'getCode', [that.fileName]);
+                language = getFileLanguage(that.fileName);
             }
             let val = execute('geFileData', 'getOneData', [that.params.fileId]);
             let content = '';
@@ -24,58 +24,60 @@ Ext.define('OnionSpace.view.generate.generate', {
             }
             if (language == undefined || language == null) {
                 language = 'html';
-                Ext.create('Ext.window.Window', {
-                    title: that.fileName,
-                    fixed: true,
-                    width: 400,
-                    layout: 'fit',
-                    resizable: false,
-                    constrain: true,
-                    modal: true,
-                    items: {
-                        xtype: 'form',
-                        layout: {
-                            type: 'vbox',
-                            pack: 'start',
-                            align: 'stretch'
+                setTimeout(function () {
+                    Ext.create('Ext.window.Window', {
+                        title: that.fileName,
+                        fixed: true,
+                        width: 280,
+                        layout: 'fit',
+                        resizable: false,
+                        constrain: true,
+                        modal: true,
+                        items: {
+                            xtype: 'form',
+                            layout: {
+                                type: 'vbox',
+                                pack: 'start',
+                                align: 'stretch'
+                            },
+                            items: [
+                                {
+                                    xtype: 'combobox',
+                                    fieldLabel: '语言',
+                                    margin: '10',
+                                    labelWidth: 45,
+                                    store: {
+                                        fields: ['id', 'text'],
+                                        data: languageType
+                                    },
+                                    name: 'language',
+                                    queryMode: 'local',
+                                    displayField: 'text',
+                                    valueField: 'id',
+                                    allowBlank: false
+                                }]
                         },
-                        items: [
+                        buttonAlign: 'center',
+                        buttons: [
                             {
-                                xtype: 'combobox',
-                                fieldLabel: '语言',
-                                margin: '10',
-                                labelWidth: 45,
-                                store: {
-                                    fields: ['id', 'text'],
-                                    data: languageType
-                                },
-                                name: 'language',
-                                queryMode: 'local',
-                                displayField: 'text',
-                                valueField: 'id',
-                                allowBlank: false
-                            }]
-                    },
-                    buttonAlign: 'center',
-                    buttons: [
-                        {
-                            text: '确定', handler: function () {
-                                const form = this.up('window').down('form').getForm();
-                                if (form.isValid()) {
-                                    const {language} = form.getValues();
-                                    execute('systemConfig', 'setCode', [that.fileName, language])
-                                    that.codeEditor.updateLanguage(content, language);
+                                text: '确定', handler: function () {
+                                    const form = this.up('window').down('form').getForm();
+                                    if (form.isValid()) {
+                                        const {language} = form.getValues();
+                                        execute('systemConfig', 'setCode', [that.fileName, language])
+                                        that.codeEditor.updateLanguage(content, language);
+                                        this.up('window').close();
+                                    }
+                                }
+                            },
+                            {
+                                text: '取消', handler: function () {
                                     this.up('window').close();
                                 }
                             }
-                        },
-                        {
-                            text: '取消', handler: function () {
-                                this.up('window').close();
-                            }
-                        }
-                    ]
-                }).show().focus();
+                        ]
+                    }).show().focus();
+                }, 500)
             }
             that.codeEditor = Ext.create({
                 language: language,
