@@ -68,7 +68,7 @@ function createMainWindow() {
         data = {id: '', width: 800, height: 600, maximal: false, x: 100, y: 100};
     }
     let opacity = systemConfig.getConfig('win-opacity');
-    if(opacity == null) {
+    if (opacity == null) {
         systemConfig.setConfig('win-opacity', 1);
         opacity = 1;
     }
@@ -247,19 +247,8 @@ function createMainWindow() {
         }
     ];
     if (process.platform === 'darwin') {
-        menuItems = [
+        menuItems = menuItems.concat([
             {
-                label: "Application",
-                submenu: [
-                    {label: "关于应用", selector: "orderFrontStandardAboutPanel:"},
-                    {type: "separator"},
-                    {
-                        label: "退出", accelerator: "Command+Q", click: function () {
-                            app.quit();
-                        }
-                    }
-                ]
-            }, {
                 label: "编辑",
                 submenu: [
                     {label: "撤销", accelerator: "CmdOrCtrl+Z", selector: "undo:"},
@@ -271,7 +260,7 @@ function createMainWindow() {
                     {label: "选择所有", accelerator: "CmdOrCtrl+A", selector: "selectAll:"}
                 ]
             }
-        ].concat(menuItems);
+        ]);
     }
     const menu = Menu.buildFromTemplate(menuItems);
     Menu.setApplicationMenu(menu);

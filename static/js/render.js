@@ -4,10 +4,12 @@ const appPath = require('app-root-path').path.replace(/\\/g, '/');
 let controlData = need(appPath + '/service/dao/controls');
 const jsC = require('../service/utils/JscodeUtil');
 const logger = require('../service/utils/logger');
+const utils = require('../service/utils/utils');
 let history = need(appPath + '/service/dao/history');
 let moduleId = history.getMode();
 const remote = require('electron').remote;
 let geFileData = need(appPath + '/service/dao/gefile');
+const fileData = need(appPath + '/service/dao/file');
 process
     .on('unhandledRejection', (reason, p) => {
         console.error(reason, 'Unhandled Rejection at Promise', p);
@@ -26,6 +28,31 @@ try {
 const getAllData = () => {
     controlData = need(appPath + '/service/dao/controls');
     return controlData.getModuleData(moduleId);
+};
+
+//获取所有生成文件
+const getAllFile = () => {
+    controlData = need(appPath + '/service/dao/controls');
+    const files = [],
+        generatorData = geFileData.getFileData(moduleId);
+    const allModuleData = controlData.getModuleData(moduleId);
+    generatorData.forEach(f => {
+        if (!utils.isEmpty(f.file) && !utils.isEmpty(f.content)) {
+            const {updateType} = fileData.getFile(f.id);
+            f.file = f.file.replace(/\\/g, '\/');
+            const tpl = swig.compile(f.file);
+            f.name = tpl(allModuleData).replace(/\\/g, '\/');
+            const flag = utils.fileExists(f.name);
+            if (flag) {
+                f.flag = '是';
+            } else {
+                f.flag = '否';
+            }
+            f.type = updateType;
+            files.push({file: f.name, type: updateType, exits: f.flag});
+        }
+    });
+    return files;
 };
 
 //创建无缓存node模块

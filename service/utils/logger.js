@@ -3,29 +3,45 @@ const fs = require('fs');
 const log4js = require('log4js');
 const filePath = help.getDataPath() + 'log.log';
 try {
-    if (fs.statSync(filePath).size > 50000) {
+    if (fs.statSync(filePath).size > 100000) {
         fs.writeFileSync(filePath, '');
     }
 } catch (e) {
 
 }
 log4js.configure({
-    appenders: {cheese: {type: 'file', filename: filePath}, console: {type: 'console'}},
-    categories: {default: {appenders: ['cheese', 'console'], level: 'debug'}}
+    appenders: {'|': {type: 'file', filename: filePath}, console: {type: 'console'}},
+    categories: {default: {appenders: ['|', 'console'], level: 'debug'}}
 });
-const logger = log4js.getLogger('cheese');
+const logger = log4js.getLogger('|');
 module.exports = {
     debug(message, ...optionalParams) {
-        logger.debug(message, optionalParams);
+        if (optionalParams.length > 0) {
+            logger.debug(message, optionalParams);
+        } else {
+            logger.debug(message);
+        }
     },
     info(message, ...optionalParams) {
-        logger.info(message, optionalParams);
+        if (optionalParams.length > 0) {
+            logger.info(message, optionalParams);
+        } else {
+            logger.info(message);
+        }
     },
     warn(message, ...optionalParams) {
-        logger.warn(message, optionalParams);
+        if (optionalParams.length > 0) {
+            logger.warn(message, optionalParams);
+        } else {
+            logger.warn(message);
+        }
     },
     error(message, ...optionalParams) {
-        logger.error(message, optionalParams);
+        if (optionalParams.length > 0) {
+            logger.error(message, optionalParams);
+        } else {
+            logger.error(message);
+        }
     },
     readValue() {
         return fs.readFileSync(help.getDataPath() + 'log.log', 'utf8');

@@ -13,14 +13,12 @@ Ext.define('OnionSpace.view.message.message', {
                 language: 'consoleLanguage',
                 theme: 'consoleTheme',
                 readOnly: true,
-                lineNumbers: 'off',
                 contextmenu: false,
                 lineDecorationsWidth: '0px',
                 scrollBeyondLastLine: false,
                 minimap: {
                     enabled: false
-                },
-                automaticLayout: true
+                }
             });
             that.codeEditor.onDidChangeModelContent(function (e) {
                 that.changeValue();
@@ -35,12 +33,19 @@ Ext.define('OnionSpace.view.message.message', {
                 }
 
             }
+        },
+        resize: {
+            fn: function (el) {
+                this.resizeCode();
+            }
         }
     },
     setValue: function (msg) {
         const nowTime = this.getNowTime();
-        Ext.getCmp('msg-bar').infoPanel.innerText = '[' + nowTime + '] ' + msg;
-        this.value += '[' + nowTime + '] ' + msg + '\n';
+        const m = '[' + nowTime + '] ' + msg;
+        Ext.getCmp('msg-bar').infoPanel.innerText = m;
+        this.value += m + '\n';
+        logger.debug(msg);
         this.codeEditor.setValue(this.value);
         this.codeEditor.revealLine(this.value.split('\n').length);
     },
@@ -74,5 +79,10 @@ Ext.define('OnionSpace.view.message.message', {
         }
 
         return code;
+    },
+    resizeCode: function () {
+        if (this.codeEditor) {
+            this.codeEditor.layout();
+        }
     }
 });

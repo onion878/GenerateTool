@@ -16,12 +16,16 @@ Ext.define('OnionSpace.view.code.code', {
             that.codeEditor = monaco.editor.create(dom, {
                 value: that.fileContent,
                 theme: 'consoleTheme',
-                language: that.language,
-                automaticLayout: true
+                language: that.language
             });
             that.codeEditor.onDidChangeModelContent(function (e) {
                 that.writeValue();
             });
+        },
+        resize: {
+            fn: function(el) {
+                this.resizeCode();
+            }
         }
     },
     writeValue: function () {
@@ -59,6 +63,11 @@ Ext.define('OnionSpace.view.code.code', {
             command.write(`node -p "require('./${file}')"`);
         } else {
             command.write(`node -p "require('./${file}')"`);
+        }
+    },
+    resizeCode: function () {
+        if (this.codeEditor) {
+            this.codeEditor.layout();
         }
     }
 });

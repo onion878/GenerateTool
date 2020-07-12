@@ -9,4 +9,5 @@ const data = getAllData();
 execSync(`svn update ${data.file}`);
 console.log('更新文件:[' + data.file + ']成功');
 ```
-其中`getAllData()`为获取数据模板中所有数据的内置方法
+内置方法`getAllData()`为获取数据模板中所有数据的内置方法<br>
+内置方法`getAllFile()`为生成文件的路径和信息<br>

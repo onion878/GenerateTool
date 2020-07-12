@@ -27,12 +27,16 @@ Ext.define('OnionSpace.view.minicode.minicode', {
                 value: that.value,
                 minimap: {
                     enabled: mini
-                },
-                automaticLayout: true
+                }
             });
             that.codeEditor.onDidChangeModelContent(function (e) {
                 that.changeValue();
             });
+        },
+        resize: {
+            fn: function(el) {
+                this.resizeCode();
+            }
         }
     },
     initComponent: function () {
@@ -47,6 +51,11 @@ Ext.define('OnionSpace.view.minicode.minicode', {
         this.codeEditor.setModel(newModel);
         if (oldModel) {
             oldModel.dispose();
+        }
+    },
+    resizeCode: function () {
+        if (this.codeEditor) {
+            this.codeEditor.layout();
         }
     }
 });

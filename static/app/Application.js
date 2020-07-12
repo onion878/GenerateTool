@@ -1074,7 +1074,7 @@ function initMainView() {
             document.body.style.backgroundImage = `url('${execute('userConfig', 'getBg').replace(/\\/g, '/')}')`;
             document.body.style.backgroundPosition = 'center center !important';
             document.body.style.backgroundRepeat = 'no-repeat no-repeat';
-            document.body.style.backgroundSize = '100% 100%';
+            document.body.style.backgroundSize = 'cover';
             document.body.style.opacity = execute('userConfig', 'getOpacity');
             ipcRenderer.send('loading-success', '加载完成!');
             checkVersion();
@@ -1702,7 +1702,7 @@ function createFile(dom) {
                                     } else {
                                         const filePath = f.name.replace(/\\/g, '\/');
                                         try {
-                                            f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
+                                            f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;\n` + f.content);
                                         } catch (e) {
                                             console.error(e);
                                             showError(e);
@@ -1822,7 +1822,7 @@ function createFile(dom) {
                                 } else {
                                     const filePath = f.name.replace(/\\/g, '\/');
                                     try {
-                                        f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;` + f.content);
+                                        f.preview = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(filePath, 'utf8').toString().replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;\n` + f.content);
                                     } catch (e) {
                                         console.error(e);
                                         showError(e);

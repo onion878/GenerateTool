@@ -13,19 +13,17 @@ Ext.define('OnionSpace.view.logger.logger', {
                 language: 'consoleLanguage',
                 theme: 'consoleTheme',
                 readOnly: true,
-                lineNumbers: 'off',
                 lineDecorationsWidth: '0px',
                 scrollBeyondLastLine: false,
                 minimap: {
                     enabled: true
-                },
-                automaticLayout: true
+                }
             });
             that.codeEditor.addAction({
                 id: 'refresh-action',
                 label: '刷新日志',
                 keybindings: [
-                    monaco.KeyCode.F5
+                    monaco.KeyCode.F2
                 ],
                 precondition: null,
                 keybindingContext: null,
@@ -53,6 +51,11 @@ Ext.define('OnionSpace.view.logger.logger', {
                 }
             });
             that.setValue(logger.readValue());
+        },
+        resize: {
+            fn: function(el) {
+                this.resizeCode();
+            }
         }
     },
     setValue: function (msg) {
@@ -65,5 +68,10 @@ Ext.define('OnionSpace.view.logger.logger', {
     },
     initComponent: function () {
         this.callParent(arguments);
+    },
+    resizeCode: function () {
+        if (this.codeEditor) {
+            this.codeEditor.layout();
+        }
     }
 });
