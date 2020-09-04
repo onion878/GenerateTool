@@ -45,7 +45,7 @@
     "ansicolor": "^1.1.92",
     "app-root-path": "^3.0.0",
     "archiver": "^3.0.0",
-    "decompress": "^4.2.0",
+    "decompress": "^4.2.1",
     "del": "^5.0.0",
     "log4js": "^6.1.0",
     "lowdb": "^1.0.0",
