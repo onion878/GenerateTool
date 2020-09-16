@@ -60,7 +60,7 @@ Ext.define('OnionSpace.view.detail-temp.detail-temp', {
                                 Ext.getCmp('main-content').mask('下载中, 请稍等...');
                                 const local = execute('parentData', 'getByServeId', [data.Pid]);
                                 utils.downloadFile(data.User + '/' + data.Id + '.zip', data.Id + '.zip').then(d => {
-                                    if (local === null) {
+                                    if (local == null) {
                                         jsCode.importModule(d, "", data.Pid, data.Id).then(({msg, pId}) => {
                                             showToast('[success] [' + data.Name + ']下载成功!');
                                             jsCode.deleteFile(d);

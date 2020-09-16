@@ -29,7 +29,7 @@ class Commands {
         return new Promise((resolve, reject) => {
             let terminal = this.config.getConfig('terminal');
             if (terminal.trim().length == 0) {
-                terminal = process.env[os.platform() === 'win32' ? 'COMSPEC' : 'SHELL'];
+                terminal = process.env[os.platform() == 'win32' ? 'COMSPEC' : 'SHELL'];
                 this.systemCmd = true;
             }
             if (this.nowPty == null) {
@@ -68,8 +68,12 @@ class Commands {
     initXterm(userBash, resolve, element) {
         const that = this;
         // Initialize xterm.js and attach it to the DOM
+        let font = execute('userConfig', 'getConfig', ['font']);
+        if (font == null || font == 'default') {
+            font = 'sans-serif';
+        }
         that.term = new Terminal({
-            fontFamily: execute('userConfig', 'getConfig', ['font']),
+            fontFamily: font,
             theme: {
                 foreground: that.ColorReverse(that.color2),
                 background: that.color2,

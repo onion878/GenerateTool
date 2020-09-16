@@ -260,7 +260,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                         scope: this,
                                         animateTarget: item,
                                         fn: function (btn, text) {
-                                            if (btn === 'ok') {
+                                            if (btn == 'ok') {
                                                 const child = {...record.data};
                                                 Ext.getCmp('mainmenutab').remove(record.data.parentFolder);
                                                 jsCode.reName(pId, record.data.text, text, record.parentNode.data.parentFolder);

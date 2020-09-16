@@ -56,7 +56,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                         const jsonResp = Ext.util.JSON.decode(response.responseText);
                                         const local = execute('parentData', 'getByServeId', [jsonResp.Pid]);
                                         utils.downloadFile(jsonResp.User + '/' + jsonResp.Id + '.zip', jsonResp.Id + '.zip').then(d => {
-                                            if (local === null) {
+                                            if (local == null) {
                                                 jsCode.importModule(d, "", data.Id, jsonResp.Id).then(({msg, pId}) => {
                                                     showToast('[success] [' + data.Name + ']下载成功!');
                                                     jsCode.deleteFile(d);

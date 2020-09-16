@@ -92,7 +92,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                             handler: function (btn) {
                                 const d = btn.up().getWidgetRecord().getData();
                                 const auth = execute('userConfig', 'getAuth');
-                                if (auth.trim() === "") {
+                                if (auth.trim() == "") {
                                     login();
                                 } else {
                                     const data = {id: d.id, text: d.text + '-' + utils.getNowTimeCode()};

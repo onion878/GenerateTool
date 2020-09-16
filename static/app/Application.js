@@ -298,7 +298,7 @@ function initMainView() {
                                                                 handler: function () {
                                                                     const combo = this.up('window').down('combobox');
                                                                     const row = combo.getSelectedRecord();
-                                                                    if (row === null) {
+                                                                    if (row == null) {
                                                                         Ext.toast({
                                                                             html: `<span style="color: red;">请选择至少一条数据!</span>`,
                                                                             autoClose: true,
@@ -384,7 +384,7 @@ function initMainView() {
                                                                     }
                                                                     let ifAdd = true;
                                                                     modes.forEach(function (m) {
-                                                                        if (m.text === t) {
+                                                                        if (m.text == t) {
                                                                             ifAdd = false;
                                                                         }
                                                                     });
@@ -1220,7 +1220,7 @@ function showPrompt(title, msg, fn, dom, value) {
     if (msg !== undefined) options.msg = msg;
     if (value !== undefined) options.value = value;
     if (fn !== undefined) options.fn = function (btn, text) {
-        if (btn === 'ok')
+        if (btn == 'ok')
             fn(text);
     };
     if (dom !== undefined) options.animateTarget = dom;
@@ -1238,7 +1238,7 @@ function showConfirm(msg, fn, dom, icon) {
     };
     if (msg !== undefined) options.msg = msg;
     if (fn !== undefined) options.fn = function (btn) {
-        if (btn === 'yes')
+        if (btn == 'yes')
             fn();
     };
     if (dom !== undefined) options.animateTarget = dom;
@@ -1281,7 +1281,7 @@ function doSomeThing(text) {
                     handler: function () {
                         const combo = this.up('window').down('combobox');
                         const row = combo.getSelectedRecord();
-                        if (row === null) {
+                        if (row == null) {
                             Ext.toast({
                                 html: `<span style="color: red;">请选择至少一条数据!</span>`,
                                 autoClose: true,
