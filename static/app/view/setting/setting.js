@@ -200,7 +200,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                     listeners: {
                         render: function (dom) {
                             utils.getAllFonts().then(fonts => {
-                                const data = [];
+                                const data = [{id: 'default', text: '默认(防止编辑器无法对齐)'}];
                                 fonts.forEach(f => {
                                     data.push({id: f.replace(/\"/g, ''), text: f.replace(/\"/g, '')});
                                 });
@@ -208,17 +208,28 @@ Ext.define('OnionSpace.view.setting.setting', {
                                     fields: ['id', 'text'],
                                     data: data
                                 }));
-                                dom.setValue(execute('userConfig', 'getConfig', ['font']));
+                                const font = execute('userConfig', 'getConfig', ['font']);
+                                if (font == null) {
+                                    dom.setValue('default');
+                                } else {
+                                    dom.setValue(font);
+                                }
                             });
                         },
                         change: function (dom, val) {
+                            execute('userConfig', 'setConfig', ['font', val]);
                             const id = "font-style";
                             let node = document.getElementById(id);
+                            if (val == 'default') {
+                                if (node != null) {
+                                    node.remove();
+                                }
+                                return;
+                            }
                             if (node == null) node = document.createElement('style');
                             node.id = id;
                             node.innerHTML = `*:not(.font-part) {font-family: '${val}',Consolas, "Courier New", monospace}`;
                             document.getElementsByTagName('head')[0].appendChild(node)
-                            execute('userConfig', 'setConfig', ['font',val]);
                         }
                     }
                 },

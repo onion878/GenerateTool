@@ -1053,7 +1053,7 @@ function initMainView() {
             const tabData = execute('history', 'getTab');
             const tabCode = execute('history', 'getCode');
             const showTab = execute('history', 'getShowTab');
-            if(pId !== '') {
+            if (pId !== '') {
                 for (let i = 0; i < tabData.length; i++) {
                     if (tabData[i].id == showTab) {
                         openSome(tabData[i]);
@@ -1071,11 +1071,13 @@ function initMainView() {
             }
             registerAllSuggestion();
             checkNew(pId);
-            const id = "font-style";
-            let node = document.createElement('style');
-            node.id = id;
-            node.innerHTML = `*:not(.font-part) {font-family: '${execute('userConfig', 'getConfig', ['font'])}',Consolas, "Courier New", monospace}`;
-            document.getElementsByTagName('head')[0].appendChild(node)
+            const font = execute('userConfig', 'getConfig', ['font']);
+            if (font != null && font != 'default') {
+                let node = document.createElement('style');
+                node.id = "font-style";
+                node.innerHTML = `*:not(.font-part) {font-family: '${font}',Consolas, "Courier New", monospace}`;
+                document.getElementsByTagName('head')[0].appendChild(node);
+            }
             document.body.style.backgroundImage = `url('${execute('userConfig', 'getBg').replace(/\\/g, '/')}')`;
             document.body.style.backgroundPosition = 'center center !important';
             document.body.style.backgroundRepeat = 'no-repeat no-repeat';
