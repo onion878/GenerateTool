@@ -288,6 +288,11 @@ class Utils {
         }
         return bytes;
     }
+
+    getAllFonts() {
+        const fontManager = require('font-list');
+        return fontManager.getFonts();
+    }
 }
 
 module.exports = new Utils();

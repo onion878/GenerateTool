@@ -1,6 +1,6 @@
 {
   "name": "GenerateTool",
-  "version": "1.6.7",
+  "version": "1.6.8",
   "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {
@@ -38,29 +38,30 @@
     }
   },
   "devDependencies": {
-    "electron": "^7.1.2",
-    "electron-builder": "^21.2.0"
+    "electron": "^10.1.1",
+    "electron-builder": "^22.8.0"
   },
   "dependencies": {
     "ansicolor": "^1.1.92",
     "app-root-path": "^3.0.0",
-    "archiver": "^3.0.0",
+    "archiver": "^5.0.1",
     "decompress": "^4.2.0",
     "del": "^5.0.0",
+    "font-list": "^1.2.11",
     "log4js": "^6.1.0",
     "lowdb": "^1.0.0",
-    "marked": "^0.7.0",
+    "marked": "^1.1.1",
     "monaco-editor": "^0.20.0",
     "node-pty": "^0.9.0",
     "open": "^7.0.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "require-uncached": "^2.0.0",
-    "sequelize": "^5.21.3",
+    "sequelize": "^6.3.5",
     "shelljs": "^0.8.3",
-    "sqlite3": "^4.1.1",
+    "sqlite3": "^5.0.0",
     "swig": "^1.4.2",
     "xterm": "^4.2.0-vscode1",
-    "xterm-addon-fit": "^0.3.0"
+    "xterm-addon-fit": "^0.4.0"
   }
 }

@@ -14,7 +14,7 @@ const need = require('require-uncached');
 const {getDataPath} = require('./service/utils/help');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false, globalStoreDirPath;
-
+app.allowRendererProcessReuse = false;
 function createWindow() {
     // 预加载
     loading = new BrowserWindow({
@@ -76,7 +76,8 @@ function createMainWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            enableRemoteModule: true
         },
         width: data.width,
         height: data.height,
@@ -85,7 +86,7 @@ function createMainWindow() {
         opacity: opacity,
         backgroundColor: 'black',
         title: '代码构建工具',
-        icon: icon
+        icon: icon,
     });
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({

@@ -1071,6 +1071,11 @@ function initMainView() {
             }
             registerAllSuggestion();
             checkNew(pId);
+            const id = "font-style";
+            let node = document.createElement('style');
+            node.id = id;
+            node.innerHTML = `*:not(.font-part) {font-family: '${execute('userConfig', 'getConfig', ['font'])}',Consolas, "Courier New", monospace}`;
+            document.getElementsByTagName('head')[0].appendChild(node)
             document.body.style.backgroundImage = `url('${execute('userConfig', 'getBg').replace(/\\/g, '/')}')`;
             document.body.style.backgroundPosition = 'center center !important';
             document.body.style.backgroundRepeat = 'no-repeat no-repeat';

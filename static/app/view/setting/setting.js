@@ -175,7 +175,53 @@ Ext.define('OnionSpace.view.setting.setting', {
                             remote.getCurrentWindow().setOpacity(v / 100);
                         }
                     }
-                }
+                },
+                {
+                    xtype: 'combobox',
+                    fieldLabel: '字体',
+                    store: {
+                        fields: ['id', 'text'],
+                    },
+                    queryMode: 'local',
+                    displayField: 'text',
+                    valueField: 'id',
+                    allowBlank: false,
+                    selectOnFocus: true,
+                    enableKeyEvents: true,
+                    tpl: new Ext.XTemplate(
+                        '<ul class="x-list-plain">',
+                        '<tpl for=".">',
+                        '<li class="x-boundlist-item">',
+                        '<span class="font-part" style="font-family: \'{[values.text]}\'">{[values.text]}</span>',
+                        '</li>',
+                        '</tpl>',
+                        '</ul>'
+                    ),
+                    listeners: {
+                        render: function (dom) {
+                            utils.getAllFonts().then(fonts => {
+                                const data = [];
+                                fonts.forEach(f => {
+                                    data.push({id: f.replace(/\"/g, ''), text: f.replace(/\"/g, '')});
+                                });
+                                dom.setStore(Ext.create('Ext.data.Store', {
+                                    fields: ['id', 'text'],
+                                    data: data
+                                }));
+                                dom.setValue(execute('userConfig', 'getConfig', ['font']));
+                            });
+                        },
+                        change: function (dom, val) {
+                            const id = "font-style";
+                            let node = document.getElementById(id);
+                            if (node == null) node = document.createElement('style');
+                            node.id = id;
+                            node.innerHTML = `*:not(.font-part) {font-family: '${val}',Consolas, "Courier New", monospace}`;
+                            document.getElementsByTagName('head')[0].appendChild(node)
+                            execute('userConfig', 'setConfig', ['font',val]);
+                        }
+                    }
+                },
             ]
         },
         {

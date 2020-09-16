@@ -44,6 +44,7 @@ Ext.define('OnionSpace.view.message.message', {
         const nowTime = this.getNowTime();
         const m = '[' + nowTime + '] ' + msg;
         Ext.getCmp('msg-bar').infoPanel.innerText = m;
+        Ext.getCmp('msg-bar').infoPanel.title = m;
         this.value += m + '\n';
         logger.debug(msg);
         this.codeEditor.setValue(this.value);
@@ -61,13 +62,13 @@ Ext.define('OnionSpace.view.message.message', {
 
     },
     getNowTime() {
-        var date = new Date();
-        var month = date.getMonth() + 1;
-        var day = date.getDate();
-        var hours = date.getHours();
-        var min = date.getMinutes();
-        var sec = date.getSeconds();
-        var code = date.getFullYear() + '-' + toForMatter(month) + '-' +
+        let date = new Date();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        let hours = date.getHours();
+        let min = date.getMinutes();
+        let sec = date.getSeconds();
+        let code = date.getFullYear() + '-' + toForMatter(month) + '-' +
             toForMatter(day) + ' ' + toForMatter(hours) + ':' + toForMatter(min)
             + ':' + toForMatter(sec);
 

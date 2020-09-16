@@ -67,10 +67,9 @@ class Commands {
 
     initXterm(userBash, resolve, element) {
         const that = this;
-
         // Initialize xterm.js and attach it to the DOM
         that.term = new Terminal({
-            fontFamily: 'Consolas',
+            fontFamily: execute('userConfig', 'getConfig', ['font']),
             theme: {
                 foreground: that.ColorReverse(that.color2),
                 background: that.color2,
