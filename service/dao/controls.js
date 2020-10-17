@@ -86,6 +86,15 @@ class Controls {
         return con.get('code').filter({cId: cId, pId: help.getPid()}).value();
     }
 
+    getCodeConfig(pId) {
+        const list = [];
+        con.get('code').filter({pId: pId}).value().forEach(r => {
+            const d = con.get('ext').filter({id: r.id, pId: pId}).value()[0];
+            list.push({label: d.label, script: r.value});
+        });
+        return list;
+    }
+
     //获取当前设置的控件数据集
     getModuleData(pId) {
         const data = con.get('ext').filter({pId: pId}).value();

@@ -45,8 +45,8 @@ Ext.define('OnionSpace.controller.Generate', {
         code.updateOptions({
             readOnly: true
         });
-        dom.mask('处理中...');
         if (params.updateType == 'add') {
+            dom.mask('处理中...');
             nodeRun(`compileTemplate('${params.fileId}')`).then(output => {
                 code.setValue(output);
                 dom.unmask();
@@ -63,6 +63,7 @@ Ext.define('OnionSpace.controller.Generate', {
                 showError('Error 未设置修改文件,无法预览!');
                 return;
             }
+            dom.mask('处理中...');
             try {
                 const tplFile = swig.compile(file);
                 const f = tplFile(execute('controlData', 'getModuleData', [btn.up('generate').pId])).replace(/\\/g, '\/');

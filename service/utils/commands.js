@@ -68,11 +68,16 @@ class Commands {
     initXterm(userBash, resolve, element) {
         const that = this;
         // Initialize xterm.js and attach it to the DOM
-        let font = execute('userConfig', 'getConfig', ['font']);
+        let font = execute('userConfig', 'getConfig', ['font']),
+            fontSize = execute('userConfig', 'getConfig', ['fontSize']);
         if (font == null || font == 'default') {
             font = 'sans-serif';
         }
+        if (fontSize == null) {
+            fontSize = 13;
+        }
         that.term = new Terminal({
+            fontSize: fontSize,
             fontFamily: font,
             theme: {
                 foreground: that.ColorReverse(that.color2),

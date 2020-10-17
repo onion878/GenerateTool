@@ -2,6 +2,52 @@ Ext.define('OnionSpace.controller.Mode', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.Mode',
     pId: null,
+    types: [
+        {
+            id: 'text',
+            text: '文本框'
+        },
+        {
+            id: 'textarea',
+            text: '多行文本框'
+        },
+        {
+            id: 'combobox',
+            text: '单选框'
+        },
+        {
+            id: 'datalist',
+            text: '单一集合'
+        },
+        {
+            id: 'datagrid',
+            text: '表格数据'
+        },
+        {
+            id: 'minicode',
+            text: '代码块'
+        },
+        {
+            id: 'folder',
+            text: '文件夹'
+        },
+        {
+            id: 'file',
+            text: '文件'
+        },
+        {
+            id: 'json',
+            text: 'JSON数据'
+        },
+        {
+            id: 'radio',
+            text: '单选标签'
+        },
+        {
+            id: 'check',
+            text: '多选标签'
+        }
+    ],
     init: function () {
         this.control({
             'mode': {
@@ -64,44 +110,7 @@ Ext.define('OnionSpace.controller.Mode', {
                         labelWidth: 60,
                         store: {
                             fields: ['id', 'text'],
-                            data: [
-                                {
-                                    id: 'text',
-                                    text: '文本框'
-                                },
-                                {
-                                    id: 'textarea',
-                                    text: '多行文本框'
-                                },
-                                {
-                                    id: 'combobox',
-                                    text: '单选框'
-                                },
-                                {
-                                    id: 'datalist',
-                                    text: '单一集合'
-                                },
-                                {
-                                    id: 'datagrid',
-                                    text: '表格数据'
-                                },
-                                {
-                                    id: 'minicode',
-                                    text: '代码块'
-                                },
-                                {
-                                    id: 'folder',
-                                    text: '文件夹'
-                                },
-                                {
-                                    id: 'file',
-                                    text: '文件'
-                                },
-                                {
-                                    id: 'json',
-                                    text: 'JSON数据'
-                                }
-                            ]
+                            data: that.types
                         },
                         name: 'type',
                         queryMode: 'local',
@@ -127,10 +136,23 @@ Ext.define('OnionSpace.controller.Mode', {
                                         valueField: 'id',
                                         allowBlank: false
                                     });
+                                    this.up('form').add({
+                                        xtype: 'numberfield',
+                                        margin: '10',
+                                        labelWidth: 60,
+                                        name: 'height',
+                                        id: 'number-language',
+                                        allowBlank: false,
+                                        fieldLabel: '高度',
+                                        emptyText: '如:150'
+                                    });
                                 } else {
-                                    const dom = Ext.getCmp('combo-language');
+                                    const dom = Ext.getCmp('combo-language'), dom1 = Ext.getCmp('number-language');
                                     if (dom != undefined) {
                                         dom.destroy();
+                                    }
+                                    if (dom1 != undefined) {
+                                        dom1.destroy();
                                     }
                                 }
                             }
@@ -148,12 +170,13 @@ Ext.define('OnionSpace.controller.Mode', {
                         const {
                             type,
                             name,
-                            language
+                            language,
+                            height
                         } = form.getValues();
                         if (moduleData[name] != undefined) {
                             showToast(`已存在[${name}]!`);
                         } else {
-                            btn.up('panel').add(that.getComponent(type, name, id, language));
+                            btn.up('panel').add(that.getComponent(type, name, id, language, parseInt(height)));
                             const d = {};
                             if (type == 'json') {
                                 d[name] = `JSON: ${name}`;
@@ -177,7 +200,7 @@ Ext.define('OnionSpace.controller.Mode', {
             ]
         }).show().focus();
     },
-    getComponent(type, label, id, language) {
+    getComponent(type, label, id, language, codeHeight) {
         let content = {};
         if (type == 'text') {
             content = {
@@ -256,7 +279,29 @@ Ext.define('OnionSpace.controller.Mode', {
                 xtype: 'propertygrid',
                 flex: 1
             };
-        } else {
+        } else if (type == 'radio') {
+            content = {
+                flex: 1,
+                xtype: 'radiogroup',
+                layout: {
+                    autoFlex: false
+                },
+                defaults: {
+                    margin: '0 15 0 0',
+                }
+            };
+        } else if (type == 'check') {
+            content = {
+                flex: 1,
+                xtype: 'checkboxgroup',
+                layout: {
+                    autoFlex: false
+                },
+                defaults: {
+                    margin: '0 15 0 0'
+                }
+            };
+        } else if (type == 'minicode') {
             content = {
                 xtype: 'panel',
                 flex: 1,
@@ -265,6 +310,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     border: '1px solid #c2c2c2'
                 },
                 items: {
+                    height: codeHeight,
                     language: language,
                     xtype: 'minicode'
                 }
@@ -508,8 +554,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     execute('controlData', 'setDataValue', [id, that.getGridJsonData(this.getStore())]);
                 }
             };
-        } else {
-            content.height = 150;
+        } else if (type == 'minicode') {
             content.items.changeValue = function () {
                 execute('controlData', 'setDataValue', [id, this.codeEditor.getValue()]);
             };
@@ -551,6 +596,68 @@ Ext.define('OnionSpace.controller.Mode', {
                     }
                 }
             ];
+        } else if (type == 'radio') {
+            content.style = {
+                marginLeft: '-4px'
+            };
+            content.listeners = {
+                change: function (dom, val) {
+                    const list = [];
+                    dom.items.items.forEach(r => {
+                        list.push({
+                            label: r.boxLabel,
+                            value: r.inputValue,
+                            check: val[r.name] == r.inputValue
+                        });
+                    });
+                    execute('controlData', 'setDataValue', [id, list]);
+                }
+            };
+            const list = [];
+            if (value instanceof Array) {
+                value.forEach(r => {
+                    list.push({
+                        boxLabel: r.label,
+                        inputValue: r.value,
+                        checked: r.check
+                    });
+                })
+            }
+            content.items = list;
+        } else if (type == 'check') {
+            content.style = {
+                marginLeft: '-4px'
+            };
+            content.listeners = {
+                change: function (dom, val) {
+                    let v = false;
+                    const list = [];
+                    dom.items.items.forEach(r => {
+                        if (val[r.name] instanceof Array) {
+                            v = val[r.name].includes(r.inputValue);
+                        } else {
+                            v = val[r.name] == r.inputValue;
+                        }
+                        list.push({
+                            label: r.boxLabel,
+                            value: r.inputValue,
+                            check: v
+                        });
+                    });
+                    execute('controlData', 'setDataValue', [id, list]);
+                }
+            };
+            const list = [];
+            if (value instanceof Array) {
+                value.forEach(r => {
+                    list.push({
+                        boxLabel: r.label,
+                        inputValue: r.value,
+                        checked: r.check
+                    });
+                })
+            }
+            content.items = list;
         }
         return {
             xtype: 'container',
@@ -559,7 +666,8 @@ Ext.define('OnionSpace.controller.Mode', {
             margin: {
                 left: 10,
                 right: 10,
-                bottom: 10
+                bottom: 10,
+                top: 10
             },
             items: [
                 {
@@ -572,6 +680,11 @@ Ext.define('OnionSpace.controller.Mode', {
                         width: 105,
                         margin: {
                             top: 3
+                        },
+                        style: {
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis'
                         },
                         listeners: {
                             'render': function () {
@@ -866,11 +979,15 @@ Ext.define('OnionSpace.controller.Mode', {
         const that = this;
         const id = btn.up('mode').id;
         const data = execute('controlData', 'getExt', [id]);
+        const keys = {};
+        that.types.forEach(r => {
+            keys[r.id] = r.text;
+        });
         Ext.create('Ext.window.Window', {
             title: '排序',
             fixed: true,
-            width: 300,
-            maxHeight: 400,
+            width: 350,
+            maxHeight: 450,
             layout: 'fit',
             animateTarget: btn,
             resizable: false,
@@ -898,6 +1015,15 @@ Ext.define('OnionSpace.controller.Mode', {
                         align: 'center',
                         dataIndex: 'label',
                         flex: 1
+                    },
+                    {
+                        text: '类型',
+                        align: 'center',
+                        dataIndex: 'type',
+                        flex: 1,
+                        renderer: function (v) {
+                            return keys[v];
+                        }
                     }
                 ],
                 buttonAlign: 'center',
@@ -956,7 +1082,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 return;
             }
             Promise.all(reData).then(values => {
-                const data = {};
+                const data = execute('controlData', 'getModuleData', [that.pId]);
                 values.forEach((v, i) => {
                     const btn = Ext.getCmp(list[i].id),
                         type = btn.bType, label = btn.up('container').down('label').text;
@@ -1107,9 +1233,35 @@ Ext.define('OnionSpace.controller.Mode', {
                 d1[k] = `JSON: ... -> ${k}`;
             }
             registerSingleData(d1);
-        } else {
+        } else if (type == 'minicode') {
             const code = btn.up('container').down('minicode');
-            code.updateLanguage(v, code.language)
+            code.updateLanguage(v, code.language);
+            code.changeValue();
+        } else if (type == 'radio') {
+            let val = {};
+            const radio = btn.up('container').down('radiogroup');
+            radio.removeAll(true);
+            v.forEach(c => {
+                if (c.check === true) {
+                    val[radio.name] = c.value;
+                }
+                const r = new Ext.form.field.Radio({boxLabel: c.label, inputValue: c.value});
+                radio.add(r);
+            });
+            radio.setValue(val);
+        } else if (type == 'check') {
+            let val = {};
+            const check = btn.up('container').down('checkboxgroup');
+            check.removeAll(true);
+            val[check.name] = [];
+            v.forEach(c => {
+                if (c.check === true) {
+                    val[check.name].push(c.value);
+                }
+                const r = new Ext.form.field.Checkbox({boxLabel: c.label, inputValue: c.value});
+                check.add(r);
+            });
+            check.setValue(val);
         }
     }
 });

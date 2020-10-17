@@ -49,7 +49,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                     name: 'editor',
                     fieldLabel: '界面缩放',
                     id: 'setting-zoom',
-                    increment: 10,
+                    increment: 1,
                     minValue: 0,
                     maxValue: 200,
                     tipText: function (thumb) {
@@ -177,6 +177,27 @@ Ext.define('OnionSpace.view.setting.setting', {
                     }
                 },
                 {
+                    xtype: 'slider',
+                    fieldLabel: '字体大小',
+                    increment: 1,
+                    minValue: 5,
+                    maxValue: 50,
+                    listeners: {
+                        render: function (dom) {
+                            dom.setValue(execute('userConfig', 'getConfig', ['fontSize']));
+                        },
+                        change: function (dom, val) {
+                            execute('userConfig', 'setConfig', ['fontSize', val]);
+                            const id = "font-size";
+                            let node = document.getElementById(id);
+                            if (node == null) node = document.createElement('style');
+                            node.id = id;
+                            node.innerHTML = `* {font-size: ${val}px;}`;
+                            document.getElementsByTagName('head')[0].appendChild(node);
+                        }
+                    }
+                },
+                {
                     xtype: 'combobox',
                     fieldLabel: '字体',
                     store: {
@@ -229,7 +250,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                             if (node == null) node = document.createElement('style');
                             node.id = id;
                             node.innerHTML = `*:not(.font-part) {font-family: '${val}',Consolas, "Courier New", monospace}`;
-                            document.getElementsByTagName('head')[0].appendChild(node)
+                            document.getElementsByTagName('head')[0].appendChild(node);
                         }
                     }
                 },

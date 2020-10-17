@@ -952,7 +952,8 @@ const nodeRun = (content) => {
         const {BrowserWindow, getCurrentWindow} = require('electron').remote;
         runWin = new BrowserWindow({
             webPreferences: {
-                nodeIntegration: true
+                nodeIntegration: true,
+                enableRemoteModule: true
             },
             title: 'Thread-runCode',
             parent: getCurrentWindow(),

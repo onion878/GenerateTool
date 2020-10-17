@@ -395,6 +395,7 @@ class JscodeUtil {
                                     // 判断是文件还是目录
                                     if (stat.isFile()) {
                                         fs.writeFileSync(_dist, fs.readFileSync(_src));
+                                        callback(_dist);
                                     } else if (stat.isDirectory()) {
                                         // 当是目录是，递归复制
                                         that.copyDir(_src, _dist, callback)
@@ -406,6 +407,14 @@ class JscodeUtil {
                 })
             }
         }
+    }
+
+    copyFile(file, folder) {
+        const path = require('path');
+        if (!fs.existsSync(folder)) {
+            fs.mkdirSync(folder);
+        }
+        fs.copyFileSync(file, folder + "/" + path.basename(file));
     }
 
     getNewModuleName(name, total) {

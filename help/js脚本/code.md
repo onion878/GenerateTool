@@ -6,6 +6,8 @@
 - **[单一集合]: 返回单一数组对象,如: ['Google', 'Microsoft', 'Apple']**<br>
 - **[JSON数据]: 返回单一对象,如: {name: 'Google'}**<br>
 - **[表格数据]: 返回集合对象,如: [{name: 'Google'}]**<br>
+- **[单选标签]: 返回固定键的集合对象,如: [{label: "选项1", value: 1, check: true},{label: "选项2", value: 2}]**<br>
+- **[多选标签]: 返回固定键的集合对象,如: [{label: "选项1", value: 1, check: true},{label: "选项2", value: 2}]**<br>
 
 ## 返回定义
 **数据**: 如：module.exports = {name: 'Google'}<br>

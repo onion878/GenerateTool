@@ -3,8 +3,10 @@ const jsCode = require('../service/utils/JscodeUtil');
 const swig = require('swig');
 const utils = require('../service/utils/utils');
 const command = require('../service/utils/commands');
-let threadIndex = 0;
 
+swig.setDefaults({autoescape: false});
+
+let threadIndex = 0;
 function execute(key, method, args) {
     if (args === undefined) {
         args = [];
@@ -820,7 +822,8 @@ function initMainView() {
                                 id: 'js-data',
                                 useArrows: true,
                                 hidden: true,
-                                scrollable: true
+                                scrollable: true,
+                                layout: 'fit'
                             },
                             {
                                 region: 'center',
@@ -1071,11 +1074,20 @@ function initMainView() {
             }
             registerAllSuggestion();
             checkNew(pId);
-            const font = execute('userConfig', 'getConfig', ['font']);
+            const font = execute('userConfig', 'getConfig', ['font']),
+                fontSize = execute('userConfig', 'getConfig', ['fontSize']);
             if (font != null && font != 'default') {
                 let node = document.createElement('style');
                 node.id = "font-style";
                 node.innerHTML = `*:not(.font-part) {font-family: '${font}',Consolas, "Courier New", monospace}`;
+                document.getElementsByTagName('head')[0].appendChild(node);
+            }
+            if (fontSize != null) {
+                const id = "font-size";
+                let node = document.getElementById(id);
+                if (node == null) node = document.createElement('style');
+                node.id = id;
+                node.innerHTML = `* {font-size: ${fontSize}px;}`;
                 document.getElementsByTagName('head')[0].appendChild(node);
             }
             document.body.style.backgroundImage = `url('${execute('userConfig', 'getBg').replace(/\\/g, '/')}')`;

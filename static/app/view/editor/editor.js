@@ -2,6 +2,7 @@ Ext.define('OnionSpace.view.editor.editor', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.editor',
     viewModel: true,
+    layout: 'accordion',
     listeners: {
         render: function (c) {
             if (utils.isEmpty(this.pId)) {
@@ -25,8 +26,11 @@ Ext.define('OnionSpace.view.editor.editor', {
         this.items = {
             margins: '0 0 0 0',
             xtype: 'treepanel',
+            title: 'JS脚本',
             useArrows: true,
             lines: false,
+            rootVisible: false,
+            hideCollapseTool: true,
             viewConfig: {
                 plugins: [{
                     ptype: 'treeviewdragdrop',
@@ -50,7 +54,6 @@ Ext.define('OnionSpace.view.editor.editor', {
                     }
                 }
             },
-            rootVisible: true,
             store: Ext.create('Ext.data.TreeStore', {
                 root: {
                     expanded: true,
@@ -60,6 +63,130 @@ Ext.define('OnionSpace.view.editor.editor', {
                     children: rootData
                 }
             }),
+            tools: [
+                {
+                    renderTpl: [
+                        '<div id="{id}-toolEl" class="x-tool-tool-el" style="background: url(images/add.svg)" role="presentation"></div>'
+                    ],
+                    qtip: '新建文件',
+                    listeners: {
+                        click: function () {
+                            const that = this;
+                            showPrompt('文件名', '', function (text) {
+                                const child = jsCode.createFile(that.up('editor').pId, text);
+                                child.icon = getFileIcon(text);
+                                const root = that.up('treepanel').getRootNode();
+                                root.appendChild(child);
+                            }, that);
+                        }
+                    }
+                },
+                {
+                    renderTpl: [
+                        '<div id="{id}-toolEl" class="x-tool-tool-el" style="background: url(images/folder_add.svg)" role="presentation"></div>'
+                    ],
+                    qtip: '新建文件夹',
+                    listeners: {
+                        click: function () {
+                            const that = this;
+                            showPrompt('文件夹', '', function (text) {
+                                const child = jsCode.createFolder(that.up('editor').pId, text);
+                                child.icon = './icons/folder-core.svg';
+                                const root = that.up('treepanel').getRootNode();
+                                root.appendChild(child);
+                            }, that);
+                        }
+                    }
+                },
+                {
+                    renderTpl: [
+                        '<div id="{id}-toolEl" class="x-tool-tool-el x-tool-img-more" role="presentation"></div>'
+                    ],
+                    qtip: '其它配置',
+                    listeners: {
+                        click: function (btn, e) {
+                            new Ext.menu.Menu({
+                                minWidth: 60,
+                                items: [
+                                    {
+                                        text: '编辑器打开',
+                                        icon: 'images/javascript.svg',
+                                        handler: function () {
+                                            showConfirm(`是否采用编辑器打开项目?`, function (text) {
+                                                utils.openCodeFolder(execute('systemConfig', 'getConfig', ['editor']), jsCode.getFolder(pId));
+                                            }, this, Ext.MessageBox.INFO);
+                                        }
+                                    },
+                                    {
+                                        text: '在文件夹中显示',
+                                        icon: 'images/folder.svg',
+                                        handler: function () {
+                                            const {shell} = require('electron').remote;
+                                            shell.openPath(jsCode.getFolder(pId)).then();
+                                        }
+                                    },
+                                    {
+                                        text: '管理包',
+                                        icon: 'images/npm.svg',
+                                        handler: function () {
+                                            const nowItem = Ext.getCmp('unpkg-main');
+                                            const tPanel = Ext.getCmp('mainmenutab');
+                                            if (nowItem) {
+                                                tPanel.setActiveTab(nowItem);
+                                            } else {
+                                                tPanel.mask('加载中...');
+                                                Ext.require(controllers['unpkg'], function () {
+                                                    tPanel.unmask();
+                                                    const data = {
+                                                        id: 'unpkg-main',
+                                                        pId: pId,
+                                                        title: '管理包',
+                                                        closable: true,
+                                                        useType: 'editor',
+                                                        icon: './images/npm.svg',
+                                                        xtype: 'unpkg'
+                                                    };
+                                                    const jTab = tPanel.add(data);
+                                                    tPanel.setActiveTab(jTab);
+                                                    execute('history', 'setCode', [data]);
+                                                });
+                                            }
+                                        }
+                                    },
+                                    {
+                                        text: '安装包',
+                                        icon: 'images/npm-install.svg',
+                                        handler: function () {
+                                            const nowItem = Ext.getCmp('pkg-main');
+                                            const tPanel = Ext.getCmp('mainmenutab');
+                                            if (nowItem) {
+                                                tPanel.setActiveTab(nowItem);
+                                            } else {
+                                                tPanel.mask('加载中...');
+                                                Ext.require(controllers['pkg'], function () {
+                                                    tPanel.unmask();
+                                                    const data = {
+                                                        id: 'pkg-main',
+                                                        pId: pId,
+                                                        title: '安装包',
+                                                        closable: true,
+                                                        icon: './images/npm-install.svg',
+                                                        useType: 'editor',
+                                                        xtype: 'pkg'
+                                                    };
+                                                    const jTab = tPanel.add(data);
+                                                    execute('history', 'setCode', [data]);
+                                                    tPanel.setActiveTab(jTab);
+                                                });
+                                            }
+                                        }
+                                    }
+                                ]
+                            }).showAt(e.getPoint());
+                        }
+                    }
+                }
+            ],
             listeners: {
                 beforeitemexpand: function (node, index, item, eOpts) {
                     node.data.icon = './icons/folder-core-open.svg';
@@ -81,7 +208,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                 },
                 itemclick: function (node, record) {
                     if (record.data.type == 'file') {
-                        if (record.data.parentId == 'root' && (record.data.text == 'data.js' || record.data.text == 'package.json')) return;
+                        if (record.data.text == 'data.js' || record.data.text == 'package.json') return;
                         const {file, content} = jsCode.readFile(pId, record.data.parentFolder);
                         const tPanel = Ext.getCmp('mainmenutab');
                         const id = record.data.parentFolder;
@@ -112,102 +239,6 @@ Ext.define('OnionSpace.view.editor.editor', {
                 },
                 itemcontextmenu: function (node, record, item, index, event, eOpts) {
                     const that = this;
-                    if (record.data.parentId == 'root' && (record.data.text == 'data.js' || record.data.text == 'package.json')) return;
-                    if (record.id == 'root') {
-                        new Ext.menu.Menu({
-                            minWidth: 60,
-                            items: [
-                                {
-                                    text: '新建文件',
-                                    icon: 'images/add.svg',
-                                    handler: function () {
-                                        showPrompt('文件名', '', function (text) {
-                                            const child = jsCode.createFile(that.up('editor').pId, text);
-                                            child.icon = getFileIcon(text);
-                                            const root = that.getRootNode();
-                                            root.appendChild(child);
-                                        }, item);
-                                    }
-                                },
-                                {
-                                    text: '新建文件夹',
-                                    icon: 'images/folder_add.svg',
-                                    handler: function () {
-                                        showPrompt('文件夹', '', function (text) {
-                                            const child = jsCode.createFolder(that.up('editor').pId, text);
-                                            child.icon = './icons/folder-core.svg';
-                                            const root = that.getRootNode();
-                                            root.appendChild(child);
-                                        }, item);
-                                    }
-                                },
-                                {
-                                    text: '安装包',
-                                    icon: 'images/npm.svg',
-                                    handler: function () {
-                                        const nowItem = Ext.getCmp('pkg-main');
-                                        const tPanel = Ext.getCmp('mainmenutab');
-                                        if (nowItem) {
-                                            tPanel.setActiveTab(nowItem);
-                                        } else {
-                                            tPanel.mask('加载中...');
-                                            Ext.require(controllers['pkg'], function () {
-                                                tPanel.unmask();
-                                                const data = {
-                                                    id: 'pkg-main',
-                                                    pId: pId,
-                                                    title: '安装包',
-                                                    closable: true,
-                                                    icon: './images/npm.svg',
-                                                    useType: 'editor',
-                                                    xtype: 'pkg'
-                                                };
-                                                const jTab = tPanel.add(data);
-                                                execute('history', 'setCode', [data]);
-                                                tPanel.setActiveTab(jTab);
-                                            });
-                                        }
-                                    }
-                                },
-                                {
-                                    text: '管理包',
-                                    icon: 'images/npm.svg',
-                                    handler: function () {
-                                        const nowItem = Ext.getCmp('unpkg-main');
-                                        const tPanel = Ext.getCmp('mainmenutab');
-                                        if (nowItem) {
-                                            tPanel.setActiveTab(nowItem);
-                                        } else {
-                                            tPanel.mask('加载中...');
-                                            Ext.require(controllers['unpkg'], function () {
-                                                tPanel.unmask();
-                                                const data = {
-                                                    id: 'unpkg-main',
-                                                    pId: pId,
-                                                    title: '管理包',
-                                                    closable: true,
-                                                    useType: 'editor',
-                                                    icon: './images/npm.svg',
-                                                    xtype: 'unpkg'
-                                                };
-                                                const jTab = tPanel.add(data);
-                                                tPanel.setActiveTab(jTab);
-                                                execute('history', 'setCode', [data]);
-                                            });
-                                        }
-                                    }
-                                },
-                                {
-                                    text: '编辑器打开',
-                                    icon: 'images/javascript.svg',
-                                    handler: function () {
-                                        utils.openCodeFolder(execute('systemConfig', 'getConfig', ['editor']), jsCode.getFolder(pId));
-                                    }
-                                }
-                            ]
-                        }).showAt(event.getPoint());
-                        return;
-                    }
                     new Ext.menu.Menu({
                         minWidth: 60,
                         items: [

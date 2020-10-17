@@ -20,6 +20,7 @@ process
         remote.getCurrentWindow().getParentWindow().send('runNodeErr', err.message);
     });
 try {
+    swig.setDefaults({autoescape: false});
     eval(geFileData.getSwig(moduleId));
 } catch (e) {
     console.error(e);

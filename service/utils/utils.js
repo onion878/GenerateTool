@@ -105,14 +105,26 @@ class Utils {
         }
     }
 
-    createFile(path, content) {
+    createFolder(folder) {
         try {
-            path = path.replace(/\\/g, '/');
-            const filePath = path.substring(0, path.lastIndexOf(`/`));
+            if (!fs.existsSync(folder)) {
+                shell.mkdir('-p', folder);
+            }
+            return true;
+        } catch (e) {
+            console.error(e);
+            return false;
+        }
+    }
+
+    createFile(file, content) {
+        const path = require('path');
+        try {
+            const filePath = path.dirname(file);
             if (!fs.existsSync(filePath)) {
                 shell.mkdir('-p', filePath);
             }
-            fs.writeFileSync(path, content, 'utf8');
+            fs.writeFileSync(file, content, 'utf8');
             return true;
         } catch (e) {
             console.error(e);
@@ -216,7 +228,7 @@ class Utils {
         });
     }
 
-    downloadFile(file, f, url) {
+    downloadFile(file, f, url, progressBar) {
         const that = this;
         return new Promise((resolve, reject) => {
             if (url === undefined) {
@@ -252,11 +264,37 @@ class Utils {
             r.on('data', function (chunk) {
                 received += chunk.length;
                 const progressVal = received / total;
-                Ext.getCmp('msg-bar').setProgress(`下载中(${that.formatSizeUnits(received) + ' to ' + that.formatSizeUnits(total)})...`, progressVal);
+                if (progressBar) {
+                    progressBar.updateProgress(progressVal, `下载中(${that.formatSizeUnits(received) + ' to ' + that.formatSizeUnits(total)})...`, true);
+                } else {
+                    Ext.getCmp('msg-bar').setProgress(`下载中(${that.formatSizeUnits(received) + ' to ' + that.formatSizeUnits(total)})...`, progressVal);
+                }
             });
             r.on('end', function () {
-                Ext.getCmp('msg-bar').closeProgress();
+                if (progressBar) {
+                    progressBar.updateText('下载完成!');
+                } else {
+                    Ext.getCmp('msg-bar').closeProgress();
+                }
             });
+        });
+    }
+
+    unZipFile(file, options, target) {
+        const unZip = require('decompress');
+        const help = require('./help');
+        return new Promise((resolve, reject) => {
+            const dir = target || help.getDataPath();
+            try {
+                unZip(file, dir, options).then(files => {
+                    resolve(true);
+                }).catch(e => {
+                    console.log(e);
+                    reject(e);
+                });
+            } catch (e) {
+                reject(e);
+            }
         });
     }
 

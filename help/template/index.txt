@@ -1,0 +1,52 @@
+const {
+    exit
+} = require('process');
+const fs = require('fs');
+const data = require("./data.json");
+
+const compile = () => {
+    {{req}}
+    const keys = [{{keys}}];
+    const runs = [
+        {{runs}}
+    ];
+    Promise.all(eval('runs')).then((values) => {
+        values.forEach((v, i) => {
+            data[keys[i]] = v;
+        });
+        console.log(data);
+        fs.writeFileSync('./data.json', JSON.stringify(data, null, "\t"));
+        exit(2);
+    }).catch((e) => {
+        console.error(e);
+        exit(0);
+    });
+}
+
+const rl = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
+const inputList = [{{input}}];
+if (inputList.length > 0) {
+    let inputIndex = 0;
+    rl.setPrompt(`请输入[${inputList[inputIndex]}],默认值(${data[inputList[inputIndex]]}): `);
+    rl.prompt();
+    rl.on('line', function (line) {
+        const value = line.trim();
+        if (value.length > 0) {
+            data[inputList[inputIndex]] = line.trim();
+        }
+        inputIndex++;
+        if (inputIndex == inputList.length) {
+            fs.writeFileSync("./data.json", JSON.stringify(data, null, "\t"), 'utf8');
+            rl.close();
+            compile();
+            return;
+        }
+        rl.setPrompt(`请输入[${inputList[inputIndex]}],默认值(${data[inputList[inputIndex]]}): `);
+        rl.prompt();
+    })
+} else {
+    compile();
+}
