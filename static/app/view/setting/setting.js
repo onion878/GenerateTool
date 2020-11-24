@@ -8,6 +8,7 @@ Ext.define('OnionSpace.view.setting.setting', {
         render: function (c) {
         }
     },
+    scrollable: true,
     items: [
         {
             xtype: 'fieldset',

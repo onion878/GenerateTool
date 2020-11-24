@@ -99,8 +99,13 @@ amdRequire(['vs/editor/editor.main'], function () {
                 }, {
                     label: 'getAllData',
                     kind: monaco.languages.CompletionItemKind.Function,
-                    detail: 'get set data',
+                    detail: '获取所有配置数据,生成前后脚本可用',
                     insertText: `getAllData()`
+                }, {
+                    label: 'getAllFile',
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    detail: '获取所有生成文件信息,生成前后脚本可用',
+                    insertText: `getAllFile()`
                 }, {
                     label: 'content',
                     kind: monaco.languages.CompletionItemKind.Variable,

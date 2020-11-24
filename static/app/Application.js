@@ -7,6 +7,7 @@ const command = require('../service/utils/commands');
 swig.setDefaults({autoescape: false});
 
 let threadIndex = 0;
+
 function execute(key, method, args) {
     if (args === undefined) {
         args = [];
@@ -622,12 +623,14 @@ function initMainView() {
                                                                         },
                                                                         items: [
                                                                             {
-                                                                                xtype: 'textfield',
+                                                                                xtype: 'textareafield',
                                                                                 fieldLabel: '文件',
                                                                                 margin: '10',
                                                                                 emptyText: '如:{{folder}}/{{file.mapper}}',
                                                                                 labelWidth: 45,
                                                                                 name: 'file',
+                                                                                grow: true,
+                                                                                growMin: 1,
                                                                                 value: file,
                                                                                 listeners: {
                                                                                     change: function (dom, val) {
@@ -638,7 +641,7 @@ function initMainView() {
                                                                                         } catch (e) {
                                                                                             console.error(e);
                                                                                         }
-                                                                                        this.up('form').down('textareafield').setValue(output);
+                                                                                        Ext.getCmp('file-preview').setValue(output);
                                                                                     }
                                                                                 }
                                                                             },
@@ -648,6 +651,9 @@ function initMainView() {
                                                                                 margin: '10',
                                                                                 readOnly: true,
                                                                                 labelWidth: 45,
+                                                                                id: 'file-preview',
+                                                                                grow: true,
+                                                                                growMin: 3,
                                                                                 value: fileOutput
                                                                             }
                                                                         ]
