@@ -40,7 +40,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                 text: '操作',
                 align: 'center',
                 xtype: 'widgetcolumn',
-                width: 100,
+                width: 150,
                 widget: {
                     xtype: 'toolbar',
                     style: {

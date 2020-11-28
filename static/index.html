@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>代码构建工具</title>
+    <link rel="shortcut icon" type="image/x-icon" href="images/code.png" />
+    <link href="Ext/theme-material/theme-material-all.css" rel="stylesheet"/>
+    <link href="Ext/theme-material/ux/ux-all.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/index.css"/>
+    <link rel="stylesheet" href="css/xterm.css"/>
+</head>
+
+<body onload="initMainView()">
+
+<!-- End Page Loading -->
+<script>
+    if (typeof module === 'object') {
+        window.module = module;
+        module = undefined;
+    }
+</script>
+<script src="Ext/ext-all.js"></script>
+<script src="Ext/ux.js"></script>
+<script src="Ext/theme-material/theme-material.js"></script>
+<script src="Ext/theme-material/css-vars.js"></script>
+<script src="Ext/locale-zh_CN.js"></script>
+<script src="app/Application.js"></script>
+<script>
+    if (window.module) module = window.module;
+</script>
+<script>
+    const nodeRequire = global.require;
+</script>
+<script src="vs/loader.js"></script>
+<script>
+    const amdRequire = global.require;
+    global.require = nodeRequire;
+</script>
+<script src="js/base.js"></script>
+</body>
+
+</html>

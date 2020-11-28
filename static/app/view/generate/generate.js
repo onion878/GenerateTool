@@ -9,6 +9,7 @@ Ext.define('OnionSpace.view.generate.generate', {
     layout: 'fit',
     fileName: null,
     codeEditor: null,
+    codeReview: null,
     listeners: {
         render: function (c) {
             const that = this;
@@ -85,7 +86,15 @@ Ext.define('OnionSpace.view.generate.generate', {
                 minimap: true,
                 xtype: 'minicode'
             });
+            that.codeReview = Ext.create({
+                language: language,
+                value: content,
+                minimap: true,
+                hidden: true,
+                xtype: 'diffcode'
+            });
             that.add(that.codeEditor);
+            that.add(that.codeReview);
         }
     },
     initComponent: function () {

@@ -11,7 +11,6 @@ Ext.define('OnionSpace.view.logger.logger', {
             const {dom} = this.getEl().down('.code-editor-content'), that = this;
             that.codeEditor = monaco.editor.create(dom, {
                 language: 'consoleLanguage',
-                theme: 'consoleTheme',
                 readOnly: true,
                 lineDecorationsWidth: '0px',
                 scrollBeyondLastLine: false,

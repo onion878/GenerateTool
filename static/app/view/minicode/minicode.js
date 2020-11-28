@@ -21,20 +21,21 @@ Ext.define('OnionSpace.view.minicode.minicode', {
             if (this.minimap) {
                 mini = true;
             }
+
             that.codeEditor = monaco.editor.create(dom, {
                 language: that.language,
-                theme: 'consoleTheme',
                 value: that.value,
                 minimap: {
                     enabled: mini
                 }
             });
+
             that.codeEditor.onDidChangeModelContent(function (e) {
                 that.changeValue();
             });
         },
         resize: {
-            fn: function(el) {
+            fn: function (el) {
                 this.resizeCode();
             }
         }

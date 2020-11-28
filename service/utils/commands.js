@@ -14,9 +14,9 @@ class Commands {
         this.workFlag = false;
         this.fitAddon = new FitAddon();
         this.config = require('../dao/system');
-        if (this.config.getTheme() == 'aria') {
+        if (this.config.getTheme() == 'dark') {
             this.color1 = '#424242';
-            this.color2 = '#232D38';
+            this.color2 = '#222';
         } else {
             this.color1 = '#FFFFFF';
             this.color2 = '#FAFAFA';

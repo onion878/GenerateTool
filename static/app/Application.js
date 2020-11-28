@@ -43,9 +43,10 @@ const controllers = {
     'pkg': ['OnionSpace.view.pkg.pkg'],
     'unpkg': ['OnionSpace.view.unpkg.unpkg'],
     'minicode': ['OnionSpace.view.minicode.minicode'],
+    'diffcode': ['OnionSpace.view.diffcode.diffcode'],
     'welcome': ['OnionSpace.controller.Welcome'],
     'help': ['OnionSpace.view.help.help'],
-    'generate': ['OnionSpace.view.minicode.minicode', 'OnionSpace.view.generate.generate'],
+    'generate': ['OnionSpace.view.minicode.minicode', 'OnionSpace.view.diffcode.diffcode', 'OnionSpace.view.generate.generate'],
     'templet': ['OnionSpace.view.templet.templet'],
     'online-temp': ['OnionSpace.view.online-temp.online-temp'],
     'detail-temp': ['OnionSpace.view.detail-temp.detail-temp'],
@@ -1101,6 +1102,9 @@ function initMainView() {
             document.body.style.backgroundRepeat = 'no-repeat no-repeat';
             document.body.style.backgroundSize = 'cover';
             document.body.style.opacity = execute('userConfig', 'getOpacity');
+            const t = execute('systemConfig', 'getTheme');
+            Ext.theme.Material.setDarkMode(t == 'dark' ? true : false);
+            monaco.editor.setTheme(t == 'dark' ? 'darkTheme' : 'lightTheme');
             ipcRenderer.send('loading-success', '加载完成!');
             checkVersion();
             setDefaultUrl();

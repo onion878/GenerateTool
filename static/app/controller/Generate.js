@@ -29,11 +29,9 @@ Ext.define('OnionSpace.controller.Generate', {
     editFile: function (btn) {
         this.editType = 'edit';
         const vsCode = btn.up('generate').down('minicode');
-        const code = vsCode.codeEditor;
-        code.setValue(this.getContent(btn.up('generate')));
-        code.updateOptions({
-            readOnly: false
-        });
+        const diffCode = btn.up('generate').down('diffcode');
+        diffCode.hide();
+        vsCode.show();
     },
     preview: function (btn) {
         const that = this;
@@ -41,14 +39,13 @@ Ext.define('OnionSpace.controller.Generate', {
         const dom = btn.up('generate');
         const params = dom.params;
         const vsCode = dom.down('minicode');
-        const code = vsCode.codeEditor;
-        code.updateOptions({
-            readOnly: true
-        });
+        const diffCode = dom.down('diffcode');
         if (params.updateType == 'add') {
             dom.mask('处理中...');
             nodeRun(`compileTemplate('${params.fileId}')`).then(output => {
-                code.setValue(output);
+                diffCode.changeValue(output);
+                vsCode.hide();
+                diffCode.show();
                 dom.unmask();
             }).catch(e => {
                 dom.down('button[action=edit]').click();
@@ -67,10 +64,13 @@ Ext.define('OnionSpace.controller.Generate', {
             try {
                 const tplFile = swig.compile(file);
                 const f = tplFile(execute('controlData', 'getModuleData', [btn.up('generate').pId])).replace(/\\/g, '\/');
-                const d = jsCode.runNodeJs(`const content = \`${require('fs').readFileSync(f, 'utf8').replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`')}\`;\n` + code.getValue());
+                const oldValue = require('fs').readFileSync(f, 'utf8').replace(/\\/g, '\\\\').replace(/\$/g, '\\$').replace(/\`/g, '\\`');
+                const d = jsCode.runNodeJs(`const content = \`${oldValue}\`;\n` + vsCode.codeEditor.getValue());
                 if (d instanceof Promise) {
                     d.then(v => {
-                        code.setValue(v);
+                        diffCode.changeValue(v, oldValue);
+                        vsCode.hide();
+                        diffCode.show();
                         dom.unmask();
                     }).catch(e => {
                         console.error(e);
@@ -81,7 +81,9 @@ Ext.define('OnionSpace.controller.Generate', {
                 } else {
                     dom.unmask();
                     if (d != undefined) {
-                        code.setValue(d);
+                        diffCode.changeValue(d, oldValue);
+                        vsCode.hide();
+                        diffCode.show();
                     }
                 }
             } catch (e) {

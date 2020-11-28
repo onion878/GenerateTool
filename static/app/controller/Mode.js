@@ -283,9 +283,7 @@ Ext.define('OnionSpace.controller.Mode', {
             content = {
                 flex: 1,
                 xtype: 'radiogroup',
-                layout: {
-                    autoFlex: false
-                },
+                cls: 'x-check-group-alt',
                 defaults: {
                     margin: '0 15 0 0',
                 }
@@ -294,9 +292,7 @@ Ext.define('OnionSpace.controller.Mode', {
             content = {
                 flex: 1,
                 xtype: 'checkboxgroup',
-                layout: {
-                    autoFlex: false
-                },
+                cls: 'x-check-group-alt',
                 defaults: {
                     margin: '0 15 0 0'
                 }

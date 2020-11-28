@@ -73,8 +73,21 @@ amdRequire(['vs/editor/editor.main'], function () {
     });
 
     // Define a new theme that contains only rules that match this language
-    monaco.editor.defineTheme('consoleTheme', {
-        base: execute('systemConfig', 'getTheme') == 'aria' ? 'vs-dark' : 'vs',
+    monaco.editor.defineTheme('lightTheme', {
+        base: 'vs',
+        inherit: true,
+        rules: [
+            {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},
+            {token: 'custom-info', foreground: '26c6da'},
+            {token: 'custom-success', foreground: '2962ff'},
+            {token: 'custom-error', foreground: 'ff0000', fontStyle: 'bold'},
+            {token: 'custom-warn', foreground: 'FFA500'},
+            {token: 'custom-date', foreground: '008800'}
+        ]
+    });
+
+    monaco.editor.defineTheme('darkTheme', {
+        base: 'vs-dark',
         inherit: true,
         rules: [
             {token: 'custom-click', foreground: '448aff', fontStyle: 'underline'},

@@ -16,6 +16,7 @@ Ext.define('OnionSpace.view.setting.setting', {
             checkboxToggle: true,
             defaultType: 'textfield',
             defaults: {
+                labelAlign: 'top',
                 anchor: '100%'
             },
             items: [
@@ -49,7 +50,6 @@ Ext.define('OnionSpace.view.setting.setting', {
                     xtype: 'slider',
                     name: 'editor',
                     fieldLabel: '界面缩放',
-                    id: 'setting-zoom',
                     increment: 1,
                     minValue: 0,
                     maxValue: 200,
@@ -58,7 +58,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                     },
                     listeners: {
                         render: function (dom) {
-                            Ext.getCmp('setting-zoom').setValue(execute('systemConfig', 'getZoom') * 100);
+                            dom.setValue(execute('systemConfig', 'getZoom') * 100);
                         },
                         dragend: function (dom) {
                             const v = dom.getValue();
@@ -70,24 +70,22 @@ Ext.define('OnionSpace.view.setting.setting', {
                 {
                     xtype: 'radiogroup',
                     fieldLabel: '主题',
-                    layout: {
-                        autoFlex: false
-                    },
+                    cls: 'x-check-group-alt',
                     defaults: {
-                        margin: '0 15 0 0'
+                        margin: '0 15 0 0',
                     },
                     items: [{
-                        boxLabel: 'neptune',
-                        inputValue: 'neptune'
+                        boxLabel: 'light',
+                        inputValue: 'light'
                     }, {
-                        boxLabel: 'aria',
-                        inputValue: 'aria'
+                        boxLabel: 'dark',
+                        inputValue: 'dark'
                     }],
                     listeners: {
                         render: function (dom) {
                             let index = 0;
                             const t = execute('systemConfig', 'getTheme');
-                            if (t == 'aria') {
+                            if (t == 'dark') {
                                 index = 1;
                             }
                             dom.items.items[index].setValue(true);
@@ -98,18 +96,14 @@ Ext.define('OnionSpace.view.setting.setting', {
                                 t = val[v];
                             }
                             if (t != execute('systemConfig', 'getTheme')) {
+                                Ext.theme.Material.setDarkMode(t == 'dark' ? true : false);
+                                monaco.editor.setTheme(t == 'dark' ? 'darkTheme' : 'lightTheme');
                                 execute('systemConfig', 'setTheme', [t]);
-                                showConfirm(`是否重新启动?`, function (text) {
-                                    const {app} = require('electron').remote;
-                                    app.relaunch();
-                                    app.exit(0);
-                                }, dom, Ext.MessageBox.ERROR);
                             }
                         }
                     }
                 },
                 {
-                    xtype: 'textfield',
                     fieldLabel: '服务端地址',
                     emptyText: 'http://localhost:8000',
                     listeners: {
@@ -138,7 +132,6 @@ Ext.define('OnionSpace.view.setting.setting', {
                     xtype: 'slider',
                     fieldLabel: '背景透明度',
                     increment: 1,
-                    id: 'setting-opacity',
                     minValue: 20,
                     maxValue: 100,
                     tipText: function (thumb) {
@@ -146,7 +139,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                     },
                     listeners: {
                         render: function (dom) {
-                            Ext.getCmp('setting-opacity').setValue(execute('userConfig', 'getOpacity') * 100);
+                            dom.setValue(execute('userConfig', 'getOpacity') * 100);
                         },
                         dragend: function (dom) {
                             const v = dom.getValue();
@@ -159,7 +152,6 @@ Ext.define('OnionSpace.view.setting.setting', {
                     xtype: 'slider',
                     fieldLabel: '窗体透明度',
                     increment: 1,
-                    id: 'window-opacity',
                     minValue: 20,
                     maxValue: 100,
                     tipText: function (thumb) {
@@ -167,7 +159,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                     },
                     listeners: {
                         render: function (dom) {
-                            Ext.getCmp('window-opacity').setValue(execute('systemConfig', 'getConfig', ['win-opacity']) * 100);
+                            dom.setValue(execute('systemConfig', 'getConfig', ['win-opacity']) * 100);
                         },
                         dragend: function (dom) {
                             const v = dom.getValue();
