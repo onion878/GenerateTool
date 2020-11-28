@@ -33,7 +33,7 @@ Ext.define('OnionSpace.view.pkg.pkg', {
             },
             {
                 xtype: 'actioncolumn',
-                width: 60,
+                width: 80,
                 sortable: false,
                 text: '操作',
                 align: 'center',
