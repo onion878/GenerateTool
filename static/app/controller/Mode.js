@@ -68,12 +68,17 @@ Ext.define('OnionSpace.controller.Mode', {
         });
     },
     onPanelRendered: function (panel) {
+        panel.up().mask("处理中...");
         this.pId = panel.pId;
         const data = execute('controlData', 'getExt', [panel.id]),
-            that = this;
+            that = this, list = [];
         data.forEach(d => {
-            panel.add(that.getDataModule(d.content, d.type, d.label, d.id, d.data));
+            list.push(that.getDataModule(d.content, d.type, d.label, d.id, d.data));
         });
+        setTimeout(() => {
+            panel.add(list);
+            panel.up().unmask();
+        }, 0);
     },
     add: function (btn) {
         const that = this;

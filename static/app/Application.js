@@ -1105,6 +1105,10 @@ function initMainView() {
             const t = execute('systemConfig', 'getTheme');
             Ext.theme.Material.setDarkMode(t == 'dark' ? true : false);
             monaco.editor.setTheme(t == 'dark' ? 'darkTheme' : 'lightTheme');
+            const color = execute('systemConfig', 'getConfig', ['color']);
+            if (color) {
+                document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};`;
+            }
             ipcRenderer.send('loading-success', '加载完成!');
             checkVersion();
             setDefaultUrl();

@@ -104,6 +104,23 @@ Ext.define('OnionSpace.view.setting.setting', {
                     }
                 },
                 {
+                    xtype: 'colorfield',
+                    fieldLabel: '颜色',
+                    defaults: {
+                        margin: '0 15 0 0',
+                    },
+                    listeners: {
+                        render: function(dom) {
+                            dom.setValue(execute('systemConfig', 'getConfig', ['color']) ? execute('systemConfig', 'getConfig', ['color']) : '2196f3');
+                        },
+                        change: function (dom, val) {
+                            if(val == 'ff0000') return;
+                            dom.up('setting').updateMaterialTheme('#' + val);
+                            execute('systemConfig', 'setConfig', ['color', val]);
+                        }
+                    }
+                },
+                {
                     fieldLabel: '服务端地址',
                     emptyText: 'http://localhost:8000',
                     listeners: {
@@ -442,5 +459,8 @@ Ext.define('OnionSpace.view.setting.setting', {
             });
         }
         this.callParent(arguments);
+    },
+    updateMaterialTheme: function (base) {
+        document.body.style = `${document.body.attributes['style'].value};--base-color:${base};`;
     }
 });
