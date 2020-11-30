@@ -405,14 +405,14 @@ Ext.define('OnionSpace.controller.Mode', {
                     if (i == 0) {
                         for (let key in v) {
                             if (key != null && key == '操作') {
-                                const {width, html} = v[key];
+                                const {width} = v[key];
                                 columns.push({
                                     width: width,
                                     text: '操作',
                                     sortable: false,
                                     align: 'center',
-                                    renderer: function (v) {
-                                        return html;
+                                    renderer: function (_, _, _, index) {
+                                        return value[index]['操作']['html'];
                                     }
                                 });
                             } else {
