@@ -1182,14 +1182,14 @@ Ext.define('OnionSpace.controller.Mode', {
                 const col = v[0];
                 for (let key in col) {
                     if (key != null && key == '操作') {
-                        const {width, html} = col[key];
+                        const {width} = col[key];
                         columns.push({
                             width: width,
                             text: '操作',
                             sortable: false,
                             align: 'center',
-                            renderer: function (v) {
-                                return html;
+                            renderer: function (_, _, _, i) {
+                                return v[i]['操作']['html'];
                             }
                         });
                     } else {
