@@ -61,6 +61,7 @@
     "shelljs": "^0.8.3",
     "sqlite3": "^5.0.0",
     "swig": "^1.4.2",
+    "windows-titlebar-color": "^1.2.0",
     "xterm": "^4.2.0-vscode1",
     "xterm-addon-fit": "^0.4.0"
   }

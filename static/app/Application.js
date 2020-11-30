@@ -1108,6 +1108,10 @@ function initMainView() {
             const color = execute('systemConfig', 'getConfig', ['color']);
             if (color) {
                 document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};`;
+            } else {
+                const {titlebarColor} = require('windows-titlebar-color');
+                document.body.style = `${document.body.attributes['style'].value};--base-color:${titlebarColor};`;
+                execute('systemConfig', 'setConfig', ['color', titlebarColor.replace('#', '')]);
             }
             ipcRenderer.send('loading-success', '加载完成!');
             checkVersion();
