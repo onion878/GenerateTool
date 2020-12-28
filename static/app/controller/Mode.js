@@ -506,7 +506,10 @@ Ext.define('OnionSpace.controller.Mode', {
                         handler: function (btn) {
                             const remote = require('electron').remote;
                             const dialog = remote.dialog;
-                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']}).then(({canceled, filePaths}) => {
+                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']}).then(({
+                                                                                                                   canceled,
+                                                                                                                   filePaths
+                                                                                                               }) => {
                                 if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
                                     btn.up('container').down('textfield').setRawValue(filePaths[0]);
                                     execute('controlData', 'setDataValue', [id, filePaths[0]]);
@@ -538,7 +541,10 @@ Ext.define('OnionSpace.controller.Mode', {
                         handler: function (btn) {
                             const remote = require('electron').remote;
                             const dialog = remote.dialog;
-                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({canceled, filePaths}) => {
+                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
+                                                                                                                        canceled,
+                                                                                                                        filePaths
+                                                                                                                    }) => {
                                 if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
                                     btn.up('container').down('textfield').setRawValue(filePaths[0]);
                                     execute('controlData', 'setDataValue', [id, filePaths[0]]);
@@ -1082,6 +1088,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 Ext.getCmp('main-content').unmask();
                 return;
             }
+            const startTime = new Date().getTime();
             Promise.all(reData).then(values => {
                 const data = execute('controlData', 'getModuleData', [that.pId]);
                 values.forEach((v, i) => {
@@ -1097,10 +1104,11 @@ Ext.define('OnionSpace.controller.Mode', {
                     modeId: id,
                     date: utils.getNowTime()
                 }]);
+                showToast(`[success] 执行耗时:${new Date().getTime() - startTime}ms`);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
-                showError('[error] ' + e.toString());
+                showError(`[error] ${new Date().getTime() - startTime}ms ` + e.toString());
                 Ext.getCmp('main-content').unmask();
             });
         }, btn, Ext.MessageBox.QUESTION);
@@ -1120,6 +1128,7 @@ Ext.define('OnionSpace.controller.Mode', {
         }
         execute('controlData', 'setCode', [bId, valStr, cId]);
         Ext.getCmp('main-content').mask('执行中...');
+        const startTime = new Date().getTime();
         let d = '',
             btn = Ext.getCmp(bId),
             type = btn.bType;
@@ -1137,9 +1146,11 @@ Ext.define('OnionSpace.controller.Mode', {
                 showToast('[info] 需要执行的脚本:' + valStr);
                 showToast('[success] 执行结果:' + JSON.stringify(v));
                 this.setComponentValue(type, btn, v);
+                showToast(`[success] 执行耗时:${new Date().getTime() - startTime}ms`);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
+                showToast(`[error] 执行耗时:${new Date().getTime() - startTime}ms`);
                 Ext.getCmp('main-content').unmask();
             });
         } else {

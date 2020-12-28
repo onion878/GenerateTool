@@ -5,11 +5,10 @@ let controlData = need(appPath + '/service/dao/controls');
 const jsC = require('../service/utils/JscodeUtil');
 const logger = require('../service/utils/logger');
 const utils = require('../service/utils/utils');
-let history = need(appPath + '/service/dao/history');
-let moduleId = history.getMode();
 const remote = require('electron').remote;
 let geFileData = need(appPath + '/service/dao/gefile');
 const fileData = need(appPath + '/service/dao/file');
+
 process
     .on('unhandledRejection', (reason, p) => {
         console.error(reason, 'Unhandled Rejection at Promise', p);

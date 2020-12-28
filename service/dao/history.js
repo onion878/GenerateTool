@@ -33,8 +33,8 @@ class History {
         }
     }
 
-    getTab() {
-        return m.get('tab').value();
+    getTab(modeId) {
+        return m.get('tab').filter({modeId: modeId}).value();
     }
 
     removeTab(id) {

@@ -11,10 +11,12 @@ const url = require('url');
 const fs = require('fs');
 const shell = require('shelljs');
 const need = require('require-uncached');
-const {getDataPath} = require('./service/utils/help');
+const {getDataPath, getPid} = require('./service/utils/help');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false, globalStoreDirPath;
 app.allowRendererProcessReuse = false;
+const variable = require('./service/utils/variable');
+
 function createWindow() {
     // 预加载
     loading = new BrowserWindow({
@@ -94,10 +96,10 @@ function createMainWindow() {
         protocol: 'file:',
         slashes: true
     }));
-
     if (data.id == 'system') {
         mainWindow.setPosition(data.x, data.y);
     }
+    variable.setCache("historyId", getPid());
     // Open the DevTools. debug
     // mainWindow.webContents.openDevTools();
     let menuItems = [
@@ -113,6 +115,13 @@ function createMainWindow() {
                     label: '新建模板',
                     click() {
                         mainWindow.webContents.executeJavaScript('createTemplate();');
+                    }
+                },
+                {
+                    label: '新建窗口',
+                    click() {
+                        const child = require('child_process').execFile;
+                        child(process.execPath, [app.getAppPath()], {shell: true});
                     }
                 },
                 {type: 'separator'},
@@ -204,6 +213,12 @@ function createMainWindow() {
                     }
                 },
                 {
+                    label: '停止脚本进程',
+                    click() {
+                        mainWindow.webContents.executeJavaScript(`closeNodeWin();Ext.getCmp('main-content').unmask();`);
+                    }
+                },
+                {
                     label: '停止loading',
                     click() {
                         mainWindow.webContents.executeJavaScript(`Ext.getCmp('main-content').unmask();`);
@@ -228,7 +243,7 @@ function createMainWindow() {
                 {
                     label: '关于',
                     click() {
-                        const info = `Version: ${systemConfig.getConfig('version')}\r\tChrome: ${process.versions["chrome"]}\r\tNode: ${
+                        const info = `Version: ${app.getVersion()}\r\tChrome: ${process.versions["chrome"]}\r\tNode: ${
                             process.versions["node"]
                         }\r\tElectron: ${
                             process.versions["electron"]
@@ -309,6 +324,10 @@ function createMainWindow() {
         help: './service/utils/help',
         command: './service/utils/commands'
     };
+
+    ipcMain.on('runCache', async (event, {method, args}) => {
+        event.returnValue = await variable[method](...args);
+    });
 
     ipcMain.on('run', async (event, {key, method, args}) => {
         event.returnValue = await need(services[key])[method](...args);
@@ -398,16 +417,16 @@ function createFileMenu() {
     return files;
 }
 
-const gotTheLock = app.requestSingleInstanceLock();
+// const gotTheLock = app.requestSingleInstanceLock();
 
-if (!gotTheLock) {
-    app.quit();
-} else {
-    if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        mainWindow.focus();
-    }
-}
+// if (!gotTheLock) {
+//     app.quit();
+// } else {
+//     if (mainWindow) {
+//         if (mainWindow.isMinimized()) mainWindow.restore();
+//         mainWindow.focus();
+//     }
+// }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

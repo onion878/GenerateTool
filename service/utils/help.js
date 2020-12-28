@@ -1,4 +1,4 @@
-const path = require('path'), os = require('os');
+const path = require('path'), os = require('os'), variable = require("./variable");
 
 module.exports = {
     getDataPath() {
@@ -15,8 +15,11 @@ module.exports = {
         }
     },
     getPid() {
-        const history = require('../dao/history');
-        return history.getMode();
+        let old = variable.getCache("historyId");
+        if (old) {
+            return old;
+        }
+        return require('../dao/history').getMode();
     },
     toJSON(data) {
         const v = {};

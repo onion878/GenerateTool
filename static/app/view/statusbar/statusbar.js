@@ -3,6 +3,7 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
     alias: 'widget.statusbar',
     html: '<div class="states-toolbar"></div>',
     progress: null,
+    tool: null,
     listeners: {
         render: function (c) {
             const that = this;
@@ -35,6 +36,9 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
             if (that.msg) {
                 child = child + `<div class="status-msg" id="status-msg"></div><div id="progress" class="status-progress" style="float: right;"></div>`;
             }
+            if (that.tool) {
+                child = child + `<div id="${that.tool.id}" title="${that.tool.title}" class="status-tool" style="background: url('${that.tool.image}') center center no-repeat;width: 21px;cursor: pointer;${that.tool.style}"></div>`;
+            }
             const main = c.el.dom.querySelector('.states-toolbar');
             main.innerHTML = child;
             that.infoPanel = Ext.get(c.el.dom).query('.status-msg')[0];
@@ -47,6 +51,12 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
                     that.click(that, this, l.name);
                 });
             });
+            if (that.tool) {
+                const tool = Ext.get(c.el.dom).query('.status-tool')[0];
+                tool.addEventListener("click", function () {
+                    that.tool.click(that, this);
+                });
+            }
         }
     },
     initProgress: function () {

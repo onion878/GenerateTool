@@ -110,11 +110,11 @@ Ext.define('OnionSpace.view.setting.setting', {
                         margin: '0 15 0 0',
                     },
                     listeners: {
-                        render: function(dom) {
+                        render: function (dom) {
                             dom.setValue(execute('systemConfig', 'getConfig', ['color']) ? execute('systemConfig', 'getConfig', ['color']) : '2196f3');
                         },
                         change: function (dom, val) {
-                            if(val == 'ff0000') return;
+                            if (val == 'ff0000') return;
                             dom.up('setting').updateMaterialTheme('#' + val);
                             execute('systemConfig', 'setConfig', ['color', val]);
                         }
@@ -133,17 +133,41 @@ Ext.define('OnionSpace.view.setting.setting', {
                     }
                 },
                 {
-                    xtype: 'filefield',
-                    fieldLabel: '背景图',
-                    listeners: {
-                        render: function (dom) {
-                            dom.setRawValue(execute('userConfig', 'getBg'));
+                    xtype: 'container',
+                    flex: 1,
+                    layout: 'hbox',
+                    items: [
+                        {
+                            xtype: 'textfield',
+                            emptyText: '背景图',
+                            flex: 1,
+                            listeners: {
+                                render: function (dom) {
+                                    dom.setRawValue(execute('userConfig', 'getBg'));
+                                },
+                                change: function (dom, val) {
+                                    execute('userConfig', 'setBg', [val]);
+                                    document.body.style.backgroundImage = `url('${val.replace(/\\/g, '/')}')`;
+                                }
+                            }
                         },
-                        change: function (dom, val) {
-                            execute('userConfig', 'setBg', [val]);
-                            document.body.style.backgroundImage = `url('${val.replace(/\\/g, '/')}')`;
+                        {
+                            xtype: 'button',
+                            text: '选择文件',
+                            handler: function (btn) {
+                                const remote = require('electron').remote;
+                                const dialog = remote.dialog;
+                                dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']}).then(({canceled, filePaths}) => {
+                                    if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                        const val = filePaths[0];
+                                        btn.up('container').down('textfield').setRawValue(val);
+                                        execute('userConfig', 'setBg', [val]);
+                                        document.body.style.backgroundImage = `url('${val.replace(/\\/g, '/')}')`;
+                                    }
+                                });
+                            }
                         }
-                    }
+                    ]
                 },
                 {
                     xtype: 'slider',

@@ -4,6 +4,7 @@ const {
 } = require('electron');
 const jsC = require('../service/utils/JscodeUtil');
 const logger = require('../service/utils/logger');
+const help = require('../service/utils/help');
 const need = require('require-uncached');
 let moduleId = null,
     editLabelId = null;
@@ -973,12 +974,13 @@ const nodeRun = (content) => {
                 nodeIntegration: true,
                 enableRemoteModule: true
             },
-            title: 'Thread-runCode',
+            title: '执行脚本进程运行中',
             parent: getCurrentWindow(),
             show: false,
             width: 200,
             height: 200
         });
+        runWin.webContents.executeJavaScript(`moduleId = "${global.data['historyId']}";`);
         runWin.loadURL(`file://${__dirname}/render.html`);
     }
     return runWin.webContents.executeJavaScript(content);

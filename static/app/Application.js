@@ -33,9 +33,17 @@ function runMethod(key, method, args) {
     })
 }
 
+function executeCache(method, args) {
+    if (args === undefined) {
+        args = [];
+    }
+    return ipcRenderer.sendSync('runCache', {method: method, args: args});
+}
+
 let title = '数据模板';
 let consoleShowFlag = false;
-let pId = execute('history', 'getMode');
+let pId = executeCache('getCache', ['historyId']);
+global.data['historyId'] = pId;
 const controllers = {
     'mode': ['OnionSpace.view.minicode.minicode', 'OnionSpace.view.mode.mode'],
     'editor': ['OnionSpace.controller.Editor'],
@@ -111,6 +119,17 @@ function initMainView() {
                         {id: 'console-btn', img: './images/log.svg', name: 'Console'},
                         {id: 'terminal-btn', img: './images/terminal.svg', name: 'Terminal'}
                     ],
+                    tool: {
+                        id: 'run-code',
+                        image: 'images/stop.svg',
+                        style: 'display: none;',
+                        title: '脚本进程已启动,点击可停止',
+                        click: function (bar, dom) {
+                            showConfirm("确认停止后台脚本进程吗?", function () {
+                                closeNodeWin();
+                            }, dom);
+                        }
+                    },
                     click: function (t, dom, name) {
                         if (name == 'Console') {
                             consoleShowFlag = true;
@@ -851,7 +870,8 @@ function initMainView() {
                                                 params: tab.config.params,
                                                 title: tab.config.title,
                                                 type: tab.config.xtype,
-                                                icon: tab.config.icon
+                                                icon: tab.config.icon,
+                                                modeId: pId
                                             }]);
                                         }
                                     },
@@ -1060,7 +1080,7 @@ function initMainView() {
                 showError(e);
             }
             ipcRenderer.send('loading-msg', '历史加载中...');
-            const tabData = execute('history', 'getTab');
+            const tabData = execute('history', 'getTab', [pId]);
             const tabCode = execute('history', 'getCode');
             const showTab = execute('history', 'getShowTab');
             if (pId !== '') {
@@ -1109,9 +1129,13 @@ function initMainView() {
             if (color) {
                 document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};`;
             } else {
-                const {titlebarColor} = require('windows-titlebar-color');
-                document.body.style = `${document.body.attributes['style'].value};--base-color:${titlebarColor};`;
-                execute('systemConfig', 'setConfig', ['color', titlebarColor.replace('#', '')]);
+                try {
+                    const {titlebarColor} = require('windows-titlebar-color');
+                    document.body.style = `${document.body.attributes['style'].value};--base-color:${titlebarColor};`;
+                    execute('systemConfig', 'setConfig', ['color', titlebarColor.replace('#', '')]);
+                } catch (e) {
+                    console.error(e);
+                }
             }
             ipcRenderer.send('loading-success', '加载完成!');
             checkVersion();
@@ -1262,7 +1286,7 @@ function showConfirm(msg, fn, dom, icon) {
         title: '提示',
         width: 300,
         msg: msg,
-        icon: icon,
+        icon: icon ? icon : Ext.MessageBox.QUESTION,
         buttons: Ext.MessageBox.YESNO,
         scope: this
     };
@@ -1376,7 +1400,7 @@ function checkNew(id, flag) {
                                     jsCode.deleteFile(d);
                                     if (pId == local.id) {
                                         changeTemplate(local.id);
-                                        return;
+
                                     }
                                 }).catch(e => {
                                     console.error(e);
@@ -1497,6 +1521,8 @@ function changeTemplate(newPId) {
     closeNodeWin();
     pId = newPId;
     moduleId = pId;
+    global.data['historyId'] = pId;
+    executeCache('setCache', ['historyId', pId]);
     execute('history', 'setMode', [pId]);
     Ext.getCmp('main-content').mask('切换中...');
     const root = Ext.getCmp('panel-model').getRootNode();
@@ -1620,7 +1646,6 @@ function createFile(dom) {
                 bind: '{before}',
                 fieldLabel: '执行创建前脚本',
                 inputValue: 'before',
-                labelWidth: 110,
                 boxLabel: `<img src="images/before.svg" style="width: 16px;"/>`,
                 onChange: function (v, o) {
                     if (v != o) {
@@ -1633,7 +1658,6 @@ function createFile(dom) {
                 bind: '{after}',
                 fieldLabel: '执行创建后脚本',
                 name: 'after',
-                labelWidth: 110,
                 boxLabel: `<img src="images/after.svg" style="width: 16px;"/>`,
                 onChange: function (v, o) {
                     if (v != o) {
@@ -1969,7 +1993,7 @@ function setDefaultUrl() {
             const d = JSON.parse(body);
             execute('userConfig', 'setDefaultUrl', [d.url]);
             const oldVersion = utils.getVersion();
-            if (d.version != oldVersion) {
+            if (parseInt(d.version.replace(/[^0-9]/ig, "")) > parseInt(oldVersion.replace(/[^0-9]/ig, ""))) {
                 const platform = process.platform;
                 if (platform != 'win32') return;
                 showToast(`[info] 检测到新版本(${d.version}),开始下载安装包...`);
@@ -1997,3 +2021,12 @@ function setDefaultUrl() {
         }
     });
 }
+
+// 获取后台脚本进程是否存在
+setInterval(() => {
+    if (runWin) {
+        document.getElementById("run-code").style.display = "block";
+    } else {
+        document.getElementById("run-code").style.display = "none";
+    }
+}, 1000);

@@ -94,13 +94,13 @@ Ext.define('OnionSpace.view.operation.operation', {
                     if (val) {
                         return `<i title="生成成功" class="far fa-check-circle" style="color: lightseagreen"></i>`;
                     } else {
-                        return `<i title="生成失败" class="far fa-exclamation" style="color: red"></i>`;
+                        return `<i title="生成失败" class="fa fa-bug" style="color: red"></i>`;
                     }
                 }
             },
             {
                 xtype: 'actioncolumn',
-                width: 60,
+                width: 80,
                 text: '操作',
                 sortable: false,
                 align: 'center',
