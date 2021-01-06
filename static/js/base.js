@@ -980,10 +980,9 @@ const nodeRun = (content) => {
             width: 200,
             height: 200
         });
-        runWin.webContents.executeJavaScript(`moduleId = "${global.data['historyId']}";`);
         runWin.loadURL(`file://${__dirname}/render.html`);
     }
-    return runWin.webContents.executeJavaScript(content);
+    return runWin.webContents.executeJavaScript(`moduleId = "${global.data['historyId']}";compileSwig();` + content);
 };
 
 const closeNodeWin = () => {
