@@ -61,7 +61,7 @@
     "font-list": "^1.2.11",
     "log4js": "^6.1.0",
     "lowdb": "^1.0.0",
-    "marked": "^1.2.7",
+    "marked": "^2.0.0",
     "monaco-editor": "^0.20.0",
     "node-pty": "^0.9.0",
     "open": "^7.0.0",
