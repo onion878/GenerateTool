@@ -39,12 +39,8 @@ webFrame.setZoomFactor(execute('systemConfig', 'getZoom'));
 
 amdRequire.config({
     paths: {
-        'vs': 'vs'
-    },
-    'vs/nls': {
-        availableLanguages: {
-            '*': 'zh-cn'
-        }
+        'vs': 'static/vs',
+        'vs/base/worker/': '../static/vs/base/worker/'
     }
 });
 amdRequire(['vs/editor/editor.main'], function () {

@@ -8,7 +8,8 @@ body {
 
 /* 定义滚动条宽度 */
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 8px;
+    height: 8px;
 }
 
 /* 定义那个轨道的样式 */
@@ -24,6 +25,10 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #CFCFCF;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 .code-content {

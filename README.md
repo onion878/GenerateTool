@@ -1,22 +1,12 @@
-# 代码构建工具
+# GenerateTool
 
-![截图](https://generate-docs.netlify.com/screen.png)
-##用处
+![screen](https://generate-docs.netlify.com/screen.png)
 
-一个用来自定义模板并生成代码的工具。<br>
-可以运行于linux,windows,mac平台。<br>
-比如在java微服务中我们写一个方法或者基础类可能会修改多个文件但是方法或类只有业务处理层不一样，其它都是一样的情况下就可以通过该工具来创建同时能够在一定程度上保证代码统一规范性。<br>
+A tool for customizing templates and generating code. <br>
+Can run on linux, windows, mac platforms. <br>
+For example, in Java microservices, when we write a method or basic class, we may modify multiple files, but the method or class only differs in the business processing layer. If the others are the same, it can be created by this tool and can be created to a certain extent. Ensure that the code is uniform and standardized. <br>
 
-## 使用教程
-https://blog.csdn.net/qq_36224522/article/details/81268630
-
-## 实现功能
-
-- 自定义模板
-- 自动生成文件
-
-## 构建项目
-
+## Documentation
 
 ```bash
 # 下载源码
@@ -35,16 +25,17 @@ npm start
 npm run dist
 ```
 
-## 下载
+## Download
 - [Releases](https://github.com/onion878/GenerateTool/releases)
 
 
-## 相关文档
+## Use package 
 
-- [electron.atom.io/docs](http://electron.atom.io/docs) - electron官方文档
-- [extjs-gpl](https://docs.sencha.com/extjs/6.5.0/classic/Ext.html) - ExtJS官方文档
-- [monaco-editor](https://microsoft.github.io/monaco-editor/) - 编辑器
-- [swig](https://github.com/paularmstrong/swig) - 模板创建
+- [electron.atom.io/docs](http://electron.atom.io/docs) - electron
+- [extjs-gpl](https://docs.sencha.com/extjs/6.5.0/classic/Ext.html) - ExtJS
+- [monaco-editor](https://microsoft.github.io/monaco-editor/) - code editor
+- [swig](https://github.com/paularmstrong/swig) - render template 
+
 ## License
 
 [CC0 1.0 (Public Domain)](LICENSE.md)

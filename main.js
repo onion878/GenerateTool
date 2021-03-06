@@ -117,13 +117,6 @@ function createMainWindow() {
                         mainWindow.webContents.executeJavaScript('createTemplate();');
                     }
                 },
-                {
-                    label: '新建窗口',
-                    click() {
-                        const child = require('child_process').execFile;
-                        child(process.execPath, [app.getAppPath()], {shell: true});
-                    }
-                },
                 {type: 'separator'},
                 {
                     label: '本地模板',
@@ -417,16 +410,16 @@ function createFileMenu() {
     return files;
 }
 
-// const gotTheLock = app.requestSingleInstanceLock();
+const gotTheLock = app.requestSingleInstanceLock();
 
-// if (!gotTheLock) {
-//     app.quit();
-// } else {
-//     if (mainWindow) {
-//         if (mainWindow.isMinimized()) mainWindow.restore();
-//         mainWindow.focus();
-//     }
-// }
+if (!gotTheLock) {
+    app.quit();
+} else {
+    if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.focus();
+    }
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

@@ -44,7 +44,6 @@ class Commands {
     initNodePty(userBash, resolve, element) {
         const that = this;
         const ptyProcess = pty.spawn(userBash, [], {
-            name: 'xterm-color',
             cols: 180,
             rows: 30,
             cwd: process.env.HOME,
