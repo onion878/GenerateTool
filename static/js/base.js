@@ -36,11 +36,10 @@ webFrame.setZoomFactor(execute('systemConfig', 'getZoom'));
         _warning.apply(console, arguments);
     };
 })();
-
 amdRequire.config({
     paths: {
-        'vs': 'static/vs',
-        'vs/base/worker/': '../static/vs/base/worker/'
+        'vs': __dirname + '/vs',
+        'vs/base/worker/': __dirname + '/vs/base/worker/'
     }
 });
 amdRequire(['vs/editor/editor.main'], function () {
