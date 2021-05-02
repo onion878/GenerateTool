@@ -649,8 +649,8 @@ function initMainView() {
                                                                                 emptyText: '如:{{folder}}/{{file.mapper}}',
                                                                                 labelWidth: 45,
                                                                                 name: 'file',
-                                                                                grow: true,
-                                                                                growMin: 1,
+                                                                                labelAlign: 'right',
+                                                                                allowBlank: false,
                                                                                 value: file,
                                                                                 listeners: {
                                                                                     change: function (dom, val) {
@@ -669,11 +669,10 @@ function initMainView() {
                                                                                 xtype: 'textareafield',
                                                                                 fieldLabel: '预览',
                                                                                 margin: '10',
+                                                                                labelAlign: 'right',
                                                                                 readOnly: true,
                                                                                 labelWidth: 45,
                                                                                 id: 'file-preview',
-                                                                                grow: true,
-                                                                                growMin: 3,
                                                                                 value: fileOutput
                                                                             }
                                                                         ]
