@@ -1129,7 +1129,11 @@ function initMainView() {
                 document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};`;
             } else {
                 try {
-                    const {titlebarColor} = require('windows-titlebar-color');
+                    const t = require('windows-titlebar-color');
+                    let titlebarColor = t.titlebarColor;
+                    if(titlebarColor == 'white' || titlebarColor == '#ffffff') {
+                        titlebarColor = '#287bcf';
+                    }
                     document.body.style = `${document.body.attributes['style'].value};--base-color:${titlebarColor};`;
                     execute('systemConfig', 'setConfig', ['color', titlebarColor.replace('#', '')]);
                 } catch (e) {
@@ -1486,6 +1490,8 @@ function createTemplate(t) {
                 require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${text}]`);
                 pId = execute('parentData', 'setData', [text]);
                 this.up('window').close();
+                global.data['historyId'] = pId;
+                executeCache('setCache', ['historyId', pId]);
                 moduleId = pId;
                 execute('history', 'setMode', [pId]);
                 const root = Ext.getCmp('panel-model').getRootNode();
