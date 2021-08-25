@@ -66,6 +66,35 @@ Ext.define('OnionSpace.view.editor.editor', {
             tools: [
                 {
                     renderTpl: [
+                        '<div id="{id}-toolEl" class="x-tool-tool-el" style="background: url(images/refresh.svg)" role="presentation"></div>'
+                    ],
+                    qtip: '刷新',
+                    listeners: {
+                        click: function () {
+                            const that = this;
+                            const rootData = jsCode.getFileAndFolder(pId);
+                            rootData.forEach(r => {
+                                if (r.type == 'file') {
+                                    r.icon = getFileIcon(r.text);
+                                } else {
+                                    r.icon = './icons/folder-core.svg';
+                                }
+                            });
+                            const store = Ext.create('Ext.data.TreeStore', {
+                                root: {
+                                    expanded: true,
+                                    text: 'root',
+                                    parentFolder: '',
+                                    icon: './icons/folder-core-open.svg',
+                                    children: rootData
+                                }
+                            })
+                            that.up('treepanel').setStore(store);
+                        }
+                    }
+                },
+                {
+                    renderTpl: [
                         '<div id="{id}-toolEl" class="x-tool-tool-el" style="background: url(images/add.svg)" role="presentation"></div>'
                     ],
                     qtip: '新建文件',

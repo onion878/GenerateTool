@@ -1,12 +1,13 @@
 {
   "name": "GenerateTool",
-  "version": "1.7.6",
+  "version": "1.7.8",
   "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {
     "install": "node copy.js",
     "start": "electron .",
     "dist": "electron-builder --x64",
+    "dist-arm": "electron-builder --arm64",
     "postinstall": "node prebuild.js && install-app-deps"
   },
   "keywords": [
@@ -63,6 +64,7 @@
     "marked": "^2.0.3",
     "monaco-editor": "^0.23.0",
     "node-pty": "^0.10.0",
+    "node-xlsx": "^0.17.1",
     "open": "^8.0.7",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",

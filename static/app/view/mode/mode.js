@@ -32,6 +32,18 @@ Ext.define('OnionSpace.view.mode.mode', {
                 icon: 'images/switch.svg'
             }, {
                 xtype: 'button',
+                action: 'export',
+                tooltip: '将当前模板数据导出为json',
+                text: '导出数据',
+                icon: 'images/export.svg'
+            }, {
+                xtype: 'button',
+                action: 'import',
+                tooltip: '导入json数据显示',
+                text: '导入数据',
+                icon: 'images/import.svg'
+            }, {
+                xtype: 'button',
                 action: 'reload',
                 tooltip: '重新执行数据获取代码',
                 text: '重载数据',
@@ -39,7 +51,8 @@ Ext.define('OnionSpace.view.mode.mode', {
             }, {
                 xtype: 'button',
                 action: 'showHistory',
-                tooltip: '历史数据',
+                tooltip: '查看执行的历史数据',
+                text: '历史数据',
                 icon: 'images/history.svg'
             }]
         };

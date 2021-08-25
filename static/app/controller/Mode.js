@@ -64,6 +64,12 @@ Ext.define('OnionSpace.controller.Mode', {
             },
             'toolbar button[action=showHistory]': {
                 click: this.showHistory
+            },
+            'toolbar button[action=export]': {
+                click: this.export
+            },
+            'toolbar button[action=import]': {
+                click: this.import
             }
         });
     },
@@ -341,7 +347,7 @@ Ext.define('OnionSpace.controller.Mode', {
         } else if (type == 'textarea') {
             content.listeners = {
                 change: function (dom, val) {
-                    execute('controlData', 'setDataValue', [that.pId]);
+                    execute('controlData', 'setDataValue', [id, val]);
                 }
             };
             content.value = value;
@@ -424,6 +430,7 @@ Ext.define('OnionSpace.controller.Mode', {
                                     text: key,
                                     align: 'center',
                                     dataIndex: key,
+                                    minWidth: 120,
                                     editor: {
                                         xtype: 'textfield'
                                     },
@@ -481,6 +488,25 @@ Ext.define('OnionSpace.controller.Mode', {
                                 grid.store.sync();
                             }
                         }, btn, Ext.MessageBox['QUESTION']);
+                    }
+                },
+                {
+                    xtype: 'button',
+                    text: '导出Excel',
+                    icon: 'images/export.svg',
+                    handler: function (btn) {
+                        const grid = btn.up('grid');
+                        const remote = require('electron').remote;
+                        const dialog = remote.dialog;
+                        dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
+                                                                                                                    canceled,
+                                                                                                                    filePaths
+                                                                                                                }) => {
+                            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                const file = utils.exportExcel(that.getStoreData(grid.getStore()), filePaths[0], grid.up('container').down('label').text);
+                                toast(`导出文件为: ${file}`);
+                            }
+                        });
                     }
                 }
             ]
@@ -707,7 +733,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 {
                     xtype: 'button',
                     icon: 'images/javascript.svg',
-                    tooltip: '从js脚本取值',
+                    tooltip: '配置并执行JS脚本',
                     bId: id,
                     id: id,
                     bType: type,
@@ -782,6 +808,9 @@ Ext.define('OnionSpace.controller.Mode', {
         const data = store.getData(),
             list = [];
         data.items.forEach(d => {
+            if (d.data.id && d.data.id.indexOf('') > -1) {
+                delete d.data['id'];
+            }
             list.push(d.data);
         });
         return list;
@@ -910,22 +939,15 @@ Ext.define('OnionSpace.controller.Mode', {
                         sortable: false,
                         align: 'center',
                         items: [{
-                            icon: 'images/cross.svg',
-                            tooltip: '删除',
+                            icon: 'images/undo.svg',
+                            tooltip: '回退',
                             handler: function (grid, recIndex, cellIndex, item, e, {data}) {
-                                showConfirm(`是否删除${data.date},历史记录?`, function (text) {
-                                    runMethod('modeDataDao', 'deleteById', [data.id]).then(() => {
-                                        const list = [];
-                                        runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
-                                            data.forEach(({dataValues}) => {
-                                                dataValues.detail = JSON.stringify(dataValues.content, null, "\t");
-                                                dataValues.content = JSON.stringify(dataValues.content);
-                                                list.push(dataValues);
-                                            });
-                                            grid.store.setData(list);
-                                        });
-                                    });
-                                }, e.target, Ext.MessageBox.ERROR);
+                                const win = this.up('window');
+                                showConfirm(`是否回退${data.date},历史记录?`, function (text) {
+                                    execute('controlData', 'updateData', [that.pId, JSON.parse(data.detail)]);
+                                    win.close();
+                                    changeTemplate(that.pId);
+                                }, e.target, Ext.MessageBox.INFO);
                             }
                         }, {
                             icon: 'images/view.svg',
@@ -961,7 +983,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 ],
                 listeners: {
                     render: function (grid) {
-                        runMethod('modeDataDao', 'getAll', [{pId: that.pId, modeId: id}]).then(data => {
+                        runMethod('modeDataDao', 'getAll', [{pId: that.pId}]).then(data => {
                             const list = [];
                             data.forEach(({dataValues}) => {
                                 dataValues.detail = JSON.stringify(dataValues.content, null, "\t");
@@ -1121,6 +1143,7 @@ Ext.define('OnionSpace.controller.Mode', {
         return nodeRun(valStr);
     },
     getCodeData(valStr, bId, cId) {
+        const that = this;
         if (utils.isEmpty(valStr)) {
             showToast('[info] 删除脚本设置!');
             execute('controlData', 'setCode', [bId, '', cId]);
@@ -1141,12 +1164,20 @@ Ext.define('OnionSpace.controller.Mode', {
             Ext.getCmp('main-content').unmask();
             throw e;
         }
+        const label = execute('controlData', 'getExtById', [bId])[0].label;
+        const data = execute('controlData', 'getModuleData', [that.pId]);
         if (d instanceof Promise) {
             d.then(v => {
+                data[label] = v;
                 showToast('[info] 需要执行的脚本:' + valStr);
                 showToast('[success] 执行结果:' + JSON.stringify(v));
                 this.setComponentValue(type, btn, v);
                 showToast(`[success] 执行耗时:${new Date().getTime() - startTime}ms`);
+                runMethod('modeDataDao', 'create', [{
+                    pId: that.pId,
+                    content: data,
+                    date: utils.getNowTime()
+                }]);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
@@ -1154,6 +1185,12 @@ Ext.define('OnionSpace.controller.Mode', {
                 Ext.getCmp('main-content').unmask();
             });
         } else {
+            data[label] = d;
+            runMethod('modeDataDao', 'create', [{
+                pId: that.pId,
+                content: data,
+                date: utils.getNowTime()
+            }]);
             showToast('[info] 需要执行的脚本:' + valStr);
             showToast('[success] 执行结果:' + JSON.stringify(d));
             this.setComponentValue(type, btn, d);
@@ -1204,7 +1241,7 @@ Ext.define('OnionSpace.controller.Mode', {
                             }
                         });
                     } else {
-                        if (key == 'id' && v[key].substring(0, 8) == 'extModel') {
+                        if (key == 'id' && typeof v[key] == 'string' && v[key].substring(0, 8) == 'extModel') {
                             continue;
                         }
                         fields.push(key);
@@ -1212,6 +1249,7 @@ Ext.define('OnionSpace.controller.Mode', {
                             text: key,
                             align: 'center',
                             dataIndex: key,
+                            minWidth: 120,
                             editor: {
                                 xtype: 'textfield'
                             },
@@ -1275,5 +1313,45 @@ Ext.define('OnionSpace.controller.Mode', {
             });
             check.setValue(val);
         }
+    },
+    export(btn) {
+        const that = this;
+        const remote = require('electron').remote;
+        const dialog = remote.dialog;
+        dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
+                                                                                                    canceled,
+                                                                                                    filePaths
+                                                                                                }) => {
+            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                const data = execute('controlData', 'getModuleData', [that.pId]);
+                const template = execute('parentData', 'getById', [that.pId]);
+                const file = filePaths[0] + `/${template.text}.json`;
+                utils.writeFile({path: file, content: JSON.stringify(data, null, "\t")});
+                toast(`导出文件为: ${file}`);
+            }
+        });
+    },
+    import(btn) {
+        const that = this;
+        const remote = require('electron').remote;
+        const dialog = remote.dialog;
+        dialog.showOpenDialog(remote.getCurrentWindow(), {
+            properties: ['openFile'],
+            filters: [{name: '模板JSON数据', extensions: ['json']}]
+        }).then(({
+                     canceled,
+                     filePaths
+                 }) => {
+            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                try {
+                    const data = JSON.parse(utils.readFile(filePaths[0]));
+                    execute('controlData', 'updateData', [that.pId, data]);
+                    changeTemplate(that.pId);
+                    toast('数据导入成功!');
+                } catch (e) {
+                    Ext.Msg.alert('导入错误', "请选择正确的JSON文件,错误信息:" + e.toString());
+                }
+            }
+        });
     }
 });

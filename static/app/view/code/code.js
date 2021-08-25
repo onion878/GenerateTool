@@ -59,10 +59,8 @@ Ext.define('OnionSpace.view.code.code', {
             document.getElementById('terminal-btn').click();
             const folder = jsCode.getFolder(pId);
             command.cdTargetFolder(folder);
-            command.write(`node -p "require('./${file}')"`);
-        } else {
-            command.write(`node -p "require('./${file}')"`);
         }
+        command.write(`node -p "var c = require('./${file}');if(typeof c == 'function')c();else c;"`);
     },
     resizeCode: function () {
         if (this.codeEditor) {

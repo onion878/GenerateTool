@@ -4,6 +4,7 @@ const shell = require('shelljs');
 const child = require('child_process').execFile;
 const childSync = require('child_process').execFileSync;
 const marked = require('marked');
+const xlsx = require('node-xlsx');
 
 class Utils {
 
@@ -152,7 +153,7 @@ class Utils {
         child(file, [folder], function (err, data) {
             if (err) {
                 console.error(err);
-                return;
+
             }
         });
     }
@@ -325,6 +326,33 @@ class Utils {
             bytes = "0 bytes";
         }
         return bytes;
+    }
+
+    exportExcel(data, folder, name) {
+        const rows = [];
+        data.forEach((d, i) => {
+            if (i == 0) {
+                const title = [];
+                for (const k in d) {
+                    title.push(k);
+                }
+                rows.push(title);
+            }
+            const l = [];
+            for (const k in d) {
+                l.push(d[k]);
+            }
+            rows.push(l);
+        });
+        let buffer = xlsx.build([{
+            name: '轮转结果',
+            data: rows
+        }]);
+        const file = `${folder}/${name}.xlsx`;
+        fs.writeFileSync(file, buffer, {
+            'flag': 'w'
+        });
+        return file;
     }
 }
 

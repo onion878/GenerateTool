@@ -161,6 +161,37 @@ class Controls {
             .write();
     }
 
+    updateData(pId, data) {
+        const oldExt = con.get('ext').filter({pId: pId}).value();
+        const newExt = help.toJSON(oldExt);
+        const oldCode = con.get('code').filter({pId: pId}).value();
+        const newCode = help.toJSON(oldCode);
+        const ext = [], code = [];
+        for (let k in newExt) {
+            try {
+                newExt[k].data = data[newExt[k].label];
+            } catch (e) {
+            }
+            ext.push({...newExt[k]});
+        }
+        for (let k in newCode) {
+            try {
+                newCode[k].data = data[newCode[k].label];
+            } catch (e) {
+            }
+            code.push({...newCode[k]});
+        }
+        con.get('ext')
+            .remove({pId: pId})
+            .write();
+        con.get('code')
+            .remove({pId: pId})
+            .write();
+        con.set('ext', con.get('ext').value().concat(ext))
+            .set('code', con.get('code').value().concat(code))
+            .write();
+    }
+
     removeAll(pId) {
         con.get('code')
             .remove({pId: pId})

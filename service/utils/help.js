@@ -1,8 +1,13 @@
-const path = require('path'), os = require('os'), variable = require("./variable"),need = require('require-uncached');
+const path = require('path'), os = require('os'), fs = require('fs'), variable = require("./variable"),
+    need = require('require-uncached'), app = require('app-root-path');
 
 module.exports = {
     getDataPath() {
         const platform = process.platform;
+        const appConfig = (app.path + '/config.json').replace(/\\/g, '/').replace('/resources/app.asar', '');
+        if (fs.existsSync(appConfig)) {
+            return require(appConfig)['data'];
+        }
         switch (platform) {
             case 'win32':
                 return path.join(process.env.ProgramData || 'C:/ProgramData', '/', 'GenerateTool', '/').replace(/\\/g, '\/');
