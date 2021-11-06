@@ -18,6 +18,7 @@ class User {
         }).write();
         this.udb.defaults({defaultUrl: ''}).write();
         this.udb.defaults({afterShell: true, beforeShell: true}).write();
+        this.udb.defaults({authCode: []}).write();
     }
 
     setUser(user) {
@@ -84,6 +85,36 @@ class User {
 
     getConfig(key) {
         return this.udb.get(key).value();
+    }
+
+    setAuthCode(code) {
+        var d = this.udb.get('authCode').value(), flag = false;
+        d.forEach(l => {
+            if (l == code) {
+                flag = true;
+            }
+        });
+        if (!flag) {
+            d.push(code);
+        }
+        this.udb.set('authCode', d)
+            .write();
+    }
+
+    getAuthCode() {
+        return this.udb.get('authCode').value();
+    }
+
+    deleteAuthCode(code) {
+        var list = this.udb.get('authCode').value();
+        const rows = [];
+        list.forEach(l => {
+            if (l != code) {
+                rows.push(l);
+            }
+        })
+        this.udb.set('authCode', rows)
+            .write();
     }
 }
 

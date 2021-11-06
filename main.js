@@ -200,6 +200,12 @@ function createMainWindow() {
                     }
                 },
                 {
+                    label: '注册账号',
+                    click() {
+                        mainWindow.webContents.executeJavaScript('register()');
+                    }
+                },
+                {
                     label: '重新登录',
                     click() {
                         mainWindow.webContents.executeJavaScript('login()');

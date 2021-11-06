@@ -15,12 +15,24 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
         ptype: 'rowexpander',
         rowBodyTpl: ['<p><b>描述:</b> {Info}</p><p><b>更新日志:</b> {Detail}</p>']
     }],
-    tbar: [{
-        xtype: 'textfield',
-        width: '100%',
-        emptyText: '名称',
-        action: 'search'
-    }],
+    tbar: [
+        {
+            xtype: 'button',
+            text: '添加授权码',
+            action: 'addAuth'
+        },
+        {
+            xtype: 'button',
+            text: '管理授权码',
+            action: 'managerAuth'
+        },
+        {
+            xtype: 'textfield',
+            width: '100%',
+            emptyText: '名称',
+            action: 'search'
+        }
+    ],
     bbar: {
         xtype: 'pagingtoolbar',
         displayInfo: true
@@ -67,7 +79,10 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                             const local = execute('parentData', 'getByServeId', [jsonResp.Pid]);
                                             utils.downloadFile(jsonResp.User + '/' + jsonResp.Id + '.zip', jsonResp.Id + '.zip').then(d => {
                                                 if (local == null) {
-                                                    jsCode.importModule(d, "", data.Id, jsonResp.Id).then(({msg, pId}) => {
+                                                    jsCode.importModule(d, "", data.Id, jsonResp.Id).then(({
+                                                                                                               msg,
+                                                                                                               pId
+                                                                                                           }) => {
                                                         showToast('[success] [' + data.Name + ']下载成功!');
                                                         jsCode.deleteFile(d);
                                                         ipcRenderer.send('runCode', {type: 'refreshFile'});
@@ -122,7 +137,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                                     });
                                 }, btn, Ext.MessageBox.QUESTION);
                             }
-                        },'-',
+                        }, '-',
                         {
                             xtype: 'button',
                             tooltip: '详情',
@@ -165,5 +180,9 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
             }
         ];
         this.callParent(arguments);
+        const store = this.getStore();
+        let list = execute('userConfig', 'getAuthCode');
+        store.getProxy().extraParams = {other: list.join(','), size: 30};
+        store.load();
     }
 });

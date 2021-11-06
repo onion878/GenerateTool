@@ -1046,6 +1046,25 @@ function login(call) {
                                 execute('userConfig', 'setAuth', [jsonResp.token]);
                                 execute('userConfig', 'setUser', [form.getValues()]);
                                 btn.up('window').close();
+                                Ext.Ajax.request({
+                                    url: execute('userConfig', 'getUrl') + '/getAuthCode',
+                                    method: 'GET',
+                                    headers: {
+                                        "Authorization": "Bearer " + execute('userConfig', 'getAuth')
+                                    },
+                                    success: function (response) {
+                                        const jsonResp = Ext.util.JSON.decode(response.responseText);
+                                        if (jsonResp['success']) {
+                                            execute('userConfig', 'setAuthCode', [jsonResp.data.AuthCode]);
+                                            Ext.toast({
+                                                html: `<span>您的模板代码: ${jsonResp.data.AuthCode}</span>`,
+                                                closable: false,
+                                                align: 't',
+                                                slideInDuration: 400
+                                            });
+                                        }
+                                    }
+                                });
                                 if (call) {
                                     call(jsonResp.token);
                                 }
@@ -1057,6 +1076,132 @@ function login(call) {
                                     buttons: Ext.MessageBox.OK,
                                     icon: Ext.MessageBox['ERROR']
                                 });
+                            }
+                        });
+                    }
+                }
+            }
+        ]
+    }).show().focus();
+}
+
+function register(call) {
+    Ext.create('Ext.window.Window', {
+        title: '注册',
+        width: 320,
+        modal: true,
+        items: [{
+            bodyPadding: 8,
+            defaultType: 'textfield',
+            xtype: 'form',
+            layout: {
+                type: 'vbox',
+                pack: 'start',
+                align: 'stretch'
+            },
+            items: [
+                {
+                    xtype: 'container',
+                    flex: 1,
+                    layout: 'hbox',
+                    items: [
+                        {
+                            allowBlank: false,
+                            name: 'Email',
+                            xtype: 'textfield',
+                            flex: 1,
+                            emptyText: '邮箱'
+                        },
+                        {
+                            xtype: 'button',
+                            text: '发送验证码',
+                            handler: function (btn) {
+                                var form = btn.up('window').down('form');
+                                const {Email} = form.getValues();
+                                if (Email == null || Email.trim().length == 0) {
+                                    Ext.toast({
+                                        html: `<span style="color: red;">请填写邮箱!</span>`,
+                                        autoClose: true,
+                                        align: 't',
+                                        slideDUration: 400,
+                                        maxWidth: 400
+                                    });
+                                    return;
+                                }
+                                btn.setDisabled(true);
+                                Ext.Ajax.request({
+                                    url: execute('userConfig', 'getUrl') + '/getEmailCode/' + Email,
+                                    method: 'GET',
+                                    success: function (response) {
+                                        const jsonResp = Ext.util.JSON.decode(response.responseText);
+                                        if (jsonResp) {
+                                            Ext.toast({
+                                                html: `<span>发送成功!</span>`,
+                                                autoClose: true,
+                                                align: 't',
+                                                slideDUration: 400,
+                                                maxWidth: 400
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    ]
+                }, {
+                    allowBlank: false,
+                    name: 'Code',
+                    flex: 1,
+                    emptyText: '验证码'
+                }, {
+                    allowBlank: false,
+                    name: 'UserName',
+                    flex: 1,
+                    emptyText: '用户名'
+                }, {
+                    allowBlank: false,
+                    name: 'Password',
+                    emptyText: '密码',
+                    flex: 1,
+                    inputType: 'password'
+                }
+            ],
+        }],
+        buttons: [
+            {
+                text: '注册',
+                handler: function (btn) {
+                    var form = btn.up('window').down('form');
+                    if (form.isValid()) {
+                        Ext.Ajax.request({
+                            url: execute('userConfig', 'getUrl') + '/register',
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            jsonData: form.getValues(),
+                            success: function (response) {
+                                const jsonResp = Ext.util.JSON.decode(response.responseText);
+                                if (jsonResp['success']) {
+                                    execute('userConfig', 'setUser', [form.getValues()]);
+                                    Ext.toast({
+                                        html: `<span>注册成功!</span>`,
+                                        autoClose: true,
+                                        align: 't',
+                                        slideDUration: 400,
+                                        maxWidth: 400
+                                    });
+                                    btn.up('window').close();
+                                    if (call) {
+                                        call(jsonResp.token);
+                                    }
+                                } else {
+                                    Ext.toast({
+                                        html: `<span style="color: red">注册失败,验证码错误或用户名已存在!</span>`,
+                                        autoClose: true,
+                                        align: 't',
+                                        slideDUration: 400,
+                                        maxWidth: 400
+                                    });
+                                }
                             }
                         });
                     }

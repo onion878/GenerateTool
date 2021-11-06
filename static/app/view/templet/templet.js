@@ -75,7 +75,10 @@ Ext.define('OnionSpace.view.templet.templet', {
                                 const data = btn.up().getWidgetRecord().getData();
                                 const remote = require('electron').remote;
                                 const dialog = remote.dialog;
-                                dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({canceled, filePaths}) => {
+                                dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
+                                                                                                                            canceled,
+                                                                                                                            filePaths
+                                                                                                                        }) => {
                                     if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
                                         data.folder = filePaths[0];
                                         const el = btn.up('templet').getEl();
@@ -142,7 +145,10 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                         handler: function (btn) {
                                                             const remote = require('electron').remote;
                                                             const dialog = remote.dialog;
-                                                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({canceled, filePaths}) => {
+                                                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
+                                                                                                                                                        canceled,
+                                                                                                                                                        filePaths
+                                                                                                                                                    }) => {
                                                                 if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
                                                                     btn.up('container').down('textfield').setRawValue(filePaths[0]);
                                                                 }
@@ -497,11 +503,12 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                                 }
                                                             }
                                                         });
-                                                        const ctrlAll = execute('controlData', 'getExtByPid', [data.id]), inputs = [];
+                                                        const ctrlAll = execute('controlData', 'getExtByPid', [data.id]),
+                                                            inputs = [];
                                                         ctrlAll.forEach(c => {
                                                             console.log(c);
                                                             if (c.type == 'text' || c.type == 'textarea' || c.type == 'folder' || c.type == 'file') {
-                                                                if(cache[c.label] != true) {
+                                                                if (cache[c.label] != true) {
                                                                     inputs.push(`'${c.label}'`);
                                                                 }
                                                             }
@@ -594,40 +601,51 @@ Ext.define('OnionSpace.view.templet.templet', {
                                             {
                                                 text: '上传',
                                                 handler: function (btn) {
-                                                    const v = btn.up('window').down('htmleditor').getValue();
-                                                    btn.up('window').close();
-                                                    Ext.getCmp('main-content').mask('上传中,请稍等...');
-                                                    jsCode.exportModule(data).then(t => {
-                                                        const file = data.folder + data.text + '.zip';
-                                                        const param = {info: v, name: d.text};
-                                                        utils.uploadFile(file, file, param, token).then(c => {
-                                                            showToast('[success] ' + data.text + ' ' + c.message);
-                                                            if (c.serveId) {
-                                                                execute('parentData', 'updateTemplate', [d.id, c.serveId, c.detailId]);
-                                                            }
-                                                            jsCode.deleteFile(file);
-                                                            Ext.getCmp('main-content').unmask();
-                                                        }).catch(() => {
-                                                            Ext.getCmp('main-content').unmask();
-                                                            jsCode.deleteFile(file);
-                                                            Ext.MessageBox.show({
-                                                                title: '错误',
-                                                                msg: '系统错误,请查看日志!',
-                                                                buttons: Ext.MessageBox.OK,
-                                                                icon: Ext.MessageBox.ERROR
+                                                    Ext.MessageBox.show({
+                                                        title: '提示',
+                                                        width: 300,
+                                                        msg: '是否要将其设为私有模板(只有拥有您的授权码才能下载)?',
+                                                        animateTarget: btn,
+                                                        icon: Ext.MessageBox.QUESTION,
+                                                        buttons: Ext.MessageBox.YESNO,
+                                                        scope: this,
+                                                        fn: function (pri) {
+                                                            const v = btn.up('window').down('htmleditor').getValue();
+                                                            btn.up('window').close();
+                                                            Ext.getCmp('main-content').mask('上传中,请稍等...');
+                                                            jsCode.exportModule(data).then(t => {
+                                                                const file = data.folder + data.text + '.zip';
+                                                                const param = {info: v, name: d.text, private: pri};
+                                                                utils.uploadFile(file, file, param, token).then(c => {
+                                                                    showToast('[success] ' + data.text + ' ' + c.message);
+                                                                    if (c.serveId) {
+                                                                        execute('parentData', 'updateTemplate', [d.id, c.serveId, c.detailId]);
+                                                                    }
+                                                                    jsCode.deleteFile(file);
+                                                                    Ext.getCmp('main-content').unmask();
+                                                                }).catch(() => {
+                                                                    Ext.getCmp('main-content').unmask();
+                                                                    jsCode.deleteFile(file);
+                                                                    Ext.MessageBox.show({
+                                                                        title: '错误',
+                                                                        msg: '系统错误,请查看日志!',
+                                                                        buttons: Ext.MessageBox.OK,
+                                                                        icon: Ext.MessageBox.ERROR
+                                                                    });
+                                                                });
+                                                            }).catch(err => {
+                                                                console.error(err);
+                                                                showError(err);
+                                                                Ext.getCmp('main-content').unmask();
+                                                                Ext.MessageBox.show({
+                                                                    title: '错误',
+                                                                    msg: '系统错误,请查看日志!',
+                                                                    buttons: Ext.MessageBox.OK,
+                                                                    icon: Ext.MessageBox.ERROR
+                                                                });
                                                             });
-                                                        });
-                                                    }).catch(err => {
-                                                        console.error(err);
-                                                        showError(err);
-                                                        Ext.getCmp('main-content').unmask();
-                                                        Ext.MessageBox.show({
-                                                            title: '错误',
-                                                            msg: '系统错误,请查看日志!',
-                                                            buttons: Ext.MessageBox.OK,
-                                                            icon: Ext.MessageBox.ERROR
-                                                        });
-                                                    });
+                                                        }
+                                                    }).focus();
                                                 }
                                             }
                                         ]
