@@ -37,7 +37,7 @@ Ext.define('OnionSpace.view.statusbar.statusbar', {
                 child = child + `<div class="status-msg" id="status-msg"></div><div id="progress" class="status-progress" style="float: right;"></div>`;
             }
             if (that.tool) {
-                child = child + `<div id="${that.tool.id}" title="${that.tool.title}" class="status-tool" style="background: url('${that.tool.image}') center center no-repeat;width: 21px;cursor: pointer;${that.tool.style}"></div>`;
+                child = child + `<div id="${that.tool.id}" title="${that.tool.title}" class="status-tool" style="background: url('${that.tool.image}') center center no-repeat;width: 21px;padding-left: 25px;cursor: pointer;${that.tool.style}"></div>`;
             }
             const main = c.el.dom.querySelector('.states-toolbar');
             main.innerHTML = child;

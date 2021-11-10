@@ -345,7 +345,7 @@ class Utils {
             rows.push(l);
         });
         let buffer = xlsx.build([{
-            name: '轮转结果',
+            name: '数据',
             data: rows
         }]);
         const file = `${folder}/${name}.xlsx`;
@@ -353,6 +353,24 @@ class Utils {
             'flag': 'w'
         });
         return file;
+    }
+
+    formatDuring(mss) {
+        var days = parseInt(mss / (1000 * 60 * 60 * 24));
+        var hours = parseInt((mss % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = parseInt((mss % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = (mss % (1000 * 60)) / 1000;
+        let s = "";
+        if (days > 0) {
+            s = s + days + "天";
+        }
+        if (hours > 0) {
+            s = s + hours + "时";
+        }
+        if (minutes > 0) {
+            s = s + minutes + "分";
+        }
+        return s + (seconds <= 0 ? 1 : seconds) + "秒";
     }
 }
 

@@ -1111,6 +1111,13 @@ Ext.define('OnionSpace.controller.Mode', {
                 return;
             }
             const startTime = new Date().getTime();
+            let total = execute('runtimeDao', 'getById', [id]);
+            Ext.getCmp('msg-bar').setProgress(`剩余${utils.formatDuring(total)}`, 0.0);
+            let runTime = 0;
+            globalInterval = setInterval(() => {
+                runTime = runTime + 100;
+                Ext.getCmp('msg-bar').setProgress(`执行中,剩余时间${utils.formatDuring(total - runTime)}`, runTime / total);
+            }, 100);
             Promise.all(reData).then(values => {
                 const data = execute('controlData', 'getModuleData', [that.pId]);
                 values.forEach((v, i) => {
@@ -1126,11 +1133,17 @@ Ext.define('OnionSpace.controller.Mode', {
                     modeId: id,
                     date: utils.getNowTime()
                 }]);
-                showToast(`[success] 执行耗时:${new Date().getTime() - startTime}ms`);
+                clearInterval(globalInterval);
+                const endDate = new Date().getTime() - startTime;
+                execute('runtimeDao', 'setData', [endDate, id]);
+                Ext.getCmp('msg-bar').closeProgress();
+                showToast(`[success] 执行耗时:${endDate}ms`);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
                 showError(`[error] ${new Date().getTime() - startTime}ms ` + e.toString());
+                clearInterval(globalInterval);
+                Ext.getCmp('msg-bar').closeProgress();
                 Ext.getCmp('main-content').unmask();
             });
         }, btn, Ext.MessageBox.QUESTION);
@@ -1166,13 +1179,24 @@ Ext.define('OnionSpace.controller.Mode', {
         }
         const label = execute('controlData', 'getExtById', [bId])[0].label;
         const data = execute('controlData', 'getModuleData', [that.pId]);
+        let total = execute('runtimeDao', 'getById', [bId]);
+        Ext.getCmp('msg-bar').setProgress(`剩余${utils.formatDuring(total)}`, 0.0);
+        let runTime = 0;
+        globalInterval = setInterval(() => {
+            runTime = runTime + 100;
+            Ext.getCmp('msg-bar').setProgress(`执行中,剩余时间${utils.formatDuring(total - runTime)}`, runTime / total);
+        }, 100);
         if (d instanceof Promise) {
             d.then(v => {
                 data[label] = v;
                 showToast('[info] 需要执行的脚本:' + valStr);
                 showToast('[success] 执行结果:' + JSON.stringify(v));
                 this.setComponentValue(type, btn, v);
-                showToast(`[success] 执行耗时:${new Date().getTime() - startTime}ms`);
+                clearInterval(globalInterval);
+                const endDate = new Date().getTime() - startTime;
+                execute('runtimeDao', 'setData', [endDate, bId]);
+                Ext.getCmp('msg-bar').closeProgress();
+                showToast(`[success] 执行耗时:${utils.formatDuring(endDate)}`);
                 runMethod('modeDataDao', 'create', [{
                     pId: that.pId,
                     content: data,
@@ -1181,7 +1205,9 @@ Ext.define('OnionSpace.controller.Mode', {
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
-                showToast(`[error] 执行耗时:${new Date().getTime() - startTime}ms`);
+                clearInterval(globalInterval);
+                Ext.getCmp('msg-bar').closeProgress();
+                showToast(`[success] 执行耗时:${utils.formatDuring(new Date().getTime() - startTime)}`);
                 Ext.getCmp('main-content').unmask();
             });
         } else {
@@ -1191,8 +1217,13 @@ Ext.define('OnionSpace.controller.Mode', {
                 content: data,
                 date: utils.getNowTime()
             }]);
+            clearInterval(globalInterval);
+            const endDate = new Date().getTime() - startTime;
+            execute('runtimeDao', 'setData', [endDate, bId]);
+            Ext.getCmp('msg-bar').closeProgress();
             showToast('[info] 需要执行的脚本:' + valStr);
             showToast('[success] 执行结果:' + JSON.stringify(d));
+            showToast(`[success] 执行耗时:${utils.formatDuring(endDate)}`);
             this.setComponentValue(type, btn, d);
             Ext.getCmp('main-content').unmask();
         }

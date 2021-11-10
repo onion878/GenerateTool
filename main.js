@@ -321,7 +321,8 @@ function createMainWindow() {
         operationDetail: './service/dao/HistoryDetailDao',
         utils: './service/utils/utils',
         help: './service/utils/help',
-        command: './service/utils/commands'
+        command: './service/utils/commands',
+        runtimeDao: './service/dao/runtime',
     };
 
     ipcMain.on('runCache', async (event, {method, args}) => {

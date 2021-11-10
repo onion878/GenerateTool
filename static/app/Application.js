@@ -3,6 +3,7 @@ const jsCode = require('../service/utils/JscodeUtil');
 const swig = require('swig');
 const utils = require('../service/utils/utils');
 const command = require('../service/utils/commands');
+let globalInterval;
 
 swig.setDefaults({autoescape: false});
 
@@ -127,6 +128,8 @@ function initMainView() {
                         click: function (bar, dom) {
                             showConfirm("确认停止后台脚本进程吗?", function () {
                                 closeNodeWin();
+                                Ext.getCmp('msg-bar').closeProgress();
+                                clearInterval(globalInterval);
                             }, dom);
                         }
                     },
