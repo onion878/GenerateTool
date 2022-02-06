@@ -362,8 +362,8 @@ Ext.define('OnionSpace.controller.Mode', {
                 '</ul>'
             );
             content.listeners = {
-                change: function (dom, val) {
-                    execute('controlData', 'setDataValue', [id, {value: val, data: that.getStoreData(dom.getStore())}]);
+                select: function (dom, record) {
+                    execute('controlData', 'setDataValue', [id, {value: record.id, data: that.getStoreData(dom.getStore())}]);
                 }
             };
             if (value && value != null && value != '') {
