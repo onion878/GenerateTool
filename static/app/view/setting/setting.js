@@ -116,6 +116,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                         change: function (dom, val) {
                             if (val == 'ff0000') return;
                             dom.up('setting').updateMaterialTheme('#' + val);
+                            document.body.style.setProperty('--selected-background-color','#' + val);
                             execute('systemConfig', 'setConfig', ['color', val]);
                         }
                     }

@@ -1,6 +1,6 @@
 {
   "name": "GenerateTool",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "A Generate Code Tool",
   "main": "main.js",
   "scripts": {

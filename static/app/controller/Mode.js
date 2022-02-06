@@ -808,9 +808,6 @@ Ext.define('OnionSpace.controller.Mode', {
         const data = store.getData(),
             list = [];
         data.items.forEach(d => {
-            if (d.data.id && d.data.id.indexOf('') > -1) {
-                delete d.data['id'];
-            }
             list.push(d.data);
         });
         return list;
@@ -1133,6 +1130,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     modeId: id,
                     date: utils.getNowTime()
                 }]);
+                execute('controlData', 'updateData', [that.pId, data]);
                 clearInterval(globalInterval);
                 const endDate = new Date().getTime() - startTime;
                 execute('runtimeDao', 'setData', [endDate, id]);
@@ -1202,6 +1200,7 @@ Ext.define('OnionSpace.controller.Mode', {
                     content: data,
                     date: utils.getNowTime()
                 }]);
+                execute('controlData', 'updateData', [that.pId, data]);
                 Ext.getCmp('main-content').unmask();
             }).catch(e => {
                 console.error(e);
@@ -1217,6 +1216,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 content: data,
                 date: utils.getNowTime()
             }]);
+            execute('controlData', 'updateData', [that.pId, data]);
             clearInterval(globalInterval);
             const endDate = new Date().getTime() - startTime;
             execute('runtimeDao', 'setData', [endDate, bId]);
