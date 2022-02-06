@@ -115,8 +115,12 @@ Ext.define('OnionSpace.view.setting.setting', {
                         },
                         change: function (dom, val) {
                             if (val == 'ff0000') return;
-                            dom.up('setting').updateMaterialTheme('#' + val);
-                            document.body.style.setProperty('--selected-background-color','#' + val);
+                            const color = '#' + val;
+                            dom.up('setting').updateMaterialTheme(color);
+                            document.body.style.setProperty('--base-highlight-color',color);
+                            document.body.style.setProperty('--base-pressed-color',color);
+                            document.body.style.setProperty('--base-focused-color',color);
+                            document.body.style.setProperty('--selected-background-color',color);
                             execute('systemConfig', 'setConfig', ['color', val]);
                         }
                     }

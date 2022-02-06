@@ -1129,7 +1129,7 @@ function initMainView() {
             monaco.editor.setTheme(t == 'dark' ? 'darkTheme' : 'lightTheme');
             const color = execute('systemConfig', 'getConfig', ['color']);
             if (color) {
-                document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};--selected-background-color:#${color};`;
+                document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};--base-highlight-color:#${color};--base-pressed-color:#${color};--base-focused-color:#${color};--selected-background-color:#${color};`;
             } else {
                 try {
                     const t = require('windows-titlebar-color');
@@ -1137,7 +1137,7 @@ function initMainView() {
                     if(titlebarColor == 'white' || titlebarColor == '#ffffff') {
                         titlebarColor = '#287bcf';
                     }
-                    document.body.style = `${document.body.attributes['style'].value};--base-color:${titlebarColor};--selected-background-color:#${titlebarColor};`;
+                    document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};--base-highlight-color:#${color};--base-pressed-color:${titlebarColor};--base-focused-color:#${titlebarColor};--selected-background-color:#${titlebarColor};`;
                     execute('systemConfig', 'setConfig', ['color', titlebarColor.replace('#', '')]);
                 } catch (e) {
                     console.error(e);

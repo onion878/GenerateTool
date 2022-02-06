@@ -96,6 +96,11 @@ body {
     color: var(--base-highlight-color);
 }
 
+*::selection {
+    background: var(--base-color);
+    color: var(--reverse-color);
+}
+
 #left-bar-outerCt {
     background-color: var(--base-color);
 }
@@ -223,12 +228,12 @@ code {
     color: var(--color);
 }
 
-.x-window-body-default,.x-message-box .x-window-body,.x-boundlist {
+.x-window-body-default, .x-message-box .x-window-body, .x-boundlist {
     background: var(--alt-background-color);
     color: var(--color);
 }
 
-.x-form-spinner-default{
+.x-form-spinner-default {
     background: transparent;
 }
 
