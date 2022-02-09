@@ -61,7 +61,7 @@
     "del": "^6.0.0",
     "log4js": "^6.4.1",
     "lowdb": "^1.0.0",
-    "marked": "^4.0.12",
+    "marked": "^4.0.10",
     "monaco-editor": "^0.23.0",
     "node-pty": "0.11.0-beta11",
     "node-xlsx": "^0.21.0",
