@@ -73,27 +73,23 @@ Ext.define('OnionSpace.view.templet.templet', {
                             text: '导出',
                             handler: function (btn) {
                                 const data = btn.up().getWidgetRecord().getData();
-                                const remote = require('electron').remote;
-                                const dialog = remote.dialog;
-                                dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
-                                                                                                                            canceled,
-                                                                                                                            filePaths
-                                                                                                                        }) => {
-                                    if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                        data.folder = filePaths[0];
-                                        const el = btn.up('templet').getEl();
-                                        el.mask('导出中...');
-                                        data.newId = utils.getUUID();
-                                        jsCode.exportModule(data).then(t => {
-                                            el.unmask();
-                                            showToast(`[success] 导出为[${data.folder}\\${data.text}.zip]`);
-                                        }).catch(err => {
-                                            console.error(err);
-                                            showError(err);
-                                            el.unmask();
-                                        });
-                                    }
+                                const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
+                                    properties: ['openDirectory']
                                 });
+                                if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                    data.folder = filePaths[0];
+                                    const el = btn.up('templet').getEl();
+                                    el.mask('导出中...');
+                                    data.newId = utils.getUUID();
+                                    jsCode.exportModule(data).then(t => {
+                                        el.unmask();
+                                        showToast(`[success] 导出为[${data.folder}\\${data.text}.zip]`);
+                                    }).catch(err => {
+                                        console.error(err);
+                                        showError(err);
+                                        el.unmask();
+                                    });
+                                }
                             }
                         }, '-', {
                             xtype: 'button',
@@ -101,8 +97,8 @@ Ext.define('OnionSpace.view.templet.templet', {
                             handler: function (btn) {
                                 const data = btn.up().getWidgetRecord().getData();
                                 const help = require('../service/utils/help');
-                                let winFlag = utils.fileExists(help.getDataPath() + 'node-v12.19.0-win-x64/node.exe');
-                                let linuxFlag = utils.fileExists(help.getDataPath() + 'node-v12.19.0-linux-x64/bin/node');
+                                let winFlag = utils.fileExists(help.getDataPath() + 'node-v16.9.1-win-x64/node.exe');
+                                let linuxFlag = utils.fileExists(help.getDataPath() + 'node-v16.9.1-linux-x64/bin/node');
                                 Ext.create('Ext.window.Window', {
                                     title: '模板说明',
                                     width: 550,
@@ -143,16 +139,12 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                         xtype: 'button',
                                                         text: '选择文件夹',
                                                         handler: function (btn) {
-                                                            const remote = require('electron').remote;
-                                                            const dialog = remote.dialog;
-                                                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
-                                                                                                                                                        canceled,
-                                                                                                                                                        filePaths
-                                                                                                                                                    }) => {
-                                                                if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                                                    btn.up('container').down('textfield').setRawValue(filePaths[0]);
-                                                                }
+                                                            const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
+                                                                properties: ['openDirectory']
                                                             });
+                                                            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                                                btn.up('container').down('textfield').setRawValue(filePaths[0]);
+                                                            }
                                                         }
                                                     }
                                                 ]
@@ -272,7 +264,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                         handler: function (btn) {
                                                             btn.hide();
                                                             btn.up('form').down('#windows-progress').updateText('文件下载中,请稍等...!');
-                                                            utils.downloadFile('node-v12.19.0-win-x64.zip', 'node-v12.19.0-win-x64.zip', 'https://cdn.npm.taobao.org/dist/node/v12.19.0/node-v12.19.0-win-x64.zip', btn.up('form').down('#windows-progress')).then(d => {
+                                                            utils.downloadFile('node-v16.9.1-win-x64.zip', 'node-v16.9.1-win-x64.zip', 'https://cdn.npm.taobao.org/dist/node/v16.9.1/node-v16.9.1-win-x64.zip', btn.up('form').down('#windows-progress')).then(d => {
                                                                 btn.up('window').mask('解压中,请稍等...');
                                                                 const path = require('path');
                                                                 utils.unZipFile(d, {
@@ -338,7 +330,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                         handler: function (btn) {
                                                             btn.hide();
                                                             btn.up('form').down('#linux-progress').updateText('文件下载中,请稍等...!');
-                                                            utils.downloadFile('node-v12.19.0-linux-x64.tar.gz', 'node-v12.19.0-linux-x64.tar.gz', 'https://cdn.npm.taobao.org/dist/node/v12.19.0/node-v12.19.0-linux-x64.tar.gz', btn.up('form').down('#linux-progress')).then(d => {
+                                                            utils.downloadFile('node-v16.9.1-linux-x64.tar.gz', 'node-v16.9.1-linux-x64.tar.gz', 'https://cdn.npm.taobao.org/dist/node/v16.9.1/node-v16.9.1-linux-x64.tar.gz', btn.up('form').down('#linux-progress')).then(d => {
                                                                 btn.up('window').mask('解压中,请稍等...');
                                                                 const path = require('path');
                                                                 utils.unZipFile(d, {
@@ -406,20 +398,20 @@ Ext.define('OnionSpace.view.templet.templet', {
                                                         if (type == 1) {
                                                             showToast(`[info] 开始复制node程序...`);
                                                             if (platform instanceof Array) {
-                                                                jsCode.copyFile(p + "node-v12.19.0-win-x64/node.exe", source);
-                                                                jsCode.copyFile(p + "node-v12.19.0-linux-x64/bin/node", source);
+                                                                jsCode.copyFile(p + "node-v16.9.1-win-x64/node.exe", source);
+                                                                jsCode.copyFile(p + "node-v16.9.1-linux-x64/bin/node", source);
                                                                 jsCode.writeFile(source + "/run.bat", "node.exe run.js\npause");
                                                                 jsCode.writeFile(source + "/eval.bat", "node.exe index.js\npause");
                                                                 jsCode.writeFile(source + "/run.sh", "./node run.js");
                                                                 jsCode.writeFile(source + "/eval.sh", "./node index.js");
                                                             }
                                                             if (platform == 0) {
-                                                                jsCode.copyFile(p + "node-v12.19.0-win-x64/node.exe", source);
+                                                                jsCode.copyFile(p + "node-v16.9.1-win-x64/node.exe", source);
                                                                 jsCode.writeFile(source + "/run.bat", "node.exe run.js\npause");
                                                                 jsCode.writeFile(source + "/eval.bat", "node.exe index.js\npause");
                                                             }
                                                             if (platform == 1) {
-                                                                jsCode.copyFile(p + "node-v12.19.0-linux-x64/bin/node", source);
+                                                                jsCode.copyFile(p + "node-v16.9.1-linux-x64/bin/node", source);
                                                                 jsCode.writeFile(source + "/run.sh", "./node run.js");
                                                                 jsCode.writeFile(source + "/eval.sh", "./node index.js");
                                                             }
@@ -672,9 +664,7 @@ Ext.define('OnionSpace.view.templet.templet', {
                                             execute('history', 'setMode', ['']);
                                             execute('history', 'removeAll');
                                             el.unmask();
-                                            const {app} = require('electron').remote;
-                                            app.relaunch();
-                                            app.exit(0);
+                                            ipcRenderer.send('relaunch');
                                         } else {
                                             el.unmask();
                                             showToast(`[success] 模板[${data.text}]删除成功!`);

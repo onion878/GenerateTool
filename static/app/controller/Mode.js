@@ -363,7 +363,10 @@ Ext.define('OnionSpace.controller.Mode', {
             );
             content.listeners = {
                 select: function (dom, record) {
-                    execute('controlData', 'setDataValue', [id, {value: record.id, data: that.getStoreData(dom.getStore())}]);
+                    execute('controlData', 'setDataValue', [id, {
+                        value: record.id,
+                        data: that.getStoreData(dom.getStore())
+                    }]);
                 }
             };
             if (value && value != null && value != '') {
@@ -496,17 +499,13 @@ Ext.define('OnionSpace.controller.Mode', {
                     icon: 'images/export.svg',
                     handler: function (btn) {
                         const grid = btn.up('grid');
-                        const remote = require('electron').remote;
-                        const dialog = remote.dialog;
-                        dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
-                                                                                                                    canceled,
-                                                                                                                    filePaths
-                                                                                                                }) => {
-                            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                const file = utils.exportExcel(that.getStoreData(grid.getStore()), filePaths[0], grid.up('container').down('label').text);
-                                toast(`导出文件为: ${file}`);
-                            }
+                        const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
+                            properties: ['openDirectory']
                         });
+                        if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                            const file = utils.exportExcel(that.getStoreData(grid.getStore()), filePaths[0], grid.up('container').down('label').text);
+                            toast(`导出文件为: ${file}`);
+                        }
                     }
                 }
             ]
@@ -530,17 +529,13 @@ Ext.define('OnionSpace.controller.Mode', {
                         xtype: 'button',
                         text: '选择文件',
                         handler: function (btn) {
-                            const remote = require('electron').remote;
-                            const dialog = remote.dialog;
-                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']}).then(({
-                                                                                                                   canceled,
-                                                                                                                   filePaths
-                                                                                                               }) => {
-                                if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                    btn.up('container').down('textfield').setRawValue(filePaths[0]);
-                                    execute('controlData', 'setDataValue', [id, filePaths[0]]);
-                                }
+                            const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
+                                properties: ['openFile']
                             });
+                            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                btn.up('container').down('textfield').setRawValue(filePaths[0]);
+                                execute('controlData', 'setDataValue', [id, filePaths[0]]);
+                            }
                         }
                     }
                 ]
@@ -565,17 +560,13 @@ Ext.define('OnionSpace.controller.Mode', {
                         xtype: 'button',
                         text: '选择文件夹',
                         handler: function (btn) {
-                            const remote = require('electron').remote;
-                            const dialog = remote.dialog;
-                            dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
-                                                                                                                        canceled,
-                                                                                                                        filePaths
-                                                                                                                    }) => {
-                                if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                    btn.up('container').down('textfield').setRawValue(filePaths[0]);
-                                    execute('controlData', 'setDataValue', [id, filePaths[0]]);
-                                }
+                            const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
+                                properties: ['openDirectory']
                             });
+                            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                btn.up('container').down('textfield').setRawValue(filePaths[0]);
+                                execute('controlData', 'setDataValue', [id, filePaths[0]]);
+                            }
                         }
                     }
                 ]
@@ -1347,42 +1338,32 @@ Ext.define('OnionSpace.controller.Mode', {
     },
     export(btn) {
         const that = this;
-        const remote = require('electron').remote;
-        const dialog = remote.dialog;
-        dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openDirectory']}).then(({
-                                                                                                    canceled,
-                                                                                                    filePaths
-                                                                                                }) => {
-            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                const data = execute('controlData', 'getModuleData', [that.pId]);
-                const template = execute('parentData', 'getById', [that.pId]);
-                const file = filePaths[0] + `/${template.text}.json`;
-                utils.writeFile({path: file, content: JSON.stringify(data, null, "\t")});
-                toast(`导出文件为: ${file}`);
-            }
+        const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
+            properties: ['openDirectory']
         });
+        if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+            const data = execute('controlData', 'getModuleData', [that.pId]);
+            const template = execute('parentData', 'getById', [that.pId]);
+            const file = filePaths[0] + `/${template.text}.json`;
+            utils.writeFile({path: file, content: JSON.stringify(data, null, "\t")});
+            toast(`导出文件为: ${file}`);
+        }
     },
     import(btn) {
         const that = this;
-        const remote = require('electron').remote;
-        const dialog = remote.dialog;
-        dialog.showOpenDialog(remote.getCurrentWindow(), {
+        const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
             properties: ['openFile'],
             filters: [{name: '模板JSON数据', extensions: ['json']}]
-        }).then(({
-                     canceled,
-                     filePaths
-                 }) => {
-            if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                try {
-                    const data = JSON.parse(utils.readFile(filePaths[0]));
-                    execute('controlData', 'updateData', [that.pId, data]);
-                    changeTemplate(that.pId);
-                    toast('数据导入成功!');
-                } catch (e) {
-                    Ext.Msg.alert('导入错误', "请选择正确的JSON文件,错误信息:" + e.toString());
-                }
-            }
         });
+        if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+            try {
+                const data = JSON.parse(utils.readFile(filePaths[0]));
+                execute('controlData', 'updateData', [that.pId, data]);
+                changeTemplate(that.pId);
+                toast('数据导入成功!');
+            } catch (e) {
+                Ext.Msg.alert('导入错误', "请选择正确的JSON文件,错误信息:" + e.toString());
+            }
+        }
     }
 });

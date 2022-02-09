@@ -79,7 +79,8 @@ function createMainWindow() {
     mainWindow = new BrowserWindow({
         webPreferences: {
             nodeIntegration: true,
-            enableRemoteModule: true
+            enableRemoteModule: true,
+            contextIsolation: false
         },
         width: data.width,
         height: data.height,
@@ -325,6 +326,32 @@ function createMainWindow() {
         runtimeDao: './service/dao/runtime',
     };
 
+    ipcMain.on('setTitle', async (event, title) => {
+        mainWindow.setTitle(title);
+    });
+
+    ipcMain.on('setOpacity', async (event, opacity) => {
+        mainWindow.setOpacity(opacity);
+    });
+
+    ipcMain.on('showOpenDialog', async (event, config) => {
+        event.returnValue = await dialog.showOpenDialog(config);
+    });
+
+    ipcMain.on('setProgressBar', async (event, progress) => {
+        mainWindow.setProgressBar(progress);
+    });
+
+    ipcMain.on('quit', async (event) => {
+        app.showExitPrompt = false;
+        app.quit();
+    });
+
+    ipcMain.on('relaunch', async (event) => {
+        app.relaunch();
+        app.exit(0);
+    });
+
     ipcMain.on('runCache', async (event, {method, args}) => {
         event.returnValue = await variable[method](...args);
     });
@@ -349,6 +376,48 @@ function createMainWindow() {
         event.returnValue = '';
     });
 
+
+    let runWin = null;
+
+    const nodeRun = async (content) => {
+        if (runWin == null) {
+            runWin = new BrowserWindow({
+                webPreferences: {
+                    nodeIntegration: true,
+                    enableRemoteModule: true,
+                    contextIsolation: false
+                },
+                title: '执行脚本进程运行中',
+                parent: mainWindow,
+                show: false,
+                width: 200,
+                height: 200
+            });
+            await runWin.loadURL(`file://${__dirname}/static/render.html`);
+        }
+        return await runWin.webContents.executeJavaScript(`moduleId = "${global.data['historyId']}";compileSwig();` + content);
+    };
+
+    const closeNodeWin = () => {
+        try {
+            runWin.close();
+        } catch (e) {
+
+        }
+        runWin = null;
+    };
+
+    ipcMain.handle('nodeRun', async (event, content) => {
+        return await nodeRun(content);
+    });
+
+    ipcMain.on('closeNodeWin', async () => {
+        closeNodeWin();
+    });
+
+    ipcMain.on('runFlag', async (event) => {
+        event.returnValue = runWin != null;
+    });
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
         mainWindow = null;

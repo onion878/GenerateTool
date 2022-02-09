@@ -99,7 +99,7 @@ function initMainView() {
             });
             if (pId !== '') {
                 title = execute('parentData', 'getById', [pId]).text;
-                require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${title}]`);
+                ipcRenderer.send('setTitle', `代码构建工具[${title}]`);
             }
 
             ipcRenderer.send('loading-msg', '界面加载中...');
@@ -1490,7 +1490,7 @@ function createTemplate(t) {
                     });
                     return;
                 }
-                require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${text}]`);
+                ipcRenderer.send('setTitle', `代码构建工具[${text}]`);
                 pId = execute('parentData', 'setData', [text]);
                 this.up('window').close();
                 global.data['historyId'] = pId;
@@ -1556,7 +1556,7 @@ function changeTemplate(newPId) {
     registerAllSuggestion();
     checkNew(pId);
     Ext.getCmp('main-content').unmask();
-    require('electron').remote.getCurrentWindow().setTitle(`代码构建工具[${mode.text}]`);
+    ipcRenderer.send('setTitle', `代码构建工具[${mode.text}]`);
     ipcRenderer.send('runCode', {type: 'refreshFile'});
     title = mode.text;
     showToast('[info] 切换模板为:' + mode.text);
@@ -1733,7 +1733,6 @@ function createFile(dom) {
         buttons: [
             {
                 text: '生成', handler: function () {
-                    const win = require('electron').remote.getCurrentWindow();
                     const {before, after} = this.up('window').getViewModel().getData();
                     Ext.getCmp('main-content').mask('执行中...');
                     closeNodeWin();
@@ -1750,7 +1749,7 @@ function createFile(dom) {
                         if (before) {
                             nodeRun('(function(){' + execute('geFileData', 'getBeforeShell', [pId]) + '})();').then(d => {
                                 showToast('[success] 创建前JS脚本执行成功');
-                                win.setProgressBar(0.2);
+                                ipcRenderer.send('setProgressBar', 0.2);
                                 selected.map((row, i) => {
                                     const f = row.data;
                                     if (f.type == 'add') {
@@ -1799,11 +1798,11 @@ function createFile(dom) {
                                     showToast('[success] ' + f.name + ' 生成成功!');
                                     if (after) {
                                         const progressVal = (0.6 / selected.length) * (i + 1) + 0.2;
-                                        win.setProgressBar(progressVal);
+                                        ipcRenderer.send('setProgressBar', progressVal);
                                         Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                     } else {
                                         const progressVal = (0.8 / selected.length) * (i + 1) + 0.2;
-                                        win.setProgressBar(progressVal);
+                                        ipcRenderer.send('setProgressBar', progressVal);
                                         Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                     }
                                 });
@@ -1812,9 +1811,9 @@ function createFile(dom) {
                                     nodeRun('(function(){' + execute('geFileData', 'getShell', [pId]) + '})();').then(d => {
                                         showToast('[success] 创建后JS脚本执行成功');
                                         Ext.getCmp('main-content').unmask();
-                                        win.setProgressBar(1);
+                                        ipcRenderer.send('setProgressBar', 1);
                                         setTimeout(() => {
-                                            win.setProgressBar(-1);
+                                            ipcRenderer.send('setProgressBar', -1);
                                             Ext.getCmp('msg-bar').closeProgress();
                                             new Notification('代码创建成功', {
                                                 body: `[${title}]代码创建成功`,
@@ -1826,7 +1825,7 @@ function createFile(dom) {
                                         showError(e);
                                         showErrorFlag();
                                         Ext.getCmp('main-content').unmask();
-                                        win.setProgressBar(-1);
+                                        ipcRenderer.send('setProgressBar', -1);
                                         Ext.getCmp('msg-bar').closeProgress();
                                         runMethod('operation', 'update', [{
                                             id: operationId,
@@ -1840,7 +1839,7 @@ function createFile(dom) {
                                     });
                                 } else {
                                     Ext.getCmp('main-content').unmask();
-                                    win.setProgressBar(-1);
+                                    ipcRenderer.send('setProgressBar', -1);
                                     Ext.getCmp('msg-bar').closeProgress();
                                     new Notification('代码创建成功', {
                                         body: `[${title}]代码创建成功`,
@@ -1852,7 +1851,7 @@ function createFile(dom) {
                                 showError(e);
                                 showErrorFlag();
                                 Ext.getCmp('main-content').unmask();
-                                win.setProgressBar(-1);
+                                ipcRenderer.send('setProgressBar', -1);
                                 Ext.getCmp('msg-bar').closeProgress();
                                 runMethod('operation', 'update', [{
                                     id: operationId,
@@ -1875,7 +1874,7 @@ function createFile(dom) {
                                         console.error(e);
                                         showError(f.file + ':模板错误');
                                         Ext.getCmp('main-content').unmask();
-                                        win.setProgressBar(-1);
+                                        ipcRenderer.send('setProgressBar', -1);
                                         Ext.getCmp('msg-bar').closeProgress();
                                         runMethod('operation', 'update', [{
                                             id: operationId,
@@ -1896,7 +1895,7 @@ function createFile(dom) {
                                         console.error(e);
                                         showError(e);
                                         Ext.getCmp('main-content').unmask();
-                                        win.setProgressBar(-1);
+                                        ipcRenderer.send('setProgressBar', -1);
                                         Ext.getCmp('msg-bar').closeProgress();
                                         runMethod('operation', 'update', [{
                                             id: operationId,
@@ -1925,11 +1924,11 @@ function createFile(dom) {
                                 showToast('[success] ' + f.name + ' 生成成功!');
                                 if (after) {
                                     const progressVal = (0.8 / selected.length) * (i + 1);
-                                    win.setProgressBar(progressVal);
+                                    ipcRenderer.send('setProgressBar', progressVal);
                                     Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                 } else {
                                     const progressVal = (1 / selected.length) * (i + 1);
-                                    win.setProgressBar(progressVal);
+                                    ipcRenderer.send('setProgressBar', progressVal);
                                     Ext.getCmp('msg-bar').setProgress(`生成中${progressVal}...`, progressVal);
                                 }
                             });
@@ -1938,10 +1937,10 @@ function createFile(dom) {
                                 nodeRun('(function(){' + execute('geFileData', 'getShell', [pId]) + '})();').then(d => {
                                     showToast('[success] 创建后JS脚本执行成功');
                                     Ext.getCmp('main-content').unmask();
-                                    win.setProgressBar(1);
+                                    ipcRenderer.send('setProgressBar', 1);
                                     Ext.getCmp('msg-bar').setProgress(`生成完成`, 1);
                                     setTimeout(() => {
-                                        win.setProgressBar(-1);
+                                        ipcRenderer.send('setProgressBar', -1);
                                         Ext.getCmp('msg-bar').closeProgress();
                                         new Notification('代码创建成功', {
                                             body: `[${title}]代码创建成功`,
@@ -1953,7 +1952,7 @@ function createFile(dom) {
                                     showError(e);
                                     showErrorFlag();
                                     Ext.getCmp('main-content').unmask();
-                                    win.setProgressBar(-1);
+                                    ipcRenderer.send('setProgressBar', -1);
                                     Ext.getCmp('msg-bar').closeProgress();
                                     runMethod('operation', 'update', [{
                                         id: operationId,
@@ -1967,7 +1966,7 @@ function createFile(dom) {
                                 });
                             } else {
                                 Ext.getCmp('main-content').unmask();
-                                win.setProgressBar(-1);
+                                ipcRenderer.send('setProgressBar', -1);
                                 Ext.getCmp('msg-bar').closeProgress();
                                 new Notification('代码创建成功', {
                                     body: `[${title}]代码创建成功`,
@@ -2010,9 +2009,7 @@ function setDefaultUrl() {
                     showToast(`[success] 下载成功(路径为:${d})!`);
                     showConfirm(`安装包下载成功是否退出并安装更新?`, function () {
                         try {
-                            const {app} = require('electron').remote;
-                            app.showExitPrompt = false;
-                            app.quit();
+                            ipcRenderer.send('quit');
                             utils.runFile(d);
                         } catch (e) {
                             showErrorFlag();
@@ -2032,7 +2029,7 @@ function setDefaultUrl() {
 
 // 获取后台脚本进程是否存在
 setInterval(() => {
-    if (runWin) {
+    if (ipcRenderer.sendSync('runFlag')) {
         document.getElementById("run-code").style.display = "block";
     } else {
         document.getElementById("run-code").style.display = "none";

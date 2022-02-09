@@ -1,7 +1,4 @@
-const {
-    webFrame,
-    remote
-} = require('electron');
+const {webFrame} = require('electron');
 const jsC = require('../service/utils/JscodeUtil');
 const logger = require('../service/utils/logger');
 const help = require('../service/utils/help');
@@ -951,7 +948,7 @@ ipc.on('runNodeErr', (event, message) => {
     showError('[error] ' + JSON.stringify(message));
     showToast('查看完整日志: [查看详情]');
     Ext.getCmp('main-content').unmask();
-    remote.getCurrentWindow().setProgressBar(-1);
+    ipcRenderer.send('setProgressBar', -1);
     new Notification('[GenerateTool]错误', {
         body: `出现了错误, 错误信息:${message}`,
         icon: './images/error.png'
@@ -959,34 +956,12 @@ ipc.on('runNodeErr', (event, message) => {
     showErrorFlag();
 });
 
-let runWin = null;
-
 const nodeRun = (content) => {
-    if (runWin == null) {
-        const {BrowserWindow, getCurrentWindow} = require('electron').remote;
-        runWin = new BrowserWindow({
-            webPreferences: {
-                nodeIntegration: true,
-                enableRemoteModule: true
-            },
-            title: '执行脚本进程运行中',
-            parent: getCurrentWindow(),
-            show: false,
-            width: 200,
-            height: 200
-        });
-        runWin.loadURL(`file://${__dirname}/render.html`);
-    }
-    return runWin.webContents.executeJavaScript(`moduleId = "${global.data['historyId']}";compileSwig();` + content);
+    return ipcRenderer.invoke('nodeRun', content);
 };
 
 const closeNodeWin = () => {
-    try {
-        runWin.close();
-    } catch (e) {
-
-    }
-    runWin = null;
+    ipcRenderer.send('closeNodeWin');
 };
 
 String.prototype.encodeHtml = function () {

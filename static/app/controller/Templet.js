@@ -22,26 +22,23 @@ Ext.define('OnionSpace.controller.Templet', {
         grid.getStore().setData(execute('parentData', 'getAll'));
     },
     importModule: function (dom) {
-        const remote = require('electron').remote;
-        const dialog = remote.dialog;
-        dialog.showOpenDialog(remote.getCurrentWindow(),{
+        const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
             properties: ['openFile'],
             filters: [{name: '模板压缩文件', extensions: ['zip']}]
-        }).then(({canceled, filePaths}) => {
-            if (!canceled && filePaths.length > 0) {
-                const el = dom.up('templet').getEl();
-                el.mask('导入中...');
-                jsCode.importModule(filePaths[0]).then(({msg}) => {
-                    el.unmask();
-                    showToast('[info] ' + msg);
-                    dom.up('templet').getStore().setData(execute('parentData', 'getAll'));
-                }).catch(e => {
-                    console.error(e);
-                    el.unmask();
-                    showError(e);
-                });
-            }
         });
+        if (!canceled && filePaths.length > 0) {
+            const el = dom.up('templet').getEl();
+            el.mask('导入中...');
+            jsCode.importModule(filePaths[0]).then(({msg}) => {
+                el.unmask();
+                showToast('[info] ' + msg);
+                dom.up('templet').getStore().setData(execute('parentData', 'getAll'));
+            }).catch(e => {
+                console.error(e);
+                el.unmask();
+                showError(e);
+            });
+        }
     },
     onPanelRendered: function () {
 

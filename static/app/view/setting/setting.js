@@ -117,10 +117,10 @@ Ext.define('OnionSpace.view.setting.setting', {
                             if (val == 'ff0000') return;
                             const color = '#' + val;
                             dom.up('setting').updateMaterialTheme(color);
-                            document.body.style.setProperty('--base-highlight-color',color);
-                            document.body.style.setProperty('--base-pressed-color',color);
-                            document.body.style.setProperty('--base-focused-color',color);
-                            document.body.style.setProperty('--selected-background-color',color);
+                            document.body.style.setProperty('--base-highlight-color', color);
+                            document.body.style.setProperty('--base-pressed-color', color);
+                            document.body.style.setProperty('--base-focused-color', color);
+                            document.body.style.setProperty('--selected-background-color', color);
                             execute('systemConfig', 'setConfig', ['color', val]);
                         }
                     }
@@ -160,16 +160,17 @@ Ext.define('OnionSpace.view.setting.setting', {
                             xtype: 'button',
                             text: '选择文件',
                             handler: function (btn) {
-                                const remote = require('electron').remote;
-                                const dialog = remote.dialog;
-                                dialog.showOpenDialog(remote.getCurrentWindow(), {properties: ['openFile']}).then(({canceled, filePaths}) => {
-                                    if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
-                                        const val = filePaths[0];
-                                        btn.up('container').down('textfield').setRawValue(val);
-                                        execute('userConfig', 'setBg', [val]);
-                                        document.body.style.backgroundImage = `url('${val.replace(/\\/g, '/')}')`;
-                                    }
+                                const {canceled, filePaths} = ipcRenderer.sendSync('showOpenDialog', {
+                                    properties: ['openFile'], filters: [
+                                        {name: '选择图片', extensions: ['jpg', 'png', 'gif']}
+                                    ]
                                 });
+                                if (!canceled && filePaths != undefined && !utils.isEmpty(filePaths[0])) {
+                                    const val = filePaths[0];
+                                    btn.up('container').down('textfield').setRawValue(val);
+                                    execute('userConfig', 'setBg', [val]);
+                                    document.body.style.backgroundImage = `url('${val.replace(/\\/g, '/')}')`;
+                                }
                             }
                         }
                     ]
@@ -210,8 +211,7 @@ Ext.define('OnionSpace.view.setting.setting', {
                         dragend: function (dom) {
                             const v = dom.getValue();
                             execute('systemConfig', 'setConfig', ['win-opacity', v / 100]);
-                            const {remote} = require('electron');
-                            remote.getCurrentWindow().setOpacity(v / 100);
+                            ipcRenderer.send('setOpacity', v / 100);
                         }
                     }
                 },

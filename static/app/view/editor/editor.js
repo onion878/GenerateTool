@@ -150,7 +150,7 @@ Ext.define('OnionSpace.view.editor.editor', {
                                         text: '在文件夹中显示',
                                         icon: 'images/folder.svg',
                                         handler: function () {
-                                            const {shell} = require('electron').remote;
+                                            const {shell} = require('electron');
                                             shell.openPath(jsCode.getFolder(pId)).then();
                                         }
                                     },

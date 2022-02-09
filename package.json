@@ -50,31 +50,31 @@
     }
   },
   "devDependencies": {
-    "electron": "^11.3.0",
-    "electron-builder": "^22.10.5"
+    "electron": "^16.0.8",
+    "electron-builder": "^22.14.5"
   },
   "dependencies": {
-    "ansicolor": "^1.1.92",
+    "ansicolor": "^1.1.100",
     "app-root-path": "^3.0.0",
     "archiver": "^5.3.0",
-    "decompress": "^4.2.0",
+    "decompress": "^4.2.1",
     "del": "^6.0.0",
-    "log4js": "^6.1.0",
+    "log4js": "^6.4.1",
     "lowdb": "^1.0.0",
-    "marked": "^2.0.3",
+    "marked": "^4.0.12",
     "monaco-editor": "^0.23.0",
-    "node-pty": "^0.10.1",
-    "node-xlsx": "^0.17.1",
-    "open": "^8.0.7",
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7",
+    "node-pty": "0.11.0-beta11",
+    "node-xlsx": "^0.21.0",
+    "open": "^8.4.0",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9",
     "require-uncached": "^2.0.0",
-    "sequelize": "^6.6.2",
-    "shelljs": "^0.8.3",
+    "sequelize": "^6.16.0",
+    "shelljs": "^0.8.5",
     "sqlite3": "^5.0.2",
     "swig": "^1.4.2",
     "windows-titlebar-color": "^1.2.0",
-    "xterm": "^4.11.0",
+    "xterm": "^4.17.0",
     "xterm-addon-fit": "^0.5.0"
   }
 }
