@@ -1,9 +1,8 @@
 const os = require('os');
-const pty = require('node-pty');
 const Terminal = require('xterm').Terminal;
 const FitAddon = require('xterm-addon-fit').FitAddon;
-const {remote} = require('electron');
 const {strip} = require('ansicolor');
+const {ipcRenderer} = require('electron')
 
 class Commands {
     constructor() {
@@ -29,7 +28,9 @@ class Commands {
         return new Promise((resolve, reject) => {
             let terminal = this.config.getConfig('terminal');
             if (terminal.trim().length == 0) {
-                terminal = process.env[os.platform() == 'win32' ? 'COMSPEC' : 'SHELL'];
+                terminal = process.env[os.platform() == 'win32' ? 'powershell.exe' : 'bash'];
+            }
+            if (terminal.indexOf("cmd.exe") > -1) {
                 this.systemCmd = true;
             }
             if (this.nowPty == null) {
@@ -43,21 +44,19 @@ class Commands {
 
     initNodePty(userBash, resolve, element) {
         const that = this;
-        const ptyProcess = pty.spawn(userBash, [], {
-            cols: 180,
-            rows: 30,
-            cwd: process.env.HOME,
-            env: process.env
-        });
-        that.nowPty = ptyProcess;
+        that.nowPty = {
+            write: function (msg) {
+                ipcRenderer.send('terminal', msg);
+            },
+            destroy: function () {
+                ipcRenderer.send('closeTerminal');
+            }
+        };
         that.initXterm(userBash, resolve, element);
-        that.nowPty.on('data', function (data) {
+        ipcRenderer.on('terminal', function (event, data) {
             that.msg.innerHTML = strip(data);
             if (data.toLocaleUpperCase().indexOf('(Y/N)?') > -1) {
                 that.nowPty.write('Y\r');
-            }
-            if (data.indexOf('running done!') > -1) {
-                remote.getCurrentWindow().send('terminal-end', 'end');
             }
             that.term.write(data);
         });
@@ -70,10 +69,10 @@ class Commands {
         let font = execute('userConfig', 'getConfig', ['font']),
             fontSize = execute('userConfig', 'getConfig', ['fontSize']);
         if (font == null || font == 'default') {
-            font = 'sans-serif';
+            font = 'Lucida Console';
         }
         if (fontSize == null) {
-            fontSize = 13;
+            fontSize = 9;
         }
         that.term = new Terminal({
             fontSize: fontSize,
@@ -104,6 +103,9 @@ class Commands {
         that.term.open(element);
         that.term.loadAddon(that.fitAddon);
         that.fitAddon.fit();
+        that.term.onData((data) => {
+            ipcRenderer.send('terminal', data);
+        });
     }
 
     ColorReverse(OldColorValue) {

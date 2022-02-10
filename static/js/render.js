@@ -17,26 +17,26 @@ const fileData = need(appPath + '/service/dao/file');
 
     console.debug = function (msg) {
         logger.debug(msg);
-        ipcRenderer.send('runNode', msg.message);
+        ipcRenderer.send('console', msg.message);
         _debug.apply(console, arguments);
     };
 
     console.error = function (errMessage) {
         logger.error(errMessage);
-        ipcRenderer.send('runNode', errMessage.message);
+        ipcRenderer.send('console', errMessage.message);
         _error.apply(console, arguments);
     };
 
     console.log = function (logMessage) {
         logger.info(logMessage);
-        ipcRenderer.send('runNode', logMessage);
+        ipcRenderer.send('console', logMessage);
         // Do something with the log message
         _log.apply(console, arguments);
     };
 
     console.warning = function (warnMessage) {
         logger.warning(warnMessage);
-        ipcRenderer.send('runNode', warnMessage);
+        ipcRenderer.send('console', warnMessage);
         // do something with the warn message
         _warning.apply(console, arguments);
     };

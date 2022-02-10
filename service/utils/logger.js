@@ -14,6 +14,7 @@ log4js.configure({
     categories: {default: {appenders: ['|', 'console'], level: 'debug'}}
 });
 const logger = log4js.getLogger('|');
+
 module.exports = {
     debug(message, ...optionalParams) {
         if (optionalParams.length > 0) {

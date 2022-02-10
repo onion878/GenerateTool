@@ -11,11 +11,13 @@ const url = require('url');
 const fs = require('fs');
 const shell = require('shelljs');
 const need = require('require-uncached');
+const pty = require('node-pty');
 const {getDataPath, getPid} = require('./service/utils/help');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow, loading, loadFlag = false, globalStoreDirPath;
 app.allowRendererProcessReuse = false;
 const variable = require('./service/utils/variable');
+const os = require("os");
 
 function createWindow() {
     // 预加载
@@ -26,12 +28,9 @@ function createWindow() {
         height: 200,
         opacity: 0.8
     });
-    loading.loadURL(url.format({
-        pathname: path.join(__dirname, 'static/loading/loading.html'),
-        protocol: 'file:',
-        resizable: false,
-        slashes: true
-    }));
+    loading.loadFile('static/loading/loading.html').then(() => {
+        loading.show();
+    });
     loading.webContents.once('dom-ready', () => {
         // 加载正式窗口
         createMainWindow();
@@ -50,7 +49,6 @@ function createWindow() {
             }
         }, 10000);
     });
-    loading.show();
 }
 
 function createMainWindow() {
@@ -322,7 +320,6 @@ function createMainWindow() {
         operationDetail: './service/dao/HistoryDetailDao',
         utils: './service/utils/utils',
         help: './service/utils/help',
-        command: './service/utils/commands',
         runtimeDao: './service/dao/runtime',
     };
 
@@ -411,6 +408,11 @@ function createMainWindow() {
         return await nodeRun(content);
     });
 
+    ipcMain.on('console', async (event, content) => {
+        const msg = content.toString().replace(/\"/g, "“");
+        await mainWindow.webContents.executeJavaScript(`showToast("${msg}")`);
+    });
+
     ipcMain.on('closeNodeWin', async () => {
         closeNodeWin();
     });
@@ -460,7 +462,38 @@ function createMainWindow() {
                 }
             });
         }
-    })
+    });
+
+    let ptyProcess;
+
+    ipcMain.on('closeTerminal', async (event, arg) => {
+        ptyProcess.destroy();
+    });
+
+    ipcMain.on('terminal', async (event, arg) => {
+        if (ptyProcess == null) {
+            const env = process.env;
+            if (process.platform == 'darwin') {
+                env.PATH = env.PATH + ':/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin';
+            }
+            const systemConfig = need('./service/dao/system');
+            let terminal = systemConfig.getConfig('terminal');
+            if (terminal.trim().length == 0) {
+                terminal = process.env[os.platform() == 'win32' ? 'powershell.exe' : 'bash'];
+            }
+            ptyProcess = pty.spawn(terminal, [], {
+                cols: 180,
+                rows: 30,
+                cwd: process.cwd(),
+                env: env
+            });
+
+            ptyProcess.onData(function (data) {
+                mainWindow.webContents.send('terminal', data);
+            });
+        }
+        ptyProcess.write(arg);
+    });
 }
 
 function createFileMenu() {
@@ -520,6 +553,5 @@ app.on('activate', function () {
         createWindow();
     }
 });
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
