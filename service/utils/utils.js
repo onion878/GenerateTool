@@ -300,7 +300,7 @@ class Utils {
     }
 
     showUpdate() {
-        return marked(this.readFile(require('app-root-path').path + '/UPDATE.md'));
+        return marked.marked(this.readFile(require('app-root-path').path + '/UPDATE.md'));
     }
 
     getVersion() {
@@ -308,7 +308,7 @@ class Utils {
     }
 
     showHelp(file) {
-        return marked(this.readFile(require('app-root-path').path + '/help/' + file));
+        return marked.marked(this.readFile(require('app-root-path').path + '/help/' + file));
     }
 
     formatSizeUnits(bytes) {
