@@ -683,6 +683,11 @@ Ext.define('OnionSpace.controller.Mode', {
             }
             content.items = list;
         }
+        const script = execute('controlData', 'getCode', [id]);
+        let reqScript = null;
+        if (script != undefined && script != null) {
+            reqScript = script.value;
+        }
         return {
             xtype: 'container',
             cls: 'mode-content',
@@ -723,7 +728,7 @@ Ext.define('OnionSpace.controller.Mode', {
                 },
                 {
                     xtype: 'button',
-                    icon: 'images/javascript.svg',
+                    icon: (reqScript && reqScript.trim().length > 0) ? 'images/start.svg' : 'images/javascript.svg',
                     tooltip: '配置并执行JS脚本',
                     bId: id,
                     id: id,
@@ -778,6 +783,11 @@ Ext.define('OnionSpace.controller.Mode', {
                 handler: function () {
                     const valStr = this.up('window').down('minicode').codeEditor.getValue();
                     this.up('window').close();
+                    if(valStr.trim().length > 0) {
+                        btn.setIcon('images/start.svg');
+                    } else {
+                        btn.setIcon('images/javascript.svg');
+                    }
                     that.getCodeData(valStr, btn.bId, cId);
                 }
             }, {
@@ -996,9 +1006,14 @@ Ext.define('OnionSpace.controller.Mode', {
         const that = this;
         const id = btn.up('mode').id;
         const data = execute('controlData', 'getExt', [id]);
+        const list = execute('controlData', 'getAllCode', [id]);
         const keys = {};
         that.types.forEach(r => {
             keys[r.id] = r.text;
+        });
+        const v = {};
+        list.forEach(r => {
+            v[r.id] = r.value;
         });
         Ext.create('Ext.window.Window', {
             title: '排序',
@@ -1040,6 +1055,15 @@ Ext.define('OnionSpace.controller.Mode', {
                         flex: 1,
                         renderer: function (v) {
                             return keys[v];
+                        }
+                    },
+                    {
+                        text: '脚本',
+                        align: 'center',
+                        dataIndex: 'id',
+                        flex: 1,
+                        renderer: function (k) {
+                            return v[k] ?? "无";
                         }
                     }
                 ],

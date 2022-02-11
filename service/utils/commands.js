@@ -27,7 +27,7 @@ class Commands {
         that.msg = document.getElementById('status-msg');
         return new Promise((resolve, reject) => {
             let terminal = this.config.getConfig('terminal');
-            if (terminal.trim().length == 0) {
+            if (terminal === undefined || terminal.trim().length == 0) {
                 terminal = process.env[os.platform() == 'win32' ? 'powershell.exe' : 'bash'];
             }
             if (terminal.indexOf("cmd.exe") > -1) {

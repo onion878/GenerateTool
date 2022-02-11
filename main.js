@@ -478,7 +478,7 @@ function createMainWindow() {
             }
             const systemConfig = need('./service/dao/system');
             let terminal = systemConfig.getConfig('terminal');
-            if (terminal.trim().length == 0) {
+            if (terminal === undefined || terminal.trim().length == 0) {
                 terminal = process.env[os.platform() == 'win32' ? 'powershell.exe' : 'bash'];
             }
             ptyProcess = pty.spawn(terminal, [], {
