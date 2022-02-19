@@ -1134,7 +1134,7 @@ function initMainView() {
                 try {
                     const t = require('windows-titlebar-color');
                     let titlebarColor = t.titlebarColor;
-                    if(titlebarColor == 'white' || titlebarColor == '#ffffff') {
+                    if (titlebarColor == 'white' || titlebarColor == '#ffffff') {
                         titlebarColor = '#287bcf';
                     }
                     document.body.style = `${document.body.attributes['style'].value};--base-color:#${color};--base-highlight-color:#${color};--base-pressed-color:${titlebarColor};--base-focused-color:#${titlebarColor};--selected-background-color:#${titlebarColor};`;
@@ -2035,3 +2035,20 @@ setInterval(() => {
         document.getElementById("run-code").style.display = "none";
     }
 }, 1000);
+
+ipcRenderer.on('runJs', (event, [method, ...args]) => {
+    eval(method)(...args);
+})
+
+// 设置组件值
+function setComponentValue(label, value) {
+    if (label == null || label == undefined || label.toString().trim().length == 0) {
+        return;
+    }
+    const d = execute('controlData', 'getConfigByLabel', [pId, label]);
+    const btn = Ext.getCmp(d.id);
+    if (btn === undefined) {
+        return;
+    }
+    btn.up('mode').controller.setComponentValue(d.type, btn, value);
+}

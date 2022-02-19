@@ -141,6 +141,12 @@ amdRequire(['vs/editor/editor.main'], function () {
                     insertText: 'req(\'$0\');',
                     insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
                 }, {
+                    label: 'setComponentValue',
+                    kind: monaco.languages.CompletionItemKind.Function,
+                    detail: '修改组件值 -- 生效模块: JS脚本,从JS修改组件值',
+                    insertText: 'setComponentValue(\'$1\',\'$0\');',
+                    insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+                }, {
                     label: 'swig',
                     kind: monaco.languages.CompletionItemKind.Function,
                     detail: '设置swig过滤器 -- 生效模块: swig配置',
@@ -956,8 +962,12 @@ ipc.on('runNodeErr', (event, message) => {
     showErrorFlag();
 });
 
-const nodeRun = (content) => {
-    return ipcRenderer.invoke('nodeRun', content);
+const nodeRun = (content, cId) => {
+    let c = content;
+    if(cId) {
+        c = [content, cId]
+    }
+    return ipcRenderer.invoke('nodeRun', c);
 };
 
 const closeNodeWin = () => {

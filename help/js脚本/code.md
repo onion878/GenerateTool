@@ -27,3 +27,8 @@
 ```
 [1] 其中如果返回的key是[操作]那么就可以定义内容为{width,html}的json对象,其中req是内置的可以调用js脚本。<br/>
 [2] 其中的图标采用了font awesome 5的免费版本文档:`https://fontawesome.com/icons?d=gallery&m=free`<br/>
+
+## js中设置组件值
+*setComponentValue(label, value)*<br>
+**label**: js项目目录下data.js获取到的key<br>
+**value**: 要设置的值,需要与上面返回说明中对应起来

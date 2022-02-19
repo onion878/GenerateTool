@@ -52,13 +52,13 @@ class Controls {
         this.changeData();
     }
 
-    setCode(id, val, cId) {
+    setCode(id, val, cId, mode) {
         const d = con.get('code')
             .find({id: id, pId: help.getPid()})
             .value();
         if (d == undefined || d == null) {
             con.get('code')
-                .push({id: id, value: val, cId: cId, pId: help.getPid()})
+                .push({id: id, value: val, cId: cId, pId: help.getPid(), mode: mode})
                 .write();
         } else {
             con.get('code')
@@ -66,6 +66,7 @@ class Controls {
                 .set('value', val)
                 .set('cId', cId)
                 .set('pId', help.getPid())
+                .set('mode', mode)
                 .write();
         }
         this.changeData();
@@ -140,6 +141,9 @@ class Controls {
     }
 
     updateAll({ext, code, pId}) {
+        if(pId == null || pId.trim().length  == 0) {
+            return;
+        }
         const oldExt = con.get('ext').filter({pId: pId}).value();
         const newExt = help.toJSON(oldExt);
         ext.forEach((o, i) => {
@@ -162,6 +166,9 @@ class Controls {
     }
 
     updateData(pId, data) {
+        if(pId == null || pId.trim().length  == 0) {
+            return;
+        }
         const oldExt = con.get('ext').filter({pId: pId}).value();
         const newExt = help.toJSON(oldExt);
         const oldCode = con.get('code').filter({pId: pId}).value();
@@ -193,6 +200,9 @@ class Controls {
     }
 
     removeAll(pId) {
+        if(pId == null || pId.trim().length  == 0) {
+            return;
+        }
         con.get('code')
             .remove({pId: pId})
             .write();
@@ -206,6 +216,15 @@ class Controls {
         const pId = help.getPid();
         const path = help.getDataPath() + 'jscode/' + pId;
         fs.writeFileSync(path + '/data.js', 'let data=' + JSON.stringify(this.getModuleData(pId)) + ';try {data = getAllData();}catch (e) {}module.exports = data;', 'utf8');
+    }
+
+    getConfigByLabel(pId, label) {
+        const data = con.get('ext').filter({pId: pId, label: label}).value();
+        let json = {};
+        data.forEach(function (d) {
+            json = d;
+        });
+        return json;
     }
 }
 

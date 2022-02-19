@@ -28,7 +28,7 @@ class Commands {
         return new Promise((resolve, reject) => {
             let terminal = this.config.getConfig('terminal');
             if (terminal === undefined || terminal.trim().length == 0) {
-                terminal = process.env[os.platform() == 'win32' ? 'powershell.exe' : 'bash'];
+                terminal = os.platform() == 'win32' ? 'powershell.exe' : 'bash';
             }
             if (terminal.indexOf("cmd.exe") > -1) {
                 this.systemCmd = true;
@@ -72,7 +72,7 @@ class Commands {
             font = 'Lucida Console';
         }
         if (fontSize == null) {
-            fontSize = 9;
+            fontSize = 11;
         }
         that.term = new Terminal({
             fontSize: fontSize,

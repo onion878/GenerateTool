@@ -375,10 +375,19 @@ function createMainWindow() {
 
 
     let runWin = null;
+    let runList = [];
 
-    const nodeRun = async (content) => {
-        if (runWin == null) {
-            runWin = new BrowserWindow({
+    const nodeRun = async (c) => {
+        let content = c, bId, mode, executeWin;
+        if (c instanceof Array) {
+            content = c[0];
+            bId = c[1];
+            const d = need(services['controlData'])['getCode'](bId);
+            mode = d.mode;
+        }
+        console.log(mode);
+        if (runWin == null || mode == 'another') {
+            executeWin = new BrowserWindow({
                 webPreferences: {
                     nodeIntegration: true,
                     enableRemoteModule: true,
@@ -390,9 +399,18 @@ function createMainWindow() {
                 width: 200,
                 height: 200
             });
-            await runWin.loadURL(`file://${__dirname}/static/render.html`);
+            if (mode == 'another') {
+                runList.push(executeWin);
+            } else {
+                if (runWin == null) {
+                    runWin = executeWin;
+                }
+            }
+            await executeWin.loadURL(`file://${__dirname}/static/render.html`);
+        } else {
+            executeWin = runWin;
         }
-        return await runWin.webContents.executeJavaScript(`moduleId = "${global.data['historyId']}";compileSwig();` + content);
+        return await executeWin.webContents.executeJavaScript(`moduleId = "${global.data['historyId']}";compileSwig();` + content);
     };
 
     const closeNodeWin = () => {
@@ -402,10 +420,18 @@ function createMainWindow() {
 
         }
         runWin = null;
+        runList.forEach(r => {
+            r.close();
+        });
+        runList.length = 0;
     };
 
     ipcMain.handle('nodeRun', async (event, content) => {
         return await nodeRun(content);
+    });
+
+    ipcMain.on('runMainJs', async (event, args) => {
+        event.returnValue = await mainWindow.send('runJs', args);
     });
 
     ipcMain.on('console', async (event, content) => {
@@ -418,7 +444,7 @@ function createMainWindow() {
     });
 
     ipcMain.on('runFlag', async (event) => {
-        event.returnValue = runWin != null;
+        event.returnValue = (runWin != null || runList.length > 0);
     });
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -479,7 +505,7 @@ function createMainWindow() {
             const systemConfig = need('./service/dao/system');
             let terminal = systemConfig.getConfig('terminal');
             if (terminal === undefined || terminal.trim().length == 0) {
-                terminal = process.env[os.platform() == 'win32' ? 'powershell.exe' : 'bash'];
+                terminal = os.platform() == 'win32' ? 'powershell.exe' : 'bash';
             }
             ptyProcess = pty.spawn(terminal, [], {
                 cols: 180,

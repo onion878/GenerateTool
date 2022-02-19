@@ -33,9 +33,7 @@ Ext.define('OnionSpace.view.swig-template.swig-template', {
                     const val = that.codeEditor.codeEditor.getValue();
                     try {
                         eval(val);
-                        if(runWin != null) {
-                            nodeRun(val);
-                        }
+                        nodeRun(val);
                         showToast('[success] swig模板应用成功!');
                     } catch (e) {
                         console.log(e);

@@ -5,7 +5,7 @@ let controlData = need(appPath + '/service/dao/controls');
 const jsC = require('../service/utils/JscodeUtil');
 const logger = require('../service/utils/logger');
 const utils = require('../service/utils/utils');
-const ipcRenderer = require('electron').ipcRenderer;
+const {ipcRenderer} = require('electron');
 let geFileData = need(appPath + '/service/dao/gefile');
 const fileData = need(appPath + '/service/dao/file');
 
@@ -107,3 +107,8 @@ const compileTemplate = (fileId) => {
         }
     });
 };
+
+//设置插件值
+const setComponentValue = (label, value) => {
+    ipcRenderer.send('runMainJs', [`setComponentValue`, label, value])
+}

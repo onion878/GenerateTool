@@ -753,13 +753,14 @@ Ext.define('OnionSpace.controller.Mode', {
         const val = execute('controlData', 'getCode', [btn.bId]),
             that = this,
             cId = btn.up('mode').id;
-        let v = null;
+        let v = null, mode = null;
         if (val != undefined && val != null) {
             v = val.value;
+            mode = val.mode;
         }
         Ext.create('Ext.window.Window', {
             title: '使用脚本',
-            height: 160,
+            height: 180,
             width: 400,
             layout: 'fit',
             resizable: true,
@@ -774,8 +775,27 @@ Ext.define('OnionSpace.controller.Mode', {
                 }
             }],
             items: {
-                value: v,
-                xtype: 'minicode'
+                xtype: 'form',
+                layout: {
+                    type: 'vbox',
+                    pack: 'start',
+                    align: 'stretch'
+                },
+                items: [{
+                    xtype: 'container',
+                    height: 50,
+                    layout: 'fit',
+                    items: {
+                        value: v,
+                        xtype: 'minicode'
+                    }
+                }, {
+                    xtype: 'checkboxgroup',
+                    layout: 'center',
+                    items: [
+                        {boxLabel: '独立进程运行', inputValue: 'another', checked: mode == 'another'}
+                    ]
+                }]
             },
             buttonAlign: 'center',
             buttons: [{
@@ -783,12 +803,17 @@ Ext.define('OnionSpace.controller.Mode', {
                 handler: function () {
                     const valStr = this.up('window').down('minicode').codeEditor.getValue();
                     this.up('window').close();
-                    if(valStr.trim().length > 0) {
+                    if (valStr.trim().length > 0) {
                         btn.setIcon('images/start.svg');
                     } else {
                         btn.setIcon('images/javascript.svg');
                     }
-                    that.getCodeData(valStr, btn.bId, cId);
+                    const radioValue = this.up('window').down('checkboxgroup').getValue();
+                    let rV = 'default';
+                    for (const radioValueKey in radioValue) {
+                        rV = radioValue[radioValueKey];
+                    }
+                    that.getCodeData(valStr, btn.bId, cId, rV);
                 }
             }, {
                 text: '取消',
@@ -1166,24 +1191,26 @@ Ext.define('OnionSpace.controller.Mode', {
             execute('controlData', 'removeCode', [bId]);
             return;
         }
-        return nodeRun(valStr);
+        return nodeRun(valStr, bId);
     },
-    getCodeData(valStr, bId, cId) {
+    getCodeData(valStr, bId, cId, mode) {
         const that = this;
         if (utils.isEmpty(valStr)) {
             showToast('[info] 删除脚本设置!');
-            execute('controlData', 'setCode', [bId, '', cId]);
+            execute('controlData', 'setCode', [bId, '', cId, mode]);
             return;
         }
-        execute('controlData', 'setCode', [bId, valStr, cId]);
+        execute('controlData', 'setCode', [bId, valStr, cId, mode]);
         Ext.getCmp('main-content').mask('执行中...');
         const startTime = new Date().getTime();
         let d = '',
             btn = Ext.getCmp(bId),
             type = btn.bType;
         try {
-            closeNodeWin();
-            d = nodeRun(valStr);
+            if (mode != 'another') {
+                closeNodeWin();
+            }
+            d = nodeRun(valStr, bId);
         } catch (e) {
             console.error(e);
             showError(e);

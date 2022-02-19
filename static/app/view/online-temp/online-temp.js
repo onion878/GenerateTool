@@ -48,6 +48,7 @@ Ext.define('OnionSpace.view.online-temp.online-temp', {
                     return v.substring(0, 19);
                 }
             },
+            {text: '是否需要授权', align: 'center', dataIndex: 'AuthCode', flex: 1},
             {
                 text: '操作',
                 align: 'center',
